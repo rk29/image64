@@ -1,9 +1,8 @@
-[X] "ml 1.3"
-[X] "image 1.3"
-[X] "ml.extra"
-[ ] "ml.rs232"
-[ ] "++ 0"
-[ ] "++ 1"
-[ ] "++ 2"
-[ ] "++ 3"
-[ ] "++ 4"
+- convert the assembler to C
+- import missing files:
+  "ml.rs232"
+  "++ 0"
+  "++ 1"
+  "++ 2"
+  "++ 3"
+  "++ 4"
