@@ -52,10 +52,9 @@ boot:		lda #<$a483
 ; load the ml
 ;
 
-loop1:
 		lda file
-		ldx #<file+1
-		ldy #>file+1
+		ldx #<(file+1)
+		ldy #>(file+1)
 		jsr $ffbd
 		lda #1
 		sta $b9
