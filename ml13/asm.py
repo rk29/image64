@@ -446,6 +446,15 @@ def lex_hexnum(f):
 	ungetchr(f, ch)
 	return (TOK_NUMBER, value)
 
+def lex_binnum(f):
+	value = 0
+	ch = getchr(f)
+	while ch in ['0', '1']:
+		value = value * 2 + ord(ch) - ord('0')
+		ch = getchr(f)
+	ungetchr(f, ch)
+	return (TOK_NUMBER, value)
+
 def convert_dec(ch):
 	if ch in digits:
 		return ord(ch) - ord("0")
@@ -499,6 +508,8 @@ def lex0(f):
 			pass
 		elif ch == "$":
 			return lex_hexnum(f)
+		elif ch == "%":
+			return lex_binnum(f)
 		elif ch in digits:
 			return lex_decimal(f, ch)
 		elif ch == '"':
@@ -687,6 +698,7 @@ if __name__ == "__main__":
 	if outfile is not None:
 		outfile.close()
 
+#	dump_symbols()
+
 	sys.exit(rc)
 	
-#	dump_symbols()
