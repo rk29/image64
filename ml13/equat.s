@@ -65,7 +65,8 @@ makerm1 = $b475
 getbytc = $b79b
 ptrget1 = $b0e7
 ;
-usetbl1 = $cd03
+usetbl = $cd00
+usetbl1 = usetbl+3
 buffer = $ce77
 buf2 = $ce27
 ;
@@ -87,7 +88,6 @@ rsbaud = rs232 + $0f
 rschar = rs232 + $12
 ;
 swapper = $ca80
-swapagn = $ca88
 ;
 trapline = 2000
 immdline = 3000
