@@ -9,75 +9,79 @@ org $a000, "ml13.prg"
 
 
 ; jump table for &'s
-jmptbl: word outastr ;&
-word inline ;&,1
-word dskin ;&,2
-word read0 ;&,3
-word getmdm ;&,4
-word getversn ;&,5
-word password ;&,6
-word prgfile ;&,7
-word dskdir ;&,8
-word btmvar ;&,9
-word term ;&,10
-word clrarr ;&,11
-word newuser ;&,12
-word inchr ;&,13
-word dumparr ;&,14
-word convan ;&,15
-word 49152 ;&,16
-word 49155 ;&,17
-word setmode ;&,18
-word disp1 ;&,19
-word disp2 ;&,20
-word disp3 ;&,21
-word tenwait ;&,22
-word xgetin ;&,23
-word xchrout1 ;&,24
-word sound ;&,25
-word getmdm ;&,26
-word arraysav ;&,27
-word arrayres ;&,28
-word usevar ;&,29
-word putvar ;&,30
-word zero ;&,31
-word minusone ;&,32
-word getarr ;&,33
-word putarr ;&,34
-word getln ;&,35
-word putln ;&,36
-word trapon ;&,37
-word trapoff ;&,38
-word prtln ;&,39
-word forcegc ;&,40
-word setbaud ;&,41
-word ecschk ;&,42
-word chatchk ;&,43
-word memory ;&,44
-word prtvar ;&,45
-word prtvar0 ;&,46
-word carchk ;&,47
-word getkbd ;&,48
-word getmod ;&,49
-word outscn ;&,50
-word outmod ;&,51
-word chkflags ;&,52
-word disp4 ;&,53
-word useeditr ;&,54
-word output ;&,55
-word chatmode ;&,56
-word setvars ;&,57
-word setalm ;&,58
-word putintr ;&,59
-word getintr ;&,60
-word poscrsr ;&,61
-word settim ;&,62
+jmptbl:
+		word outastr ;&
+		word inline ;&,1
+		word dskin ;&,2
+		word read0 ;&,3
+		word getmdm ;&,4
+		word getversn ;&,5
+		word password ;&,6
+		word prgfile ;&,7
+		word dskdir ;&,8
+		word btmvar ;&,9
+		word term ;&,10
+		word clrarr ;&,11
+		word newuser ;&,12
+		word inchr ;&,13
+		word dumparr ;&,14
+		word convan ;&,15
+		word 49152 ;&,16
+		word 49155 ;&,17
+		word setmode ;&,18
+		word disp1 ;&,19
+		word disp2 ;&,20
+		word disp3 ;&,21
+		word tenwait ;&,22
+		word xgetin ;&,23
+		word xchrout1 ;&,24
+		word sound ;&,25
+		word getmdm ;&,26
+		word arraysav ;&,27
+		word arrayres ;&,28
+		word usevar ;&,29
+		word putvar ;&,30
+		word zero ;&,31
+		word minusone ;&,32
+		word getarr ;&,33
+		word putarr ;&,34
+		word getln ;&,35
+		word putln ;&,36
+		word trapon ;&,37
+		word trapoff ;&,38
+		word prtln ;&,39
+		word forcegc ;&,40
+		word setbaud ;&,41
+		word ecschk ;&,42
+		word chatchk ;&,43
+		word memory ;&,44
+		word prtvar ;&,45
+		word prtvar0 ;&,46
+		word carchk ;&,47
+		word getkbd ;&,48
+		word getmod ;&,49
+		word outscn ;&,50
+		word outmod ;&,51
+		word chkflags ;&,52
+		word disp4 ;&,53
+		word useeditr ;&,54
+		word output ;&,55
+		word chatmode ;&,56
+		word setvars ;&,57
+		word setalm ;&,58
+		word putintr ;&,59
+		word getintr ;&,60
+		word poscrsr ;&,61
+		word settim ;&,62
+
 ;*
 ;* string output routines *
 ;*
-;
+
 ;* output string
-outstr:		lda #0
+
+outstr:
+		lda #0
 		sta $96
 		lda var
 		sta len1
@@ -89,226 +93,265 @@ outstr:		lda #0
 		beq outstr0
 		lda flag
 		bne outstr5
-outstr0:        lda mjump
-               beq outstr1
-               dec mjump
-               beq outstr1
-               bne outstr5
-outstr1:        jsr zero
-               ldx #17
-               jsr putvar ;rc
-               ldx #15
-               jsr usevar ;lp
-               ldx #0
-               lda var
-               beq outstr2
-               ldx #1
-outstr2:        stx wrapflg
-               lda #0
-               sta lastout
-               jsr outstr7
-               jsr zero
-               lda chat
-               sta var+1
-               ldx #38
-               jsr putvar ;kp%
-               lda chat
-               beq outstr3
-               jsr minusone
-               ldx #17
-               jsr putvar ;rc
-               jsr zero
-               ldx #18
-               jsr putvar ;sh
-               lda chat
-               cmp #"/"
-               bne outstr3
-               lda #$86
-               sta var
-               lda #$3c
-               sta var+1
-               ldx #18
-               jsr putvar ;sh
-outstr3:        lda wrapflg
-               beq outstr6
-               lda lastout
-               cmp #32
-               beq outstr5
-outstr4:        lda #13
-               sta $fe
-               jsr output
-outstr5:        jsr zero
-               ldx #15
-               jsr putvar ;lp
-outstr6:        rts
-;
-lastout: byte 0
-;
-outstr7: lda #0
-sta chat
-jsr carchk
-cmp #1
-bne outstr8
-lda #"/"
-sta chat
-rts
-outstr8: lda len1
-beq outstr11
-outstr9: ldy $96
-lda [$71],y
-sta $fe
-sta lastout
-jsr domci
-lda chat
-beq outstr10
-lda wrapflg
-beq outstr10
-lda readmode
-bne outstr10
-rts
-outstr10:      inc $96
-              lda $96
-              cmp len1
-              bcc outstr9
-outstr11:      rts
-;
+outstr0:
+	        lda mjump
+		beq outstr1
+		dec mjump
+		beq outstr1
+		bne outstr5
+outstr1:
+	        jsr zero
+		ldx #17
+		jsr putvar ;rc
+		ldx #15
+		jsr usevar ;lp
+		ldx #0
+		lda var
+		beq outstr2
+		ldx #1
+outstr2:
+	        stx wrapflg
+		lda #0
+		sta lastout
+		jsr outstr7
+		jsr zero
+		lda chat
+		sta var+1
+		ldx #38
+		jsr putvar ;kp%
+		lda chat
+		beq outstr3
+		jsr minusone
+		ldx #17
+		jsr putvar ;rc
+		jsr zero
+		ldx #18
+		jsr putvar ;sh
+		lda chat
+		cmp #"/"
+		bne outstr3
+		lda #$86
+		sta var
+		lda #$3c
+		sta var+1
+		ldx #18
+		jsr putvar ;sh
+outstr3:
+	        lda wrapflg
+		beq outstr6
+		lda lastout
+		cmp #32
+		beq outstr5
+outstr4:
+	        lda #13
+		sta $fe
+		jsr output
+outstr5:
+	        jsr zero
+		ldx #15
+		jsr putvar ;lp
+outstr6:
+	        rts
+
+lastout:
+		byte 0
+
+outstr7:
+		lda #0
+		sta chat
+		jsr carchk
+		cmp #1
+		bne outstr8
+		lda #"/"
+		sta chat
+		rts
+outstr8:
+		lda len1
+		beq outstr11
+outstr9:
+		ldy $96
+		lda [$71],y
+		sta $fe
+		sta lastout
+		jsr domci
+		lda chat
+		beq outstr10
+		lda wrapflg
+		beq outstr10
+		lda readmode
+		bne outstr10
+		rts
+
+outstr10:
+		inc $96
+		lda $96
+		cmp len1
+		bcc outstr9
+outstr11:
+		rts
+
 ;* convert an$ to date *
-convan: cpx #0
-bne convan3
-ldx #0
-jsr usevar ;an$
-ldy #10
-convan1: lda [var+1],y
-sta datebuf,y
-dey
-bpl convan1
-jsr convert
-lda #20
-jsr makeroom
-ldy #19
-convan2: lda date1+4,y
-sta [var+1],y
-dey
-bpl convan2
-ldx #0
-jmp putvar ;an$
-convan3: jmp convstr
-;
+
+convan:
+		cpx #0
+		bne convan3
+		ldx #0
+		jsr usevar ;an$
+		ldy #10
+convan1:
+		lda [var+1],y
+		sta datebuf,y
+		dey
+		bpl convan1
+		jsr convert
+		lda #20
+		jsr makeroom
+		ldy #19
+convan2:
+		lda date1+4,y
+		sta [var+1],y
+		dey
+		bpl convan2
+		ldx #0
+		jmp putvar ;an$
+convan3:
+		jmp convstr
+
 ;* months and days
-months:               cbm "Jan Feb Mar Apr "
-                     cbm "May Jun Jul Aug "
-                     cbm "Sep Oct Nov Dec "
-days:                 cbm "Sun Mon Tue Wed "
-                     cbm "Thu Fri Sat "
-;
+
+months:
+		cbm "Jan Feb Mar Apr May Jun Jul Aug "
+		cbm "Sep Oct Nov Dec "
+
+days:
+		cbm "Sun Mon Tue Wed Thu Fri Sat "
+
 ; carry clear if control
-ctrlchk: pha
-lda editor
-and #1
-beq ctrlch0
-pla
-ctrlchk1:jsr colorchk
-bcc ctrlch2
-jsr ctrlchk2
-bcc ctrlch2
-pha
-ctrlch0: pla
-cmp #32
-bcc ctrlch1
-cmp #128
-bcc ctrlch2
-cmp #160
-bcs ctrlch2
-cmp #133
-bcc ctrlch1
-cmp #141
-bcs ctrlch1
-ctrlch2: sec
-rts
-ctrlch1: clc
-rts
-;
+
+ctrlchk:
+		pha
+		lda editor
+		and #1
+		beq ctrlch0
+		pla
+ctrlchk1:
+		jsr colorchk
+		bcc ctrlch2
+		jsr ctrlchk2
+		bcc ctrlch2
+		pha
+ctrlch0:
+		pla
+		cmp #32
+		bcc ctrlch1
+		cmp #128
+		bcc ctrlch2
+		cmp #160
+		bcs ctrlch2
+		cmp #133
+		bcc ctrlch1
+		cmp #141
+		bcs ctrlch1
+ctrlch2:
+		sec
+		rts
+ctrlch1:
+		clc
+		rts
+
 ; carry clear if color chr
-colorchk:sty cytmp
-ldy #15
-colrch0: cmp colors,y
-beq colrch1
-dey
-bne colrch0
-ldy cytmp
-sec
-rts
-colrch1:          ldy cytmp
-                 clc
-                 rts
-;
-ctrlchk2:         cmp #$12         ; reverse-on
-                 beq ctrlch2a
-                 cmp #$92         ; reverse-off
-                 beq ctrlch2a
-                 cmp #cursor_down
-                 beq ctrlch2a
-                 cmp #cursor_up
-                 beq ctrlch2a
-                 cmp #cursor_right
-                 beq ctrlch2a
-                 cmp #cursor_left
-                 beq ctrlch2a
-                 sec
-                 rts
-ctrlch2a:         clc
-                 rts
-;
+colorchk:
+		sty cytmp
+		ldy #15
+colrch0:
+		cmp colors,y
+		beq colrch1
+		dey
+		bne colrch0
+		ldy cytmp
+		sec
+		rts
+colrch1:
+		ldy cytmp
+		clc
+		rts
+
+ctrlchk2:
+		cmp #$12         ; reverse-on
+		beq ctrlch2a
+		cmp #$92         ; reverse-off
+		beq ctrlch2a
+		cmp #cursor_down
+		beq ctrlch2a
+		cmp #cursor_up
+		beq ctrlch2a
+		cmp #cursor_right
+		beq ctrlch2a
+		cmp #cursor_left
+		beq ctrlch2a
+		sec
+		rts
+ctrlch2a:
+		clc
+		rts
+
 ;* message command interpreter
-;
+
 ;* mci routines follow *
-domci0: jmp notc1
-domci: cmp #$5c  ; british-pound
-bne domci0
-ldx mci
-bne domci0
-inc $96
-ldy $96
-lda [$71],y
-cmp #$5c      ; british-pound
-beq domci0
-and #63
-sta mcom
-inc $96
-iny
-lda [$71],y
-sta mchr
-and #$0f
-sta mnum
-iny
-lda [$71],y
-sta mchr2
-and #$0f
-sta mnum2
-lda mnum
-asl
-asl
-clc
-adc mnum
-asl
-clc
-adc mnum2
-sta mval
-iny
-lda [$71],y
-sta mchr3
+domci0:
+		jmp notc1
+domci:
+		cmp #$5c  ; british-pound
+		bne domci0
+		ldx mci
+		bne domci0
+		inc $96
+		ldy $96
+		lda [$71],y
+		cmp #$5c      ; british-pound
+		beq domci0
+		and #63
+		sta mcom
+		inc $96
+		iny
+		lda [$71],y
+		sta mchr
+		and #$0f
+		sta mnum
+		iny
+		lda [$71],y
+		sta mchr2
+		and #$0f
+		sta mnum2
+		lda mnum
+		asl
+		asl
+		clc
+		adc mnum
+		asl
+		clc
+		adc mnum2
+		sta mval
+		iny
+		lda [$71],y
+		sta mchr3
+
 ;* actual mci routines *
-lda mcom
-cmp #40
-bcs combad
-asl
-tax
-lda comtbl,x
-sta comjmp+1
-lda comtbl+1,x
-sta comjmp+2
-comjmp: jmp $ffff
-combad: jmp notc
+
+		lda mcom
+		cmp #40
+		bcs combad
+		asl
+		tax
+		lda comtbl,x
+		sta comjmp+1
+		lda comtbl+1,x
+		sta comjmp+2
+comjmp:
+		jmp $ffff
+combad:
+		jmp notc
+
 mcom: byte 0
 mnum: byte 3
 mchr: byte 0
@@ -323,11 +366,13 @@ comtbl:		word notc, coma, comb, comc, comd, come, comf, comg
 		word comx, notc, notc, notc, notc, notc, notc, ctab
 		word notc, notc, notc, clen, cstr, cnum, notc, notc
 ;
-mcivars:	cbm "d1","ld","na","rn","ph","bn","b"
+mcivars:
+		cbm "d1","ld","na","rn","ph","bn","b"
 		byte $80
 		cbm "an","d2","d3","ak","lt","d4","ag","cc","dd"
 ;
-mcivar:		txa
+mcivar:
+		txa
 		asl
 		tay
 		lda mcivars+1,y
@@ -336,7 +381,8 @@ mcivar:		txa
 		lda mcivars,y
 		jmp usevar0
 
-colors:		byte $9f ; cyan (default color)
+colors:
+		byte $9f ; cyan (default color)
 		byte $05 ; white
 		byte $1c ; red
 		byte $9f ; cyan
@@ -354,79 +400,97 @@ colors:		byte $9f ; cyan (default color)
 		byte $9b ; gray3
 ;
 ;* a - compare to variable
-coma: ldx mnum
-jsr mcivar
-lda var+1
-sta coma2+1
-lda var+2
-sta coma2+2
-ldx #0
-coma1: inc $96
+coma:
+		ldx mnum
+		jsr mcivar
+		lda var+1
+		sta coma2+1
+		lda var+2
+		sta coma2+2
+		ldx #0
+coma1:
+inc $96
 ldy $96
 lda [$71],y
 cmp #$5c
 beq coma3
-coma2: cmp $ffff,x
+coma2:
+cmp $ffff,x
 bne coma4
 inx
 jmp coma1
-coma3: lda #1
+coma3:
+lda #1
 sta mresult
 rts
-coma4: lda #0
+coma4:
+lda #0
 sta mresult
-coma5: inc $96
+coma5:
+inc $96
 ldy $96
 cpy #80
 beq coma6
 lda [$71],y
 cmp #$5c ; british pound
 bne coma5
-coma6: rts
+coma6:
+rts
 ;
 ;* b - send bells
-comb: lda #7
+comb:
+lda #7
 jmp repchr0
 ;
 ;* c - set color
-comc: lda mnum
+comc:
+lda mnum
 bne comc1
 lda comqc
-comc1: sta mcolor
+comc1:
+sta mcolor
 tay
 lda colors,y
 sta $fe
 jmp output
 ;
 ;* d - branch on not equal
-comd: lda mresult
+comd:
+lda mresult
 bne comd1
 jmp comj
-comd1: rts
+comd1:
+rts
 ;
 ;* e - branch on equal
-come: lda mresult
+come:
+lda mresult
 beq come1
 jmp comj
-come1: rts
+come1:
+rts
 ;
 ;* f - send form feed
-comf: lda #$93
+comf:
+lda #$93
 sta $fe
 jmp output
 ;
 ;* g - get character
-comg: lda mnum
+comg:
+lda mnum
 and #1
 sta case
 jmp inchr
 ;
 ;* h - send backspaces
-comh: lda #20
+comh:
+lda #20
 jmp repchr0
 ;
 ;* i - input to buffer
-comi: lda mnum
+comi:
+lda mnum
 and #1
 sta case
 lda #0
@@ -458,7 +522,8 @@ sta $96
 rts
 ;
 ;* j - skip lines
-comj: lda mnum
+comj:
+lda mnum
 comj1: cmp #0
 beq comj2
 sta mjump
@@ -992,23 +1057,27 @@ outptr4: rts
 ;
 ;* output routine to fix 1200 and
 ;* do the transmit window
-outm: sta $9e
-txa
-pha
-tya
-pha
-jmp out1
-out: sta $9e
-txa
-pha
-tya
-pha
-lda $9a
-cmp #2
-beq out1
-ldx #1
-jsr setmode
-lda $9e
+
+outm:
+		sta $9e
+		txa
+		pha
+		tya
+		pha
+		jmp out1
+
+out:
+		sta $9e
+		txa
+		pha
+		tya
+		pha
+		lda $9a
+		cmp #2
+		beq out1
+		ldx #1
+		jsr setmode
+		lda $9e
 jsr $e716
 jmp out6
 out1: lda scnmode
@@ -1334,190 +1403,207 @@ disabl = $4306
 modtype:byte 0
 modst: word prgstart
 ;
-modtbl: word prgstart ;0
-word lmpstart ;1
-word protostart ;2
-word mmpstart ;3
-word bmpstart ;4
-word imstart ;5
-word imstart ;6
-word pmodetbl ;7
-;
+modtbl:
+		word prgstart ;0
+		word lmpstart ;1
+		word protostart ;2
+		word mmpstart ;3
+		word bmpstart ;4
+		word imstart ;5
+		word imstart ;6
+		word pmodetbl ;7
+
 ;* program load routines
-;
-serial3a:byte >serial,<serial
-serial3b:word 65536-serial
-;
+
+;serial3a:	byte >serial,<serial
+;serial3b:	word 65536-serial
+
 ;* load various types of modules
-;
-prgfile: cpx #0
-bne prg0
-ldx #8
-prg0: stx filenum
-sty modtype
-cpy #8
-bcc prg1
-rts
-prg1: lda serial3a
-and #$0f
-sta bsnval+1
-lda serial3a+1
-sta bsnval
-lda $2b
-sta modtbl
-lda $2c
-sta modtbl+1
-tya
-asl
-tay
-lda modtbl,y
-tax
-lda modtbl+1,y
-tay
-stx modst
-sty modst+1
-ldx #1
-jsr usevar ;a$
-lda #0
-jsr setmsg
-lda #1
-ldy #0
-ldx filenum
-jsr setlfs
-ldx var+1
-ldy var+2
-lda var
-jsr setnam
-jsr disabl
-lda #0
-ldx modst
-ldy modst+1
-jsr loadf
-php
-jsr inable
-plp
-bcc prg2
-rts
-prg2: ldy modtype
-beq prg3
-cpy #1
-beq module
-cpy #3
-beq module
-cpy #4
-beq module
-cpy #5
-beq immod
-cpy #6
-beq immod
-rts
+
+prgfile:	cpx #0
+		bne prg0
+		ldx #8
+prg0:		stx filenum
+		sty modtype
+		cpy #8
+		bcc prg1
+		rts
+
+prg1:
+;		lda serial3a
+;		and #$0f
+;		sta bsnval+1
+;		lda serial3a+1
+;		sta bsnval
+		lda $2b
+		sta modtbl
+		lda $2c
+		sta modtbl+1
+		tya
+		asl
+		tay
+		lda modtbl,y
+		tax
+		lda modtbl+1,y
+		tay
+		stx modst
+		sty modst+1
+		ldx #1
+		jsr usevar ;a$
+		lda #0
+		jsr setmsg
+		lda #1
+		ldy #0
+		ldx filenum
+		jsr setlfs
+		ldx var+1
+		ldy var+2
+		lda var
+		jsr setnam
+		jsr disabl
+		lda #0
+		ldx modst
+		ldy modst+1
+		jsr loadf
+		php
+		jsr inable
+		plp
+		bcc prg2
+		rts
+prg2:		ldy modtype
+		beq prg3
+		cpy #1
+		beq module
+		cpy #3
+		beq module
+		cpy #4
+		beq module
+		cpy #5
+		beq immod
+		cpy #6
+		beq immod
+		rts
 ;
 ;link program to module
-module: jsr relink
-jsr follow
-lda modst
-sta [$ac],y
-iny
-lda modst+1
-sta [$ac],y
-;
+module:		jsr relink
+		jsr follow
+		lda modst
+		sta [$ac],y
+		iny
+		lda modst+1
+		sta [$ac],y
+
 ;link module to im
-prg3: lda $2b
-pha
-lda $2c
-pha
-ldx modst
-ldy modst+1
-stx $2b
-sty $2c
-jsr relink
-jsr follow
-lda #<imstart
-sta [$ac],y
-iny
-lda #>imstart
-sta [$ac],y
-prg4: pla
-sta $2c
-pla
-sta $2b
-rts
-;
+
+prg3:
+		lda $2b
+		pha
+		lda $2c
+		pha
+		ldx modst
+		ldy modst+1
+		stx $2b
+		sty $2c
+		jsr relink
+		jsr follow
+		lda #<imstart
+		sta [$ac],y
+		iny
+		lda #>imstart
+		sta [$ac],y
+prg4:
+		pla
+		sta $2c
+		pla
+		sta $2b
+		rts
+
 ;relink im program/modules
-immod: lda $2b
-pha
-lda $2c
-pha
-ldx #<imstart
-ldy #>imstart
-stx $2b
-sty $2c
-jsr relink
-jsr follow
-ldx $ac
-ldy $ad
-stx modtbl+12
-sty modtbl+13
-jmp prg4
-;
+immod:
+		lda $2b
+		pha
+		lda $2c
+		pha
+		ldx #<imstart
+		ldy #>imstart
+		stx $2b
+		sty $2c
+		jsr relink
+		jsr follow
+		ldx $ac
+		ldy $ad
+		stx modtbl+12
+		sty modtbl+13
+		jmp prg4
+
 ;follow to end or to immdline
 ;whatever comes first
-follow: ldx $2b
-ldy $2c
-stx $ac
-sty $ad
-follow1: ldy #0
-lda [$ac],y
-sta $71
-iny
-lda [$ac],y
-sta $72
-tax
-lda [$71],y
-beq follow2
-lda $71
-sta $ac
-stx $ad
-iny
-lda [$ac],y
-iny
-cmp #<immdline
-lda [$ac],y
-sbc #>immdline
-bcc follow1
-ldy #0
-follow2: tay
-rts
+
+follow:
+		ldx $2b
+		ldy $2c
+		stx $ac
+		sty $ad
+follow1:
+		ldy #0
+		lda [$ac],y
+		sta $71
+		iny
+		lda [$ac],y
+		sta $72
+		tax
+		lda [$71],y
+		beq follow2
+		lda $71
+		sta $ac
+		stx $ad
+		iny
+		lda [$ac],y
+		iny
+		cmp #<immdline
+		lda [$ac],y
+		sbc #>immdline
+		bcc follow1
+		ldy #0
+follow2:
+		tay
+		rts
 
 ;* read disk directory
-dskdir: sty dflag
-cpx #0
-beq dskdir0
-        stx filenum
-dskdir0: cpy #0
-bne dskdir1
-ldx filenum
-jsr chkin
-jsr chrin
-jsr chrin
-dskdir1: jsr dir
-lda $90
-bne dskdir2
-lda dflag
-bne dskdir2
-        jsr minusone
-ldx #15
-jsr putvar ;lp
-        jsr outastr
-ldx #17
-jsr usevar ;rc
-lda var
-beq dskdir1
-dskdir2: rts
+
+dskdir:
+		sty dflag
+		cpx #0
+		beq dskdir0
+		stx filenum
+dskdir0:
+		cpy #0
+		bne dskdir1
+		ldx filenum
+		jsr chkin
+		jsr chrin
+		jsr chrin
+dskdir1:
+		jsr dir
+		lda $90
+		bne dskdir2
+		lda dflag
+		bne dskdir2
+		jsr minusone
+		ldx #15
+		jsr putvar ;lp
+		jsr outastr
+		ldx #17
+		jsr usevar ;rc
+		lda var
+		beq dskdir1
+dskdir2:
+		rts
 
 ;* read single line of directory
 
-dir:		ldx filenum
+dir:
+		ldx filenum
 		jsr chkin
 		jsr chrin
 		jsr chrin
@@ -1603,79 +1689,92 @@ dskin3:		sty var
 		ldx #$01
 		jsr putvar ;a$
 		jmp clrchn
-;
-bytin: jsr chkin
-cpy #80
-bcc bytin0
-ldy #80
-bytin0: sty index
-ldy #0
-bytin1: jsr chrin
-sta buf2,y
-iny
-cpy index
-bne bytin1
-jmp dskin3
-;
-dumparr: sty dumparr4+1
-jsr chkout
-ldx #0
-dumparr1:inx
-txa
-pha
-jsr getarr
-ldy #0
-dumparr2:cpy var
-beq dumparr3
-lda [var+1],y
-jsr chrout
-iny
-bne dumparr2
-dumparr3:lda #13
-jsr chrout
-pla
-tax
-dumparr4:cpx #0
-bcc dumparr1
-jmp clrchn
-;
+
+bytin:
+		jsr chkin
+		cpy #80
+		bcc bytin0
+		ldy #80
+bytin0:
+		sty index
+		ldy #0
+bytin1:
+		jsr chrin
+		sta buf2,y
+		iny
+		cpy index
+		bne bytin1
+		jmp dskin3
+
+dumparr:
+		sty dumparr4+1
+		jsr chkout
+		ldx #0
+dumparr1:
+		inx
+		txa
+		pha
+		jsr getarr
+		ldy #0
+dumparr2:
+		cpy var
+		beq dumparr3
+		lda [var+1],y
+		jsr chrout
+		iny
+		bne dumparr2
+dumparr3:
+		lda #13
+		jsr chrout
+		pla
+		tax
+dumparr4:
+		cpx #0
+		bcc dumparr1
+		jmp clrchn
+
 ;*irq routine
 
 ;* counter to execute a different
 ;* part of the routine each jiffy
-;
-irq: jsr irq9
-jsr irq10
-inc idlejif
-lda mupcase
-lsr
-ror
-eor #$ff
-cmp caseflag
-beq irq0
-sta caseflag
-jsr dispdate
-irq0: ldy #0
-lda irqtbl,y
-sta irqjmp+1
-iny
-lda irqtbl,y
-sta irqjmp+2
-iny
-cpy #18
-bcc irq0a
-ldy #0
-irq0a: sty irq0+1
-irqjmp: jmp $ffff
-irqtbl: word irq1 ;page
-word irq2 ;time
-word irq3 ;blanker
-word irq4 ;lightbar
-word irq5 ;carrier
-word irq6 ;flag
-word irq7 ;lightbar
-word irq4 ;lightbar
-word irq11 ;alarm
+
+irq:
+		jsr irq9
+		jsr irq10
+		inc idlejif
+		lda mupcase
+		lsr
+		ror
+		eor #$ff
+		cmp caseflag
+		beq irq0
+		sta caseflag
+		jsr dispdate
+irq0:
+		ldy #0
+		lda irqtbl,y
+		sta irqjmp+1
+		iny
+		lda irqtbl,y
+		sta irqjmp+2
+		iny
+		cpy #18
+		bcc irq0a
+		ldy #0
+irq0a:
+		sty irq0+1
+irqjmp:
+		jmp $ffff
+irqtbl:
+		word irq1 ;page
+		word irq2 ;time
+		word irq3 ;blanker
+		word irq4 ;lightbar
+		word irq5 ;carrier
+		word irq6 ;flag
+		word irq7 ;lightbar
+		word irq4 ;lightbar
+		word irq11 ;alarm
 
 ;* chat page
 
@@ -2119,48 +2218,53 @@ iny
 cpy #80
 bne loop
 rts
-;
-bits: byte 1,2,4,8,16,32,64,128
-;
-serial4b:word serial
+
+bits:
+		byte 1,2,4,8,16,32,64,128
+
+; serial4b:	word serial
+
 ;* put check on screen for carrier
-irq5: ldx #$fa
-lda carrier
-eor mxor
-and #$10
-beq irq5a
-lda #1
-sta carrst
-ldx #$a0
-bne irq5d
-irq5a: lda carrst
-ora #128
-sta carrst
-irq5d: lda topline
-beq irq5c
-stx $427
-lda #$a0
-pha
-ldx #16
-ldy #5
-jsr chkflags
-bne irq5b
-pla
-lda #$fa
-pha
-irq5b: pla
-sta $400
-irq5c: lda serial4a
-cmp serial4b
-bne irq5e
-lda serial4a+1
-cmp serial4b+1
-bne irq5e
-rts
-irq5e: ldx #1
-jmp setmode
-serial4a:word serial
-;
+
+irq5:		ldx #$fa
+		lda carrier
+		eor mxor
+		and #$10
+		beq irq5a
+		lda #1
+		sta carrst
+		ldx #$a0
+		bne irq5d
+irq5a:		lda carrst
+		ora #128
+		sta carrst
+irq5d:		lda topline
+		beq irq5c
+		stx $427
+		lda #$a0
+		pha
+		ldx #16
+		ldy #5
+		jsr chkflags
+		bne irq5b
+		pla
+		lda #$fa
+		pha
+irq5b:		pla
+		sta $400
+irq5c:
+;		lda serial4a
+;		cmp serial4b
+;		bne irq5e
+;		lda serial4a+1
+;		cmp serial4b+1
+;		bne irq5e
+		rts
+;irq5e:		ldx #1
+;		jmp setmode
+
+;serial4a:	word serial
+
 irq6: lda carrst
 and #127
 irq6a: cmp #1
@@ -2275,65 +2379,77 @@ jsr irq7f
 iny
 pla
 jmp irq7d
-;
-chkflag: ldy #5
-chkflags:lda $ff
-pha
-stx $ff
-txa
-and #7
-tax
-lda bits,x
-pha
-lda $ff
-lsr
-lsr
-lsr
-tax
-pla
-iny
-dey
-beq chkflag0
-dey
-beq chkflag1
-dey
-beq chkflag2
-dey
-beq chkflag3
-dey
-beq chkflag4
-dey
-beq chkflag5
-chkflag6: sta chktbl,x
-chkflag7: inc irq7+1
-chkflag8: tax
-pla
-sta $ff
-txa
-rts
-;
-chkflag0:eor #$ff
-and chktbl,x
-jmp chkflag6
-chkflag1:ora chktbl,x
-jmp chkflag6
-chkflag2:eor chktbl,x
-jmp chkflag6
-chkflag3:ldy #0
-sty var
-and chktbl,x
-beq chkflg3a
-iny
-chkflg3a:sty var+1
-ldx #30
-jsr putvar ;a%
-jmp chkflag8
-chkflag4:lda $ff
-sta bar
-jmp chkflag7
-chkflag5:and chktbl,x
-jmp chkflag8
-;
+
+chkflag:
+		ldy #5
+chkflags:
+		lda $ff
+		pha
+		stx $ff
+		txa
+		and #7
+		tax
+		lda bits,x
+		pha
+		lda $ff
+		lsr
+		lsr
+		lsr
+		tax
+		pla
+		iny
+		dey
+		beq chkflag0
+		dey
+		beq chkflag1
+		dey
+		beq chkflag2
+		dey
+		beq chkflag3
+		dey
+		beq chkflag4
+		dey
+		beq chkflag5
+chkflag6:
+		sta chktbl,x
+chkflag7:
+		inc irq7+1
+chkflag8:
+		tax
+		pla
+		sta $ff
+		txa
+		rts
+
+chkflag0:
+		eor #$ff
+		and chktbl,x
+		jmp chkflag6
+chkflag1:
+		ora chktbl,x
+		jmp chkflag6
+chkflag2:
+		eor chktbl,x
+		jmp chkflag6
+chkflag3:
+		ldy #0
+		sty var
+		and chktbl,x
+		beq chkflg3a
+		iny
+chkflg3a:
+		sty var+1
+		ldx #30
+		jsr putvar ;a%
+		jmp chkflag8
+chkflag4:
+		lda $ff
+		sta bar
+		jmp chkflag7
+chkflag5:
+		and chktbl,x
+		jmp chkflag8
+
 tmp14:		byte 0
 tmp15:		byte 0
 tmpbar:		byte 0
@@ -3447,73 +3563,76 @@ tay
 clc
 jmp $fff0
 ;
-getmod: jsr getmdm
-sta $fe
-pha
-ldx #16
-ldy #5
-jsr chkflags
-tax
-pla
-cpx #0
-beq getmod1
-tax
-lda tblatc,x
-sta $fe
-getmod1: cmp #0
-beq getmod3
-ldx getmodn
-cmp getmodt,x
-bne getmod2
-inx
-stx getmodn
-cpx #5
-bcc getmod3
-pha
-lda serial4a+1
-lsr
-lsr
-lsr
-lsr
-ora #$c0
-jsr outm
-lda serial4a+1
-jsr outh
-lda serial4a
-lsr
-lsr
-lsr
-lsr
-jsr outh
-lda serial4a
-jsr outh
-pla
-getmod2: ldx #0
-stx getmodn
-getmod3: cmp #0
-rts
-getmodn: byte 0
-getmodt: byte 9,13,1,7,5 ;image
-outh: and #$0f
-ora #$30
-cmp #$3a
-bcc outh1
-adc #6
-outh1: jmp outm
-;
-outmod:               lda $fe
-                    ldx modclm
-                    ldy modclmn
-                    jsr outadj
-                    stx modclm
-                    ldx #16
-                    ldy #5
-                    jsr chkflags
-                    tax
-                    lda $fe
-                    cpx #0
-                    bne outmod0
-                    jmp outm
+getmod:		jsr getmdm
+		sta $fe
+		pha
+		ldx #16
+		ldy #5
+		jsr chkflags
+		tax
+		pla
+		cpx #0
+		beq getmod1
+		tax
+		lda tblatc,x
+		sta $fe
+getmod1:
+;		cmp #0
+;		beq getmod3
+;		ldx getmodn
+;		cmp getmodt,x
+;		bne getmod2
+;		inx
+;		stx getmodn
+;		cpx #5
+;		bcc getmod3
+;		pha
+;		lda serial4a+1
+;		lsr
+;		lsr
+;		lsr
+;		lsr
+;		ora #$c0
+;		jsr outm
+;		lda serial4a+1
+;		jsr outh
+;		lda serial4a
+;		lsr
+;		lsr
+;		lsr
+;		lsr
+;		jsr outh
+;		lda serial4a
+;		jsr outh
+;		pla
+;getmod2:	ldx #0
+;		stx getmodn
+getmod3:	cmp #0
+		rts
+
+;getmodn:	byte 0
+;getmodt:	byte 9,13,1,7,5 ;image
+
+outh:		and #$0f
+		ora #$30
+		cmp #$3a
+		bcc outh1
+		adc #6
+outh1:		jmp outm
+
+outmod:		lda $fe
+		ldx modclm
+		ldy modclmn
+		jsr outadj
+		stx modclm
+		ldx #16
+		ldy #5
+		jsr chkflags
+		tax
+		lda $fe
+		cpx #0
+		bne outmod0
+		jmp outm
 outmod0:              ldx #19
                     ldy #5
                     jsr chkflags
@@ -3705,226 +3824,238 @@ tblctoa3:       byte 196,042,179,196,196,196,196,179
 		byte 191,254,196,042,179,218,042,254
 		byte 042,179,042,197,221,179,227,092
 ;
-docall: cmp callpage
-beq calljmp
-sta calltemp
-lda callpage
-beq docall1
-pha
-jsr callswap
-lda calltemp
-sta callpage
-jsr callswap
-jsr calljmp
-jsr callswap
-sta calltemp
-pla
-sta callpage
-jsr callswap
-lda calltemp
-rts
-docall1: lda calltemp
-sta callpage
-jsr callswap
-jsr calljmp
-jsr callswap
-pha
-lda #0
-sta callpage
-pla
-rts
-;
-callswap:pha
-txa
-pha
-tya
-pha
-lda callpage
-ldy #>$c000
-ldx #4
-jsr swapper
-pla
-tay
-pla
-tax
-pla
-rts
-;
+docall:
+		cmp callpage
+		beq calljmp
+		sta calltemp
+		lda callpage
+		beq docall1
+		pha
+		jsr callswap
+		lda calltemp
+		sta callpage
+		jsr callswap
+		jsr calljmp
+		jsr callswap
+		sta calltemp
+		pla
+		sta callpage
+		jsr callswap
+		lda calltemp
+		rts
+docall1:
+		lda calltemp
+		sta callpage
+		jsr callswap
+		jsr calljmp
+		jsr callswap
+		pha
+		lda #0
+		sta callpage
+		pla
+		rts
+
+callswap:
+		pha
+		txa
+		pha
+		tya
+		pha
+		lda callpage
+		ldy #>$c000
+		ldx #4
+		jsr swapper
+		pla
+		tay
+		pla
+		tax
+		pla
+		rts
+
 calljmp: jmp $c000
-;
-callpage:byte $00
-calltemp:byte $00
-serial2a:word serial +$00ff
-;
-callf000:sta calljmp+1
-lda #>$f000
-jmp docall
-callf400:sta calljmp+1
-lda #>$f400
-jmp docall
-callf800:sta calljmp+1
-lda #>$f800
-jmp docall
-callfc00:sta calljmp+1
-lda #>$fc00
-jmp docall
-;
-inline: lda #$00
-byte $2c
-inline0: lda #$03
-byte $2c
-password:lda #$06
-jmp callf000
-useeditr:lda #$09
-jsr callf000
-pha
-lda serial2a
-cmp serial2b
-bne useedit1
-lda serial2a+1
-cmp serial2b+1
-bne useedit1
-pla
-rts
-useedit1:pla
-ldx #1
-txa
-rts
-;
-term: lda #$00
-byte $2c
-chatmode:lda #$03
-byte $2c
-clrarr: lda #$06
-byte $2c
-setvars: lda #$09
-byte $2c
-btmvar: lda #$0c
-jmp callf400
-;
-read0: lda #$00
-byte $2c
-newuser: lda #$03
-byte $2c
-arraysav:lda #$06
-byte $2c
-arrayres:lda #$09
-jmp callf800
-copyrite:lda #$0c
-jsr callf800
-jmp outastr
-sound: lda #$0f
-jsr callf800
-ldx #2
-lda serial2a-1,x
-lsr
-lsr
-lsr
-lsr
-ora #$c0
-sta bsnpre-1,x
-lda serial2a-2,x
-sec
-sbc #$ff
-sta bsnval-2,x
-lda serial2a-1,x
-sbc #0
-and #$0f
-sta bsnval-1,x
-rts
-serial2b:word serial +$00ff
-;
-convert: lda #$00
-byte $2c
-convstr: lda #$03
-jmp callfc00
-;
+
+callpage:	byte $00
+calltemp:	byte $00
+
+;serial2a:	word serial +$00ff
+
+callf000:	sta calljmp+1
+		lda #>$f000
+		jmp docall
+callf400:	sta calljmp+1
+		lda #>$f400
+		jmp docall
+callf800:	sta calljmp+1
+		lda #>$f800
+		jmp docall
+callfc00:	sta calljmp+1
+		lda #>$fc00
+		jmp docall
+
+inline:		lda #$00
+		byte $2c
+inline0:	lda #$03
+		byte $2c
+password:	lda #$06
+		jmp callf000
+useeditr:	lda #$09
+		jmp callf000
+;		pha
+;		lda serial2a
+;		cmp serial2b
+;		bne useedit1
+;		lda serial2a+1
+;		cmp serial2b+1
+;		bne useedit1
+;		pla
+;		rts
+;useedit1:	pla
+;		ldx #1
+;		txa
+;		rts
+
+term:		lda #$00
+		byte $2c
+chatmode:	lda #$03
+		byte $2c
+clrarr:		lda #$06
+		byte $2c
+setvars:	lda #$09
+		byte $2c
+btmvar:		lda #$0c
+		jmp callf400
+
+read0:		lda #$00
+		byte $2c
+newuser:	lda #$03
+		byte $2c
+arraysav:	lda #$06
+		byte $2c
+arrayres:	lda #$09
+		jmp callf800
+copyrite:	lda #$0c
+		jsr callf800
+		jmp outastr
+sound:		lda #$0f
+		jmp callf800
+
+;		ldx #2
+;		lda serial2a-1,x
+;		lsr
+;		lsr
+;		lsr
+;		lsr
+;		ora #$c0
+;		sta bsnpre-1,x
+;		lda serial2a-2,x
+;		sec
+;		sbc #$ff
+;		sta bsnval-2,x
+;		lda serial2a-1,x
+;		sbc #0
+;		and #$0f
+;		sta bsnval-1,x
+;		rts
+
+;serial2b:	word serial +$00ff
+
+convert:	lda #$00
+		byte $2c
+convstr:	lda #$03
+		jmp callfc00
+
 ; put intro program in
-;
+
 dup 0,$c000-*
-;
+
 ; intro is a proto
-jmp loadpic
-jmp setup
-byte $ff ;intro
-serial1a: word serial
-serial1b: word serial+$0123
-;
-;
+		jmp loadpic
+		jmp setup
+		byte $ff ;intro
+
+;serial1a:	word serial
+;serial1b:	word serial+$0123
+
 ;* intro program
-;
+
 ;* load files
 ;* then display
-loadpic: ldx $ba
-stx devnum
-lda picflag
-beq loadpic1
-lda #1
-ldx devnum
-ldy #1
-jsr $ffba
-lda file1
-ldx #(<file1+1)
-ldy #>(file1+1)
-jsr $ffbd
-ldx #1
-lda #$02
-sta hmm,x
-dex
-txa
-jsr $ffd5
-lda $90
-bpl loadpic1
-lda #0
-sta picflag
-loadpic1:jsr dopic
-checkchk:jsr checksn
-lda checkbad
-cmp #2
-bne notbad
-hmm: lda #2
-sta checkbad
-jsr checksn
+
+loadpic:
+;		ldx $ba
+;		stx devnum
+;		lda picflag
+;		beq loadpic1
+;		lda #1
+;		ldx devnum
+;		ldy #1
+;		jsr $ffba
+;		lda file1
+;		ldx #(<file1+1)
+;		ldy #>(file1+1)
+;		jsr $ffbd
+;		ldx #1
+;		lda #$02
+;		sta hmm,x
+;		dex
+;		txa
+;		jsr $ffd5
+;		lda $90
+;		bpl loadpic1
+;		lda #0
+;		sta picflag
+loadpic1:	jsr dopic
+;checkchk:
+;		jsr checksn
+;		lda checkbad
+;		cmp #2
+;		bne notbad
+;hmm:
+;		lda #2
+;		sta checkbad
+;		jsr checksn
+
+; load "im" file
+
+;notbad:
+		lda #<imstart
+		sta $2b
+		lda #>imstart
+		sta $2c
+		lda #1
+		ldx devnum
+		ldy #0
+		jsr $ffba
+		lda file2
+		ldx #<(file2+1)
+		ldy #>(file2+1)
+		jsr $ffbd
+		lda #0
+		ldx $2b
+		ldy $2c
+		jsr $ffd5
+		stx $2d
+		sty $2e
+		jsr $a533
+		jsr padimprg
+		ldx $2d
+		ldy $2e
+		stx $2f
+		sty $30
+		stx $31
+		sty $32
+		lda #<prgstart
+		sta $2b
+		lda #>prgstart
+		sta $2c
+		jsr psetup
+		jsr nopic
 ;
-;load "im" file
-notbad: lda #<imstart
-sta $2b
-lda #>imstart
-sta $2c
-lda #1
-ldx devnum
-ldy #0
-jsr $ffba
-lda file2
-ldx #<(file2+1)
-ldy #>(file2+1)
-jsr $ffbd
-lda #0
-ldx $2b
-ldy $2c
-jsr $ffd5
-stx $2d
-sty $2e
-jsr $a533
-jsr padimprg
-ldx $2d
-ldy $2e
-stx $2f
-sty $30
-stx $31
-sty $32
-lda #<prgstart
-sta $2b
-lda #>prgstart
-sta $2c
-jsr psetup
-jsr nopic
-;
-lda #$60
-ldy #0
-loop: sta rs232,y
-dey
-bne loop
+		lda #$60
+		ldy #0
+loop:		sta rs232,y
+		dey
+		bne loop
 
 ;
 ; load ml.extra
@@ -3964,22 +4095,23 @@ run1:		cbm " run"
 ;* uncrunch picture
 dopic:		lda picflag
 		beq dopic1
-		jmp $5f03
+;		jmp $5f03
 
 dopic1:		rts
 
 ;
 ;* remove picture
 ;
-nopic:		lda checkchk
-		cmp #$20
-		bne nopic
-		lda checkchk+1
-		cmp #<checksn
-		bne nopic
-		lda checkchk+2
-		cmp #>checksn
-		bne nopic
+nopic:
+;		lda checkchk
+;		cmp #$20
+;		bne nopic
+;		lda checkchk+1
+;		cmp #<checksn
+;		bne nopic
+;		lda checkchk+2
+;		cmp #>checksn
+;		bne nopic
 		lda picflag
 		beq nopic1
 		lda #$17
@@ -4019,11 +4151,11 @@ file2:		byte 2
 		cbm "im"
 file3:		byte 5
 		cbm "setup"
-file4:		byte 8
-		cbm "ml.extra"
+file4:		byte 12
+		cbm "ml.extra 1.3"
 
 devnum:		byte 8
-picflag:	byte 1
+picflag:	byte 0
 ;
 ;********************************
 ;* setup routines *
@@ -4031,31 +4163,31 @@ picflag:	byte 1
 ;********************************
 
 ;* main setup routine
-setup: lda #0
-tay
-loop: sta basintr,y
-iny
-cpy #sizintr
-bne loop
-ldy #0
-loop: lda date2,y
-sta date1,y
-iny
-cpy #28
-bne loop
-lda #80
-sta ptrclmn
-lda #40
-sta modclmn
-lda #1
-sta local
-ldy #0
-lda #32
-loop: sta $4000,y
-sta $4100,y
-sta $4200,y
-dey
-bne loop
+setup:		lda #0
+		tay
+loop:		sta basintr,y
+		iny
+		cpy #sizintr
+		bne loop
+		ldy #0
+loop:		lda date2,y
+		sta date1,y
+		iny
+		cpy #28
+		bne loop
+		lda #80
+		sta ptrclmn
+		lda #40
+		sta modclmn
+		lda #1
+		sta local
+		ldy #0
+		lda #32
+loop:		sta $4000,y
+		sta $4100,y
+		sta $4200,y
+		dey
+		bne loop
 		lda #$60
 		ldy #0
 loop:		sta rs232,y
@@ -4076,55 +4208,56 @@ loop:		lda #>(pmodetbl+32)
 		sta pmodetbl+33
 		lda #$d8 ; "X"
 		sta mask
-lda #2
-sta bar
-lda #0
-sta scnmode
-jsr iosetup
-jsr setirq
-jsr setmem
-jsr setptrs
-lda #$36
-sta $01
-jsr setscrn
-jsr comq
-jsr rsinb
-lda #$37
-sta $01
-lda serial1a+1
-lsr
-lsr
-lsr
-lsr
-ora #$c0
-sta bsnpre
-lda serial1a+1
-and #$0f
-sta bsnval+1
-lda serial1a
-sta bsnval
-rts
-;
+		lda #2
+		sta bar
+		lda #0
+		sta scnmode
+		jsr iosetup
+		jsr setirq
+		jsr setmem
+		jsr setptrs
+		lda #$36
+		sta $01
+		jsr setscrn
+		jsr comq
+		jsr rsinb
+		lda #$37
+		sta $01
+;		lda serial1a+1
+;		lsr
+;		lsr
+;		lsr
+;		lsr
+;		ora #$c0
+;		sta bsnpre
+;		lda serial1a+1
+;		and #$0f
+;		sta bsnval+1
+;		lda serial1a
+;		sta bsnval
+		rts
+
 ;* setup i/o windows
 ;* also 1200 baud fix
-iosetup:lda $0326
-cmp #<newout
-bne hcb0e
-lda $0327
-cmp #>newout
-beq hcb28
-hcb0e: lda $0326
-sta oldout+1
-lda $0327
-sta oldout+2
-lda #<newout
-sta $0326
-lda #>newout
-sta $0327
-hcb28:rts
+
+iosetup:	lda $0326
+		cmp #<newout
+		bne hcb0e
+		lda $0327
+		cmp #>newout
+		beq hcb28
+hcb0e:		lda $0326
+		sta oldout+1
+		lda $0327
+		sta oldout+2
+		lda #<newout
+		sta $0326	
+		lda #>newout
+		sta $0327
+hcb28:		rts
+
 ;* setup irq vector
-;
-;
+
 setirq: lda #127
 sta 56333
 lda #<raster
@@ -4155,35 +4288,41 @@ jsr chrout
 jsr makdate
 jmp dispdate
 ;
-setmem: lda 776
-ldx 777
-sta oldvec+1
-stx oldvec+2
-lda #<mem
-ldx #>mem
-sta 776
-stx 777
-rts
-;
+setmem:		lda 776
+		ldx 777
+		sta oldvec+1
+		stx oldvec+2
+		lda #<mem
+		ldx #>mem
+		sta 776
+		stx 777
+		rts
+
 ;* check serial number
-checksn: ldx #13
-sec
-lda serial1b-13,x
-sbc serial1a-13,x
-php
-cmp #$23
-bne checkbad
-plp
-lda serial1b-12,x
-sbc serial1a-12,x
-cmp #$01
-bne checkbad
-lda checkbad
-eor #98
-sta checkrts
-checkrts:rts
-checkbad:byte 2
+
+;checksn:
+;		ldx #13
+;		sec
+;		lda serial1b-13,x
+;		sbc serial1a-13,x
+;		php
+;		cmp #$23
+;		bne checkbad
+;		plp
+;		lda serial1b-12,x
+;		sbc serial1a-12,x
+;		cmp #$01
+;		bne checkbad
+;		lda checkbad
+;		eor #98
+;		sta checkrts
+;checkrts:
+;		rts
+;checkbad:
+;		byte 2
+
 ;* find basic variable
+
 getvarp: txa
 asl
 tay
@@ -4514,9 +4653,9 @@ rts
 ;
 ; far call to the error handler
 ;
-farerr: lda #$37
-sta 1
-jmp $a437
+farerr:		lda #$37
+		sta 1
+		jmp $a437
 ;
 ; raster interrupt routine
 ;
@@ -4564,38 +4703,42 @@ pla
 sta 1
 rts
 ;
-getversn:lda #15
-sta var
-lda #<version
-sta var+1
-lda #>version
-sta var+2
-ldx #1
-jsr putvar ;a$
-ldy #4
-loop: lda versnum,y
-sta var,y
-dey
-bpl loop
-ldx #15
-jsr putvar ;lp
-jsr zero
-lda rvisnum
-sta var+1
-lda rvisnum+1
-sta var
-ldx #30
-jmp putvar ;a%
-;
-trapoff: lda #<$e38b
-ldx #>$e38b
-jmp trap1
-trapon: lda #<trap
-ldx #>trap
-trap1: sta $300
-stx $301
-rts
-;
+getversn:	lda #15
+		sta var
+		lda #<version
+		sta var+1
+		lda #>version
+		sta var+2
+		ldx #1
+		jsr putvar ;a$
+		ldy #4
+loop:		lda versnum,y
+		sta var,y
+		dey
+		bpl loop
+		ldx #15
+		jsr putvar ;lp
+		jsr zero
+		lda rvisnum
+		sta var+1
+		lda rvisnum+1
+		sta var
+		ldx #30
+		jmp putvar ;a%
+
+trapoff:	lda #<$e38b
+		ldx #>$e38b
+		jmp trap1
+
+trapon:
+		rts
+
+;		lda #<trap
+;		ldx #>trap
+trap1:		sta $300
+		stx $301
+		rts
+
 outadj: sty outadjs
 cmp #13
 beq outadj1
@@ -4650,23 +4793,26 @@ rts
 ;
 ; new system chrout routine
 ;
-newout: pha
-lda $9a
-cmp #4
-bcs nout1
-lda 1
-sta rom3
-lda #$36
-sta 1
-pla
-jsr out
-pha
-lda rom3
-sta 1
-pla
-rts
-nout1: pla
-oldout: jmp $ffff
+newout:
+		pha
+		lda $9a
+		cmp #4
+		bcs nout1
+		lda 1
+		sta rom3
+		lda #$36
+		sta 1
+		pla
+		jsr out
+		pha
+		lda rom3
+		sta 1
+		pla
+		rts
+nout1:
+		pla
+oldout:
+		jmp $ffff
 ;
 ; find a basic variable
 ;
@@ -4701,22 +4847,22 @@ rts
 ;
 ; the error trap routine
 ;
-trap: stx $030c
-lda $39
-sta $030d
-lda $3a
-sta $030e
-lda #<trapline
-sta $14
-lda #>trapline
-sta $15
-ldx #$fa
-txs
-jsr $a8a3
-jmp $a7ae
-;
+trap:		stx $030c
+		lda $39
+		sta $030d
+		lda $3a
+		sta $030e
+		lda #<trapline
+		sta $14
+		lda #>trapline
+		sta $15
+		ldx #$fa
+		txs
+		jsr $a8a3
+		jmp $a7ae
+
 ; the wedge to print free memory
-;
+
 mem:		lda #$36
 		sta $01
 		jsr memory
