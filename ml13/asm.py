@@ -133,6 +133,15 @@ def assemble(f, op):
 	else:
 		raise Exception, "invalid operation mode (%s) for opcode '%s'" % (mode, op)
 
+def directive_namespace(f):
+	tok, value = parse_expr(f)
+	if tok != TOK_STRING:
+		raise Exception, "type mismatch"
+	global current_namespace
+	current_namespace = value
+	if not namespaces.has_key(value):
+		namespaces[value] = { }
+
 def directive_align(f):
 	tok, value = parse_expr(f)
 	if tok != TOK_NUMBER:
@@ -339,10 +348,12 @@ directives = {
 	"include" : directive_include,
 	"enc" : directive_enc,
 	"offset" : directive_offset,
-	"align" : directive_align
+	"align" : directive_align,
+	"namespace" : directive_namespace
 }
 
-symbols = { }
+current_namespace = ""
+namespaces = { "" : { } }
 unget = None
 line_number = 1
 pass_number = 1
@@ -529,8 +540,14 @@ def parse_expr3(f):
 	if tok == TOK_NUMBER:
 		return (TOK_NUMBER, value)
 	if tok == TOK_IDENT:
+		symbols = namespaces[current_namespace]
 		if symbols.has_key(value):
-			return symbols[value]
+			tok, value, passnum = symbols[value]
+			return (tok, value)
+		symbols = namespaces[""]
+		if symbols.has_key(value):
+			tok, value, passnum = symbols[value]
+			return (tok, value)
 		if pass_number == 1:
 			return (TOK_NUMBER, 0)
 		raise Exception, "symbol not found '%s'" % value
@@ -645,10 +662,16 @@ def parse(f):
 			name = value
 			tok, value = lex(f)
 			if tok == TOK_COLON:
-				symbols[name] = (TOK_NUMBER, address + address_offset)
+				symbols = namespaces[current_namespace]
+				if symbols.has_key(name):
+					t,v,p = symbols[name]
+					if p == pass_number:
+						raise Exception, "symbol '%s' redefined" % name
+				symbols[name] = (TOK_NUMBER, address + address_offset, pass_number)
 			elif tok == TOK_EQUAL:
+				symbols = namespaces[current_namespace]
 				value = parse_expr(f)
-				symbols[name] = value
+				symbols[name] = value + (pass_number,)
 				parse_eol(f)
 			else:
 				raise Exception, "syntax error"
@@ -666,7 +689,7 @@ def dump_symbols():
 	symbol_list = symbols.keys()
 	symbol_list.sort()
 	for symbol in symbol_list:
-		tok, value = symbols[symbol]
+		tok, value, passnum = symbols[symbol]
 		if tok == TOK_NUMBER:
 			print "%-20s $%04x" % (symbol, value)
 		elif tok == TOK_STRING:
