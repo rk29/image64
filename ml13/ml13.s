@@ -2178,46 +2178,51 @@ setsize: stx topline
 sty botline
 sta scnmode
 rts
-halfscn: jsr crsroff
-jsr toglscn
-halfscn1:ldx #7
-ldy #22
-lda #0
-beq setsize
-;
-toglscn: ldy #0
-loop: lda $428,y
-tax
-lda tempscn,y
-sta $428,y
-txa
-sta tempscn,y
-lda $d828,y
-tax
-lda tempcol,y
-sta $d828,y
-txa
-sta tempcol,y
-iny
-cpy #240
-bne loop
-ldy #0
-loop: lda $798,y
-tax
-lda tempbott,y
-sta $798,y
-txa
-sta tempbott,y
-lda $db98,y
-tax
-lda tempbotc,y
-sta $db98,y
-txa
-sta tempbotc,y
-iny
-cpy #80
-bne loop
-rts
+
+halfscn:
+		jsr crsroff
+		jsr toglscn
+halfscn1:
+		ldx #7
+		ldy #22
+		lda #0
+		beq setsize
+toglscn:
+		ldy #0
+scnloop1:
+		lda $428,y
+		tax
+		lda tempscn,y
+		sta $428,y
+		txa
+		sta tempscn,y
+		lda $d828,y
+		tax
+		lda tempcol,y
+		sta $d828,y
+		txa
+		sta tempcol,y
+		iny
+		cpy #240
+		bne scnloop1
+		ldy #0
+scnloop2:
+		lda $798,y
+		tax
+		lda tempbott,y
+		sta $798,y
+		txa
+		sta tempbott,y
+		lda $db98,y
+		tax
+		lda tempbotc,y
+		sta $db98,y
+		txa
+		sta tempbotc,y
+		iny
+		cpy #80
+		bne scnloop2
+		rts
 
 bits:
 		byte 1,2,4,8,16,32,64,128
@@ -3338,40 +3343,48 @@ stx mdigits
 ldx #$30
 stx cnumc
 jmp scdn
-scupc: and #128
-asl
-rol
-sta mupcase
-rts
-scclear: lda scnmode
-bne sccl0
-ldy #0
-loop: lda #32
-sta tempscn,y
-lda mcolor
-sta tempcol,y
-iny
-cpy #240
-bne loop
-ldy #0
-loop: lda #32
-sta tempbott,y
-lda mcolor
-sta tempbotc,y
-iny
-cpy #80
-bne loop
-sccl0: ldx topline
-dex
-sccl1: inx
-jsr scline
-jsr fixlinks
-cpx botline
-bcc sccl1
-schome: lda topline
-sta 214
-lda #0
-sta 211
+
+scupc:
+		and #128
+		asl
+		rol
+		sta mupcase
+		rts
+scclear:
+		lda scnmode
+		bne sccl0
+		ldy #0
+clrloop1:
+		lda #32
+		sta tempscn,y
+		lda mcolor
+		sta tempcol,y
+		iny
+		cpy #240
+		bne clrloop1
+		ldy #0
+clrloop2:
+		lda #32
+		sta tempbott,y
+		lda mcolor
+		sta tempbotc,y
+		iny
+		cpy #80
+		bne clrloop2
+sccl0:
+		ldx topline
+		dex
+sccl1:
+		inx
+		jsr scline
+		jsr fixlinks
+		cpx botline
+		bcc sccl1
+schome:
+		lda topline
+		sta 214
+		lda #0
+		sta 211
 sccrsr: ldx 214
 sccrsr1: jsr $e9f0
 jmp $ea24
@@ -3403,99 +3416,110 @@ ldy #0
 jsr sound
 scbell1: rts
 ;
-scroll: lda $ac
-pha
-lda $ad
-pha
-lda $ae
-pha
-lda $af
-pha
-lda scnmode
-bne scroll0
-ldy #0
-loop: lda tempscn+40,y
-sta tempscn,y
-lda tempcol+40,y
-sta tempcol,y
-iny
-cpy #200
-bne loop
-ldy #0
-loop: lda $518,y
-sta tempscn+200,y
-lda $d918,y
-sta tempcol+200,y
-iny
-cpy #40
-bne loop
-scroll0: ldx topline
-scroll1: inx
-jsr sccrsr1
-lda $d1
-sta $ac
-lda $d2
-sta $ad
-lda $f3
-sta $ae
-lda $f4
-sta $af
-dex
-jsr sccrsr1
-jsr $e9d2
-inx
-jsr fixlinks
-cpx botline
-bcc scroll1
-jsr scline
-pla
-sta $af
-pla
-sta $ae
-pla
-sta $ad
-pla
-sta $ac
-dec 214
-jsr sccrsr
-lda scnmode
-bne scroll2
-ldy #39
-loop: lda tempbott,y
-sta $770,y
-lda tempbotc,y
-sta $db70,y
-lda tempbott+40,y
-sta tempbott,y
-lda tempbotc+40,y
-sta tempbotc,y
-lda #32
-sta tempbott+40,y
-lda mcolor
-sta tempbotc+40,y
-dey
-bpl loop
-scroll2:rts
-scline:  jsr $e9f0
-jsr $ea24
-ldy #$27
-scline1:       lda 646
-             sta [$f3],y
-             lda #32
-             sta [$d1],y
-             dey
-             bpl scline1
-             rts
+scroll:
+		lda $ac
+		pha
+		lda $ad
+		pha
+		lda $ae
+		pha
+		lda $af
+		pha
+		lda scnmode
+		bne scroll0
+		ldy #0
+scrloop1:
+		lda tempscn+40,y
+		sta tempscn,y
+		lda tempcol+40,y
+		sta tempcol,y
+		iny
+		cpy #200
+		bne scrloop1
+		ldy #0
+scrloop2:
+		lda $518,y
+		sta tempscn+200,y
+		lda $d918,y
+		sta tempcol+200,y
+		iny
+		cpy #40
+		bne scrloop2
+scroll0:
+		ldx topline
+scroll1:
+		inx
+		jsr sccrsr1
+		lda $d1
+		sta $ac
+		lda $d2
+		sta $ad
+		lda $f3
+		sta $ae
+		lda $f4
+		sta $af
+		dex
+		jsr sccrsr1
+		jsr $e9d2
+		inx
+		jsr fixlinks
+		cpx botline
+		bcc scroll1
+		jsr scline
+		pla
+		sta $af
+		pla
+		sta $ae
+		pla
+		sta $ad
+		pla
+		sta $ac
+		dec 214
+		jsr sccrsr
+		lda scnmode
+		bne scroll2
+		ldy #39
+scrloop3:
+		lda tempbott,y
+		sta $770,y
+		lda tempbotc,y
+		sta $db70,y
+		lda tempbott+40,y
+		sta tempbott,y
+		lda tempbotc+40,y
+		sta tempbotc,y
+		lda #32
+		sta tempbott+40,y
+		lda mcolor
+		sta tempbotc+40,y
+		dey
+		bpl scrloop3
+scroll2:
+		rts
+scline:
+		jsr $e9f0
+		jsr $ea24
+		ldy #$27
+scline1:
+		lda 646
+		sta [$f3],y
+		lda #32
+		sta [$d1],y
+		dey
+		bpl scline1
+		rts
 
-chrtbl:        word scupc, scupc
-             word scrvs, scrvs
-             word schome, scclear
-             word scrt, sclf
-             word scdn, scup
-             word scret, scdel
-             word scbell
+chrtbl:
+		word scupc, scupc
+		word scrvs, scrvs
+		word schome, scclear
+		word scrt, sclf
+		word scdn, scup
+		word scret, scdel
+		word scbell
 
-chrs:          byte 14,142,18,146,19,147,29,157,17,145,13,20,7
+chrs:
+		byte 14,142,18,146,19,147,29,157,17,145,13,20,7
 nchrs = *-chrs
 
 swap:          lda #39
@@ -4053,9 +4077,9 @@ loadpic1:	jsr dopic
 ;
 		lda #$60
 		ldy #0
-loop:		sta rs232,y
+rsloop:		sta rs232,y
 		dey
-		bne loop
+		bne rsloop
 
 ;
 ; load ml.extra
@@ -4163,18 +4187,22 @@ picflag:	byte 0
 ;********************************
 
 ;* main setup routine
-setup:		lda #0
+
+setup:
+		lda #0
 		tay
-loop:		sta basintr,y
+setup1:
+		sta basintr,y
 		iny
 		cpy #sizintr
-		bne loop
+		bne setup1
 		ldy #0
-loop:		lda date2,y
+setup2:
+		lda date2,y
 		sta date1,y
 		iny
 		cpy #28
-		bne loop
+		bne setup2
 		lda #80
 		sta ptrclmn
 		lda #40
@@ -4183,24 +4211,27 @@ loop:		lda date2,y
 		sta local
 		ldy #0
 		lda #32
-loop:		sta $4000,y
+setup3:
+		sta $4000,y
 		sta $4100,y
 		sta $4200,y
 		dey
-		bne loop
+		bne setup3
 		lda #$60
 		ldy #0
-loop:		sta rs232,y
+setup4:
+		sta rs232,y
 		dey
-		bne loop
+		bne setup4
 		ldy #31
-loop:		lda #>(pmodetbl+32)
+setup5:
+		lda #>(pmodetbl+32)
 		sta pmodetbl,y
 		dey
 		lda #<(pmodetbl+32)
 		sta pmodetbl,y
 		dey
-		bpl loop
+		bpl setup5
 
 		lda #$ff
 		sta pmodetbl+32
@@ -4513,52 +4544,58 @@ lda $15
 adc #8
 sta $2e
 rts
-;
-;
+
+
 ;* skip rest of proto area *
-;
-dup 0,$ca80-*
-;
-swapper: sta swappg1
-sty swappg2
-stx swapsiz
-swapagn: jsr rsdisab
-sei
-lda 1
-pha
-lda #$34
-sta 1
-lda swappg1
-sta $6a
-lda swappg2
-sta $6c
-lda swapsiz
-sta $6d
-ldy #0
-sty $69
-sty $6b
-swapr1: lda [$69],y
-tax
-lda [$6b],y
-sta [$69],y
+
+dup 0, swapper-*
+
+		sta swappg1
+		sty swappg2
+		stx swapsiz
+swapagn:
+		jsr rsdisab
+		sei
+		lda 1
+		pha
+		lda #$34
+		sta 1
+		lda swappg1
+		sta $6a
+		lda swappg2
+		sta $6c
+		lda swapsiz
+		sta $6d
+		ldy #0
+		sty $69
+		sty $6b
+swapr1:
+		lda [$69],y
+		tax
+		lda [$6b],y
+		sta [$69],y
+		txa
+		sta [$6b],y
+		iny
+		bne swapr1
+		inc $6a
+		inc $6c
+		dec $6d
+		bne swapr1
+		pla
+		sta 1
+		cli
+		jmp rsinabl
+
+swappg1:
+		byte 0
+swappg2:
+		byte 0
+swapsiz:
+		byte 0
+
+ecschk:
 txa
-sta [$6b],y
-iny
-bne swapr1
-inc $6a
-inc $6c
-dec $6d
-bne swapr1
-pla
-sta 1
-cli
-jmp rsinabl
-;
-swappg1:byte 0
-swappg2: byte 0
-swapsiz:byte 0
-;
-ecschk: txa
 pha
 tya
 pha
@@ -4686,24 +4723,26 @@ dec raster+1
 inc jiffy
 jmp newirq
 ;
-gettbl: asl
-tax
-lda 1
-pha
-lda #$36
-sta 1
-php
-sei
-lda jmptbl,x
-tay
-lda jmptbl+1,x
-tax
-plp
-pla
-sta 1
-rts
-;
-getversn:	lda #15
+gettbl:
+		asl
+		tax
+		lda 1
+		pha
+		lda #$36
+		sta 1
+		php
+		sei
+		lda jmptbl,x
+		tay
+		lda jmptbl+1,x
+		tax
+		plp
+		pla
+		sta 1
+		rts
+
+getversn:
+		lda #15
 		sta var
 		lda #<version
 		sta var+1
@@ -4712,10 +4751,11 @@ getversn:	lda #15
 		ldx #1
 		jsr putvar ;a$
 		ldy #4
-loop:		lda versnum,y
+getversn1:
+		lda versnum,y
 		sta var,y
 		dey
-		bpl loop
+		bpl getversn1
 		ldx #15
 		jsr putvar ;lp
 		jsr zero
@@ -4767,32 +4807,34 @@ stx $d011
 sty $d020
 rts
 ;
-dup 0,$cd00-*
-;
+dup 0, usetbl-*
+
 ; interface page
-;
-usetbl: jsr usetbl2
-usetbl1: sta 780
-stx 781
-sty 782
-jsr gettbl
-sty jump+1
-stx jump+2
-lda 1
-pha
-lda #$36
-sta 1
-ldx 781
-ldy 782
-jump: jsr $ffff
-sta 780
-pla
-sta 1
-lda 780
-rts
-;
+
+		jsr usetbl2
+; usetbl1:
+		sta 780
+		stx 781
+		sty 782
+		jsr gettbl
+		sty jump+1
+		stx jump+2
+		lda 1
+		pha
+		lda #$36
+		sta 1
+		ldx 781
+		ldy 782
+jump:
+		jsr $ffff
+		sta 780
+		pla
+		sta 1
+		lda 780
+		rts
+
 ; new system chrout routine
-;
+
 newout:
 		pha
 		lda $9a
@@ -4922,11 +4964,19 @@ dup 0,$ce00-*
 d1str:           cbm "           "
                cbm "Tue Jan  1, 1988 12:00 PM   "
 
-buf2:            dup $20, 80
-buffer:          dup $20, 80
-;
+; buf2
+
+dup 0, buf2-*
+dup $20, 80
+
+; buffer
+
+dup 0, buffer-*
+dup $20, 80
+
+
 ; date in 6 byte bcd format
-;
+
 bootdate:
 dateday:        byte $05
 datemon:        byte $03
