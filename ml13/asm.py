@@ -11,7 +11,7 @@ address = 0
 def emit_byte(b):
 #	print "%04x: %02x" % (address, b)
 	if b < 0 or b > 255:
-		raise Exception, "byte value out of range (%s)" % b
+		raise Exception("byte value out of range (%s)" % b)
 	global address
 	address = address + 1
 	if pass_number == 3:
@@ -34,8 +34,8 @@ MODE_ZEROPAGE =   "ZP"
 MODE_ZEROPAGE_X = "ZPX"
 MODE_ZEROPAGE_Y = "ZPY"
 
-asc_to_cbm = (range(0,64) + [ ord("@") ] +  range(193,224) + [ ord("@") ] + range(65,96)) * 2
-cbm_to_scn = range(0,64) + range(0,64) + range(0,64) + range(64,128)
+asc_to_cbm = (list(range(0,64)) + [ ord("@") ] +  list(range(193,224)) + [ ord("@") ] + list(range(65,96))) * 2
+cbm_to_scn = list(range(0,64)) + list(range(0,64)) + list(range(0,64)) + list(range(64,128))
 
 def parse_operand(f):
 	tok, value = lex(f)
@@ -47,7 +47,7 @@ def parse_operand(f):
 		tok, operand = parse_expr(f)
 		if tok == TOK_STRING:
 			if len(operand) != 1:
-				raise Exception, "can only convert single character strings"
+				raise Exception("can only convert single character strings")
 			operand = ord(operand[0])
 			tok = TOK_NUMBER
 		tok, value = lex(f)
@@ -56,12 +56,12 @@ def parse_operand(f):
 			if ch == "x":
 				tok, value = lex(f)
 				if tok != TOK_RBRACKET:
-					raise Exception, "closing bracket expected"
+					raise Exception("closing bracket expected")
 				return (MODE_INDIRECT_X, operand)
 			else:
-				raise Exception, "syntax error. (value,x) expected"
+				raise Exception("syntax error. (value,x) expected")
 		elif tok != TOK_RBRACKET:
-			raise Exception, "closing bracket expected"
+			raise Exception("closing bracket expected")
 		tok, value = lex(f)
 		if tok != TOK_COMMA:
 			unlex(tok, value)
@@ -69,12 +69,12 @@ def parse_operand(f):
 		ch = getchr(f)
 		if ch == "y":
 			return (MODE_INDIRECT_Y, operand)
-		raise Exception, "syntax error. (value),y expected"
+		raise Exception("syntax error. (value),y expected")
 	elif tok == TOK_IMMEDIATE:
 		tok, operand = parse_expr(f)
 		if tok == TOK_STRING:
 			if len(operand) != 1:
-				raise Exception, "can only convert single character strings"
+				raise Exception("can only convert single character strings")
 			operand = ord(operand[0])
 			tok = TOK_NUMBER
 		return (MODE_IMMEDIATE, operand)
@@ -82,7 +82,7 @@ def parse_operand(f):
 	tok, operand = parse_expr(f)
 	if tok == TOK_STRING:
 		if len(operand) != 1:
-			raise Exception, "can only convert single character strings"
+			raise Exception("can only convert single character strings")
 		operand = ord(operand[0])
 		tok = TOK_NUMBER
 	tok, value = lex(f)
@@ -92,7 +92,7 @@ def parse_operand(f):
 			return (MODE_ABSOLUTE_X, operand)
 		if ch == "y":
 			return (MODE_ABSOLUTE_Y, operand)
-		raise Exception, "syntax error. value,x or value,y expected"
+		raise Exception("syntax error. value,x or value,y expected")
 	else:
 		unlex(tok,value)
 	return (MODE_ABSOLUTE, operand)
@@ -105,6 +105,7 @@ def demote_mode(mode):
 	
 def assemble_op(opcode, mode, operand):
 	emit_byte(opcode)
+	operand = int(operand)
 	if mode in [ MODE_IMMEDIATE, MODE_ZEROPAGE, MODE_ZEROPAGE_X, MODE_ZEROPAGE_Y, MODE_INDIRECT_X, MODE_INDIRECT_Y]:
 		emit_byte(operand & 0xFF)
 	elif mode in [ MODE_ABSOLUTE, MODE_ABSOLUTE_X, MODE_ABSOLUTE_Y, MODE_INDIRECT ]:
@@ -113,8 +114,8 @@ def assemble_op(opcode, mode, operand):
 		offset = operand - (address + address_offset + 1)
 		if (offset < -128) or (offset > 127):
 			if (pass_number == 3):
-				print address, operand, offset
-				raise Exception, "branch out of range %d" % offset
+				print(address, operand, offset)
+				raise Exception("branch out of range %d" % offset)
 			else:
 				offset = 0
 		emit_byte(offset & 0xFF)
@@ -124,28 +125,28 @@ def assemble(f, op):
 	mode, operand = parse_operand(f)
 	if operand < 0x100:
 		temp = demote_mode(mode)
-		if opcodes.has_key(temp):
+		if temp in opcodes:
 			mode = temp
-	if opcodes.has_key(MODE_RELATIVE) and mode == MODE_ABSOLUTE:
+	if (MODE_RELATIVE in opcodes) and (mode == MODE_ABSOLUTE):
 		mode = MODE_RELATIVE
-	if opcodes.has_key(mode):
+	if mode in opcodes:
 		assemble_op(opcodes[mode], mode, operand)
 	else:
-		raise Exception, "invalid operation mode (%s) for opcode '%s'" % (mode, op)
+		raise Exception("invalid operation mode (%s) for opcode '%s'" % (mode, op))
 
 def directive_namespace(f):
 	tok, value = parse_expr(f)
 	if tok != TOK_STRING:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
 	global current_namespace
 	current_namespace = value
-	if not namespaces.has_key(value):
+	if value not in namespaces:
 		namespaces[value] = { }
 
 def directive_align(f):
 	tok, value = parse_expr(f)
 	if tok != TOK_NUMBER:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
 	
 	n = value - (address + address_offset) % value
 	if n != value:
@@ -155,14 +156,14 @@ def directive_align(f):
 def directive_offset(f):
 	tok, value = parse_expr(f)
 	if tok != TOK_NUMBER:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
 	global address_offset
 	address_offset = value
 	
 def directive_enc(f):
 	tok, value = parse_expr(f)
 	if tok != TOK_NUMBER:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
 		
 	global encode_value
 	encode_value = value
@@ -170,25 +171,25 @@ def directive_enc(f):
 def directive_include(f):
 	tok, value = parse_expr(f)
 	if tok != TOK_STRING:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
+	global line_number
 	temp_linenum = line_number
 	includefile = open(value, "r")
 	parse(includefile)
 	includefile.close() 
-	global line_number
 	line_number = temp_linenum
 	
 def directive_org(f):
 
 	tok, addr = parse_expr(f)
 	if tok != TOK_NUMBER:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
 	tok, value = lex(f)
 	if tok != TOK_COMMA:
-		raise Exception, "comma expected"
+		raise Exception("comma expected")
 	tok, filename = parse_expr(f)
 	if tok != TOK_STRING:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
 
 	if pass_number == 3:
 		global outfile
@@ -206,7 +207,7 @@ def directive_word(f):
 	while not done:
 		tok, value = parse_expr(f)
 		if tok != TOK_NUMBER:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		emit_word(value)
 		tok, value = lex(f)
 		if tok != TOK_COMMA:
@@ -223,7 +224,7 @@ def directive_cbm(f):
 			for ch in value:
 				emit_byte(asc_to_cbm[ord(ch)])
 		else:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		tok, value = lex(f)
 		if tok != TOK_COMMA:
 			done = 1
@@ -239,7 +240,7 @@ def directive_scn(f):
 			for ch in value:
 				emit_byte(cbm_to_scn[asc_to_cbm[ord(ch)]])
 		else:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		tok, value = lex(f)
 		if tok != TOK_COMMA:
 			done = 1
@@ -255,7 +256,7 @@ def directive_byte(f):
 			for ch in value:
 				emit_byte(ord(ch))
 		else:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		tok, value = lex(f)
 		if tok != TOK_COMMA:
 			done = 1
@@ -264,16 +265,16 @@ def directive_byte(f):
 def directive_dup(f):
 	tok, value = parse_expr(f)
 	if tok != TOK_NUMBER:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
 	tok, comma = lex(f)
 	if tok != TOK_COMMA:
-		raise Exception, "comma expected"
+		raise Exception("comma expected")
 	tok, count = parse_expr(f)
 	if tok != TOK_NUMBER:
-		raise Exception, "type mismatch"
+		raise Exception("type mismatch")
 	if count < 0:
-		print "warning, count value < 0 (%d) in line %d" % (count, line_number)
-#		raise Exception, "illegal count value (%d)" % count
+		print("warning, count value < 0 (%d) in line %d" % (count, line_number))
+#		raise Exception("illegal count value (%d)" % count)
 	if count > 0:
 		for i in range(count):
 			emit_byte(value)
@@ -433,11 +434,11 @@ def lex_ident(f, ch):
 		ident = ident + ch
 		ch = getchr(f)
 	ungetchr(f, ch)
-	if ops.has_key(ident):
+	if ident in ops:
 		return (TOK_OP, ident)
-	if directives.has_key(ident):
+	if ident in directives:
 		return (TOK_DIRECTIVE, ident)
-	if tokens.has_key(ident):
+	if ident in tokens:
 		return (tokens[ident], ident)
 	return (TOK_IDENT, ident)
 
@@ -446,7 +447,7 @@ def convert_hex(ch):
 		return ord(ch) - ord("0")
 	if ch in "abcdef":
 		return ord(ch) - ord("a") + 10
-	raise Exception, "invalid hex digit '%c'" % ch
+	raise Exception("invalid hex digit '%c'" % ch)
 	
 def lex_hexnum(f):
 	value = 0
@@ -469,7 +470,7 @@ def lex_binnum(f):
 def convert_dec(ch):
 	if ch in digits:
 		return ord(ch) - ord("0")
-	raise Exception, "invalid digit '%c'" % ch
+	raise Exception("invalid digit '%c'" % ch)
 
 def lex_decimal(f, ch):
 	value = convert_dec(ch)
@@ -485,7 +486,7 @@ def lex_string(f):
 	ch = getchr(f)
 	while (ch != "") and (ch != '"'):
 		if ch == "\n":
-			raise Exception, "unterminated string"
+			raise Exception("unterminated string")
 		value = value + ch
 		ch = getchr(f)
 	return (TOK_STRING, value)
@@ -507,7 +508,7 @@ def lex0(f):
 	while ch != "":
 		if ch in ident_start:
 			return lex_ident(f, ch)
-		elif tokens.has_key(ch):
+		elif ch in tokens:
 			return (tokens[ch], ch)
 		elif ch == ";":
 			ch = getchr(f)
@@ -526,7 +527,7 @@ def lex0(f):
 		elif ch == '"':
 			return lex_string(f)
 		else:
-			raise Exception, "unexpected character '%c'" % ch
+			raise Exception("unexpected character '%c'" % ch)
 		ch = getchr(f)
 	return (TOK_EOF, ch)
 
@@ -541,16 +542,16 @@ def parse_expr3(f):
 		return (TOK_NUMBER, value)
 	if tok == TOK_IDENT:
 		symbols = namespaces[current_namespace]
-		if symbols.has_key(value):
+		if value in symbols:
 			tok, value, passnum = symbols[value]
 			return (tok, value)
 		symbols = namespaces[""]
-		if symbols.has_key(value):
+		if value in symbols:
 			tok, value, passnum = symbols[value]
 			return (tok, value)
 		if pass_number == 1:
 			return (TOK_NUMBER, 0)
-		raise Exception, "symbol not found '%s'" % value
+		raise Exception("symbol not found '%s'" % value)
 	if tok == TOK_STRING:
 		return (TOK_STRING, value)
 	if tok == TOK_ASTERISK:
@@ -559,26 +560,26 @@ def parse_expr3(f):
 		tok1, value1 = parse_expr(f)
 		tok, value = lex(f)
 		if tok != TOK_CLOSE_PAREN:
-			raise Exception, "parenthesis mismatch"
+			raise Exception("parenthesis mismatch")
 		return (tok1, value1)
-	raise Exception, "unexpected input (%s,%s)" % (tok, value)
+	raise Exception("unexpected input (%s,%s)" % (tok, value))
 
 def parse_expr2(f):
 	tok, value = lex(f)
 	if tok == TOK_LESS_THAN:
 		tok, value = parse_expr3(f)
 		if tok != TOK_NUMBER:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		return (tok, value & 0xFF)
 	if tok == TOK_GREATER_THAN:
 		tok, value = parse_expr3(f)
 		if tok != TOK_NUMBER:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		return (tok, (value >> 8) & 0xFF)
 	if tok == TOK_NOT:
 		tok, value = parse_expr2(f)
 		if tok != TOK_NUMBER:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		return (tok, ~value)
 	unlex(tok, value)
 	return parse_expr3(f)
@@ -591,16 +592,16 @@ def parse_expr1(f):
 		if tok == TOK_ASTERISK:
 			tok2, value2 = parse_expr2(f)
 			if tok2 != tok1:
-				raise Exception, "type mismatch"
+				raise Exception("type mismatch")
 			if tok1 != TOK_NUMBER:
-				raise Exception, "invalid math operation"
+				raise Exception("invalid math operation")
 			value1 = value1 * value2
 		elif tok == TOK_DIVIDE:
 			tok2, value2 = parse_expr2(f)
 			if tok1 != tok2:
-				raise Exception, "type mismatch"
+				raise Exception("type mismatch")
 			if tok1 != TOK_NUMBER:
-				raise Exception, "invalid math operation"
+				raise Exception("invalid math operation")
 			value1 = value1 / value2
 		else:
 			unlex(tok, value)
@@ -614,14 +615,14 @@ def parse_expr0(f):
 		if tok == TOK_PLUS:
 			tok2, value2 = parse_expr1(f)
 			if tok2 != tok1:
-				raise Exception, "type mismatch"
+				raise Exception("type mismatch")
 			value1 = value1 + value2
 		elif tok == TOK_MINUS:
 			tok2, value2 = parse_expr1(f)
 			if tok1 != tok2:
-				raise Exception, "type mismatch"
+				raise Exception("type mismatch")
 			if tok1 != TOK_NUMBER:
-				raise Exception, "invalid math operation"
+				raise Exception("invalid math operation")
 			value1 = value1 - value2
 		else:
 			unlex(tok, value)
@@ -634,17 +635,17 @@ def parse_expr(f):
 	if (tok == TOK_OP) and (value == "and"):
 		tok2, value2 = parse_expr0(f)
 		if tok2 != tok1:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		if tok1 != TOK_NUMBER:
-			raise Exception, "invalid math operation"
+			raise Exception("invalid math operation")
 		result = value1 & value2
 		return (tok1, result)
 	if tok == TOK_OR:
 		tok2, value2 = parse_expr0(f)
 		if tok1 != tok2:
-			raise Exception, "type mismatch"
+			raise Exception("type mismatch")
 		if tok1 != TOK_NUMBER:
-			raise Exception, "invalid math operation"
+			raise Exception("invalid math operation")
 		result = value1 | value2
 		return (tok1, result)
 	unlex(tok, value)
@@ -653,7 +654,7 @@ def parse_expr(f):
 def parse_eol(f):
 	tok, value = lex(f)
 	if tok != TOK_EOL:
-		raise Exception, "extra input on end of line (%s,%s)" % (tok, value)
+		raise Exception("extra input on end of line (%s,%s)" % (tok, value))
 
 def parse(f):
 	tok, value  = lex(f)
@@ -663,10 +664,10 @@ def parse(f):
 			tok, value = lex(f)
 			if tok == TOK_COLON:
 				symbols = namespaces[current_namespace]
-				if symbols.has_key(name):
+				if name in symbols:
 					t,v,p = symbols[name]
 					if p == pass_number:
-						raise Exception, "symbol '%s' redefined" % name
+						raise Exception("symbol '%s' redefined" % name)
 				symbols[name] = (TOK_NUMBER, address + address_offset, pass_number)
 			elif tok == TOK_EQUAL:
 				symbols = namespaces[current_namespace]
@@ -674,7 +675,7 @@ def parse(f):
 				symbols[name] = value + (pass_number,)
 				parse_eol(f)
 			else:
-				raise Exception, "syntax error"
+				raise Exception("syntax error")
 		elif tok == TOK_DIRECTIVE:
 			directives[value](f)
 			parse_eol(f)
@@ -682,7 +683,7 @@ def parse(f):
 			assemble(f, value)
 			parse_eol(f)
 		elif tok != TOK_EOL:
-			raise Exception, "unexpected (%s,%s)" % (tok,value)
+			raise Exception("unexpected (%s,%s)" % (tok,value))
 		tok, value = lex(f)
 
 def dump_symbols():
@@ -691,18 +692,18 @@ def dump_symbols():
 	for symbol in symbol_list:
 		tok, value, passnum = symbols[symbol]
 		if tok == TOK_NUMBER:
-			print "%-20s $%04x" % (symbol, value)
+			print("%-20s $%04x" % (symbol, value))
 		elif tok == TOK_STRING:
-			print "%-20s '%s'" % (symbol, value)
+			print("%-20s '%s'" % (symbol, value))
 		else:
-			print "%-20s ? type=%d value=%s" % (symbol, tok, value)
+			print("%-20s ? type=%d value=%s" % (symbol, tok, value))
 
 if __name__ == "__main__":
 
 	outfile = None
 	
 	if len(sys.argv) != 2:
-		print "usage: asm.py <filename>"
+		print("usage: asm.py <filename>")
 		sys.exit(1)
 
 	rc = 0
@@ -712,9 +713,9 @@ if __name__ == "__main__":
 			line_number = 1
 			f.seek(0)
 			parse(f)
-	except Exception, msg:
+	except Exception as ex:
 		traceback.print_exc()
-		print "line", line_number
+		print("line", line_number)
 		rc = 1
 	f.close()
 
