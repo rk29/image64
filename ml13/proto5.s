@@ -263,7 +263,8 @@ clrclk2b:
 		cpy #17
 		bne clrclk2c
 		ldy #3
-		clrclk2c:cpy #255
+clrclk2c:
+		cpy #255
 		bne clrclk2a
 		rts
 
@@ -319,8 +320,9 @@ clockn2:
 		pla
 		tax
 		rts
-;
+
 ;* big clock number patterns
+
 numpats:
 		byte %00011100
 		byte %00100010
@@ -483,6 +485,3 @@ usevar:
 putvar:
 		lda #30
 		jmp usetbl1
-
-
-
