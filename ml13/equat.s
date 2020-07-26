@@ -5,7 +5,6 @@ scnclm = 2
 ridbe = $29b
 ridbs = $29c
 scnpos = 2
-;
 
 ; control-codes
 
@@ -39,13 +38,12 @@ cursor_lt_green = $99
 cursor_lt_blue =  $9a
 cursor_gray3 =    $9b
 
-;
 ten = $dc08
 scs = $dc09
 min = $dc0a
 hrs = $dc0b
 carrier = $dd01
-;
+
 getin = $ffe4
 chkout = $ffc9
 chrout = $ffd2
@@ -59,17 +57,17 @@ readst = $ffb7
 romcolors = $e8da
 chrin = $ffcf
 setmsg = $ff90
-;
+
 linkprg = $a533
 makerm1 = $b475
 getbytc = $b79b
 ptrget1 = $b0e7
-;
+
 usetbl = $cd00
 usetbl1 = usetbl+3
 buffer = $ce77
 buf2 = $ce27
-;
+
 prgstart = $0801
 bmpstart = $1001
 mmpstart = $2001
@@ -78,7 +76,7 @@ prgend = $4000
 imstart = $4601
 protostart = $c000
 protoend = $cb00
-;
+
 rs232 = $4300
 rsinabl = rs232 + $03
 rsdisab = rs232 + $06
@@ -86,22 +84,22 @@ rsget = rs232 + $09
 rsout = rs232 + $0c
 rsbaud = rs232 + $0f
 rschar = rs232 + $12
-;
+
 swapper = $ca80
-;
+
 trapline = 2000
 immdline = 3000
-;
+
 tempbott = $4000
 tempbotc = $4050
 pmodetbl = $40a0
-;
+
 light = $04f0
-;
+
 tempscn = $4100 ;$f0
 tempcol = $41f0 ;$f0
 fkeybuf = $42e0 ;$20
-;
+
 basintr = $2a7
 sizintr = 83
 tsr = basintr + 0
@@ -136,7 +134,7 @@ mcolor = basintr+28
 mprtr = basintr+29
 mreverse = basintr+30
 mdigits = basintr+31
-;
+
 filetyp = basintr+32
 curdsp = basintr+33
 interm = basintr+34
@@ -188,7 +186,7 @@ blnkflag = basintr+79
 blnkcntr = basintr+80
 outadjs = basintr+81
 oldtsr = basintr+82
-;
+
 tmp1 = $d000
 tmp2 = $d001
 tmp3 = $d002
@@ -196,28 +194,27 @@ tmp4 = $d003
 tmp5 = $d004
 tmp6 = $d005
 tmp7 = $d006
-;
+
 trans = $d00e
 index = $d00f
-;
+
 datebuf = 828 ;$0b
 date1 = 839 ;$1c
 wrapbuf = 867 ;$50
-;
+
 gc = $c000
 gchide = $e000
 gclen = 4
-;
+
 ecs = $c000
 ecshide = $e400
 ecslen = 10
-;
-;
+
 bsnpre = $02fd
 bsnval = $02fe
 
 ; FIXME unknown value
 nchk1 = $00
 
-bsnpre = $02fd
-bsnval = $02fe
+inable = $4303
+disabl = $4306

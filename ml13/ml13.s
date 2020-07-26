@@ -1558,9 +1558,6 @@ chatchk:
 		ldy #5
 		jmp chkflags
 
-		inable = $4303
-		disabl = $4306
-
 modtype:
 		byte 0
 modst:
@@ -3124,10 +3121,6 @@ t3fk7:
 		sta access
 		ldx #2
 		jmp t1init
-
-
-		inable = $4303
-		disabl = $4306
 
 ;********************************
 ;* display routines
