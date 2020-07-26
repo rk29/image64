@@ -2880,8 +2880,6 @@ dspdev: byte 8
 setbaud:txa
 		jmp rsbaud
 
-		bsnpre = $02fd
-		bsnval = $02fe
 
 ;********************************
 ;* variable handling routines *

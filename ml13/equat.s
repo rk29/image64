@@ -218,3 +218,6 @@ bsnval = $02fe
 
 ; FIXME unknown value
 nchk1 = $00
+
+bsnpre = $02fd
+bsnval = $02fe
