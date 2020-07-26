@@ -2,11 +2,9 @@ revision = 1
 version_string = "07/31/90 03:55a"
 serial = $1003
 
-
 include "equat.s"
 
 org $a000, "ml13.prg"
-
 
 ; jump table for &'s
 jmptbl:
@@ -352,15 +350,23 @@ comjmp:
 combad:
 		jmp notc
 
-mcom: byte 0
-mnum: byte 3
-mchr: byte 0
-mnum2: byte 0
-mchr2: byte 0
-mval: byte 0
-mchr3: byte 0
+mcom:
+		byte 0
+mnum:
+		byte 3
+mchr:
+		byte 0
+mnum2:
+		byte 0
+mchr2:
+		byte 0
+mval:
+		byte 0
+mchr3:
+		byte 0
 
-comtbl:		word notc, coma, comb, comc, comd, come, comf, comg
+comtbl:
+		word notc, coma, comb, comc, comd, come, comf, comg
 		word comh, comi, comj, comk, coml, notc, comn, como
 		word comp, comq, comr, coms, comt, comu, comv, comw
 		word comx, notc, notc, notc, notc, notc, notc, ctab
@@ -524,48 +530,58 @@ comi:
 ;* j - skip lines
 comj:
 		lda mnum
-comj1: cmp #0
+comj1:
+		cmp #0
 		beq comj2
 		sta mjump
 		lda #240
 		sta $96
-comj2: rts
+comj2:
+		rts
 
 ;* k - kolorific
-comk: lda mnum
+comk:
+		lda mnum
 		cmp #0
 		bne comk1
 		sta mkolor
 		rts
-comk1: sta mkolor
+comk1:
+		sta mkolor
 		jmp comc
 
 ;* l - send output to printer
-coml: lda mnum
+coml:
+		lda mnum
 		and #1
 		sta mprtr
 		rts
 
 ;* n - send carriage returns
-comn: lda #13
+comn:
+		lda #13
 		jmp repchr0
 
 ;* o - output 19 characters
-como: lda #19
+como:
+		lda #19
 		sta mnum
 		lda mchr
 		jmp repchr
 
 ;* p - set print mode
-comp: lda mnum
+comp:
+		lda mnum
 		sta mprint
 		rts
 
 ;* q - reset mci settings
-comq: lda mnum
+comq:
+		lda mnum
 		beq comq1
 		sta comqc
-comq1: lda #0
+comq1:
+		lda #0
 		sta mjump
 		sta mnum
 		sta mreverse
@@ -577,10 +593,12 @@ comq1: lda #0
 		jsr comc
 		lda #0
 		jmp comu1
-comqc: byte 3
+comqc:
+		byte 3
 
 ;* r - reverse mode
-comr: lda mnum
+comr:
+		lda mnum
 		and #1
 		sta mreverse
 		lsr
@@ -590,12 +608,14 @@ comr: lda mnum
 		jmp outchr
 
 ;* s - set print speed
-coms: lda mnum
+coms:
+		lda mnum
 		sta mspeed
 		rts
 
 ;* t - compare to buffer
-comt: lda mnum
+comt:
+		lda mnum
 		cmp #2
 		bne comt1
 		ldx #24
@@ -604,7 +624,8 @@ comt: lda mnum
 		and #$0f
 		ora #$30
 		sta buffer
-comt1: lda #<buffer
+comt1:
+		lda #<buffer
 		sta coma2+1
 		lda #>buffer
 		sta coma2+2
@@ -612,8 +633,10 @@ comt1: lda #<buffer
 		jmp coma1
 
 ;* u - uppercase mode
-comu: lda mnum
-comu1: and #1
+comu:
+		lda mnum
+comu1:
+		and #1
 		sta mupcase
 		lsr
 		ror
@@ -622,10 +645,12 @@ comu1: and #1
 		jmp outchr
 
 ;* v - print variable
-comv: ldx mnum
+comv:
+		ldx mnum
 		stx mcom
 		jsr mcivar
-comv0: lda var
+comv0:
+		lda var
 		sta comv1+1
 		lda var+1
 		sta comv3+1
@@ -633,27 +658,34 @@ comv0: lda var
 		sta comv3+2
 		lda #0
 		sta comv2+1
-comv1: lda #$ff
-comv2: cmp #$ff
+comv1:
+		lda #$ff
+comv2:
+		cmp #$ff
 		beq comv6
 		ldy comv2+1
-comv3: lda $ffff,y
+comv3:
+		lda $ffff,y
 		sta $fe
 		ldx mcom
 		cpx #2
 		bcs comv4
 		sta datebuf,y
 		jmp comv5
-comv4: jsr domode
-comv5: inc comv2+1
+comv4:
+		jsr domode
+comv5:
+		inc comv2+1
 		jmp comv1
-comv6: ldx mcom
+comv6:
+		ldx mcom
 		cpx #2
 		bcs comv8
 		jsr convert
 		lda #0
 		sta comv2+1
-comv7: ldy comv2+1
+comv7:
+		ldy comv2+1
 		lda date1,y
 		sta $fe
 		jsr output
@@ -661,26 +693,32 @@ comv7: ldy comv2+1
 		lda comv2+1
 		cmp #25
 		bcc comv7
-comv8: rts
+comv8:
+		rts
 
 ;* w - wait
-comw: lda mnum
+comw:
+		lda mnum
 		beq comw2
 		inc mnum
-comw1: lda scs
+comw1:
+		lda scs
 		cmp mcom
 		beq comw1
 		sta mcom
 		dec mnum
 		bne comw1
-comw2: rts
+comw2:
+		rts
 
 ;* x - abort file read
-comx: lda #240
+comx:
+		lda #240
 		jmp comj1
 
 ;* # - length of field / fill chr
-clen:		lda mchr
+clen:
+		lda mchr
 		cmp #$30
 		bcc clen1
 		cmp #$3a
@@ -689,13 +727,16 @@ clen:		lda mchr
 		cmp #5
 		bcc clen0
 		lda #5
-clen0:		sta mdigits
+clen0:
+		sta mdigits
 		lda #$30
-clen1:		sta cnumc
+clen1:
+		sta cnumc
 		rts
 
 ;* $ - print string variable
-cstr: lda #2
+cstr:
+		lda #2
 		sta mcom
 		lda mchr
 		ldx #$80
@@ -703,13 +744,15 @@ cstr: lda #2
 		jmp comv0
 
 ;* % - print integer variable
-cnum: lda mchr
+cnum:
+		lda mchr
 		ora #$80
 		ldx #$80
 		jsr usevar0
 		ldx var
 		lda var+1
-prax: jsr decimal
+prax:
+		jsr decimal
 		ldy #0
 		sty cnumf
 		ldx mdigits
@@ -718,7 +761,8 @@ prax: jsr decimal
 		sec
 		sbc mdigits
 		tay
-cnum1: sty cnumd
+cnum1:
+		sty cnumd
 		lda decchr,y
 		cpy #4
 		bcs cnum2
@@ -732,67 +776,85 @@ cnum1: sty cnumd
 		sta $fe
 		jsr domode
 		jmp cnum3
-cnum2: sta $fe
+cnum2:
+		sta $fe
 		jsr domode
 		inc cnumf
-cnum3: ldy cnumd
+cnum3:
+		ldy cnumd
 		iny
 		cpy #5
 		bne cnum1
 		rts
-cnumf: byte 0
-cnumd: byte 0
-cnumc: byte $30
+cnumf:
+		byte 0
+cnumd:
+		byte 0
+cnumc:
+		byte $30
 
 ; mci tab
-ctab: inc $96
+ctab:
+		inc $96
 		lda mval
 		cmp scnpos
 		bcc ctab0
 		beq ctab0
 		cmp #40
 		bcs ctab0
-ctab1: lda #$20
+ctab1:
+		lda #$20
 		sta $fe
 		jsr output
 		lda mval
 		cmp scnpos
 		bne ctab1
-ctab0: rts
+ctab0:
+		rts
 
 ;* repeat a character(|b,|h,|n,|o)
-repchr: sta tmp5
+repchr:
+		sta tmp5
 		lda mnum
 		beq repchr2
 		sta tmp2
-repchr1: lda tmp5
+repchr1:
+		lda tmp5
 		sta $fe
 		jsr domode
 		dec tmp2
 		bne repchr1
-repchr2: rts
-repchr0: ldx mnum
-repchr5: stx tmp6
+repchr2:
+		rts
+repchr0:
+		ldx mnum
+repchr5:
+		stx tmp6
 		sta tmp7
 		lda tmp6
 		beq repchr4
-repchr3: lda tmp7
+repchr3:
+		lda tmp7
 		sta $fe
 		jsr output
 		dec tmp6
 		bne repchr3
-repchr4: rts
+repchr4:
+		rts
 
 ;* not an mci command
-notc: dec $96
+notc:
+		dec $96
 		dec $96
 		lda #$5c ; british pound
-notc1: cmp #$04
+notc1:
+		cmp #$04
 		bne domode
 
 ;* handle ctrl-d in string
 		ldx #0
-dodate: inc $96
+dodate:
+		inc $96
 		ldy $96
 		lda [$71],y
 		sta datebuf,x
@@ -803,7 +865,8 @@ dodate: inc $96
 		lda #0
 		sta index
 		ldy index
-dodate1: lda date1,y
+dodate1:
+		lda date1,y
 		sta $fe
 		jsr output
 		inc index
@@ -813,7 +876,8 @@ dodate1: lda date1,y
 		rts
 
 ;* do print modes
-domode: sta tmp4
+domode:
+		sta tmp4
 		jsr chkspcl
 		and #$7f
 		cmp #$20
@@ -821,7 +885,8 @@ domode: sta tmp4
 		lda tmp4
 		sta $fe
 		jmp output
-domode1: lda mprint
+domode1:
+		lda mprint
 		and #$0f
 		asl
 		tax
@@ -830,54 +895,68 @@ domode1: lda mprint
 		inx
 		lda pmodetbl,x
 		sta domode2+2
-domode2: lda $ffff
+domode2:
+		lda $ffff
 		beq domode5
 		cmp #$ff
 		beq domode6
-domode3: sta $fe
+domode3:
+		sta $fe
 		jsr output
 		inc domode2+1
 		bne domode2
 		inc domode2+2
 		bne domode2
-domode5: rts
-domode6: jsr dospeed
+domode5:
+		rts
+domode6:
+		jsr dospeed
 		lda tmp4
 		jmp domode3
 
 ;* do print speed
-dospeed: ldx mspeed
+dospeed:
+		ldx mspeed
 		beq dokolor
 		jsr tenwait
 ;* do kolorific
-dokolor: lda mkolor
+dokolor:
+		lda mkolor
 		beq donone
 		ldx mcolor
-dokolor1:inx
+dokolor1:
+		inx
 		txa
 		and #15
 		beq dokolor1
 		sta mnum
 		jsr comc
-donone: rts
+donone:
+		rts
 
 ; wait for .x tenths of a second
-tenwait: cpx #0
+tenwait:
+		cpx #0
 		beq tnw3
-tnw1: lda ten
-tnw2: cmp ten
+tnw1:
+		lda ten
+tnw2:
+		cmp ten
 		beq tnw2
 		dex
 		bne tnw1
-tnw3: rts
+tnw3:
+		rts
 
 ;* character output routines *
 ;* last revision: 8/30/87 *
 
 ;* output character in .a
 ;* preserve registers
-xchrout: sta $fe
-xchrout1:tya
+xchrout:
+		sta $fe
+xchrout1:
+		tya
 		pha
 		txa
 		pha
@@ -891,25 +970,30 @@ xchrout1:tya
 
 ;* output character, and
 ;* get response character
-output: jsr outchr
+output:
+		jsr outchr
 		jsr getchr
 		ldx #$a0
 		lda $fe
 		beq output1a
 		cmp #$13 ; home
 		beq output2
-output0: ldx #$a0
+output0:
+		ldx #$a0
 		cmp #"/"
 		beq output1
 		cmp #$20
 		beq output1
 		cmp #3
 		bne output1a
-output1:       sta chat
+output1:
+		sta chat
 		ldx #$c1  ; capital reverse A
-output1a:      stx $420
+output1a:
+		stx $420
 		rts
-output2:       lda #$d0  ; capital reverse P
+output2:
+		lda #$d0  ; capital reverse P
 		sta $41e
 		jsr xgetchr
 		lda #$a0
@@ -918,9 +1002,11 @@ output2:       lda #$d0  ; capital reverse P
 		jmp output0
 
 ;* output character
-outchr: lda $fe
+outchr:
+		lda $fe
 		jsr chkspcl
-outchr1: sta $fe
+outchr1:
+		sta $fe
 		and #127
 		cmp #32
 		bcc outchr1a
@@ -929,12 +1015,14 @@ outchr1: sta $fe
 		lda mask
 		sta $fe
 		jmp outchr2
-outchr1a:lda mci
+outchr1a:
+		lda mci
 		bpl outchr2
 		lda $fe
 		jsr ctrlchk1
 		bcc outchr2
-outchr1d:ora #64
+outchr1d:
+		ora #64
 		pha
 		lda mreverse
 		bne outchr1b
@@ -944,17 +1032,23 @@ outchr1d:ora #64
 		jsr outchr1c
 		lda #$92 ; reverse-off
 		pha
-outchr1b:pla
-outchr1c:sta $fe
-outchr2: ldx wrapflg
+outchr1b:
+		pla
+outchr1c:
+		sta $fe
+outchr2:
+		ldx wrapflg
 		bne outchr4
-outchr3: jsr outscn
+outchr3:
+		jsr outscn
 		jsr outmdm
 		jmp outptr
 
-outchr4: lda $fe
+outchr4:
+		lda $fe
 		ldx wrapind
-outchr5: sta wrapbuf,x
+outchr5:
+		sta wrapbuf,x
 		inx
 		stx wrapind
 		and #$7f
@@ -964,7 +1058,8 @@ outchr5: sta wrapbuf,x
 		beq outchr6
 		bcc outchr6
 		rts
-outchr6: lda #13
+outchr6:
+		lda #13
 		sta $fe
 		txa
 		pha
@@ -973,7 +1068,8 @@ outchr6: lda #13
 		cmp #41
 		bcc outchr6a
 		jsr outscn
-outchr6a:pla
+outchr6a:
+		pla
 		pha
 		clc
 		adc ptrclm
@@ -982,7 +1078,8 @@ outchr6a:pla
 		cpy ptrclmn
 		bcc outchr6b
 		jsr outptr
-outchr6b:pla
+outchr6b:
+		pla
 		clc
 		adc modclm
 		tay
@@ -990,9 +1087,11 @@ outchr6b:pla
 		cpy modclmn
 		bcc outchr6c
 		jsr outmdm
-outchr6c:ldy #0
+outchr6c:
+		ldy #0
 		sty wrapdmp
-outchr7: cpy wrapind
+outchr7:
+		cpy wrapind
 		beq outchr7a
 		lda wrapbuf,y
 		sta $fe
@@ -1000,11 +1099,13 @@ outchr7: cpy wrapind
 		inc wrapdmp
 		ldy wrapdmp
 		bne outchr7
-outchr7a:lda #0
+outchr7a:
+		lda #0
 		sta wrapind
 		rts
 
-outmdm: lda wrapflg
+outmdm:
+		lda wrapflg
 		beq outmdm0
 		lda $fe
 		cmp #32
@@ -1015,21 +1116,26 @@ outmdm: lda wrapflg
 		bcc outmdm0
 		lda #13
 		sta $fe
-outmdm0: lda inchat
+outmdm0:
+		lda inchat
 		bne outmdm1
 		jsr carchk4
 		bne outmdm2
-outmdm1: jsr outmod
-outmdm2: rts
+outmdm1:
+		jsr outmod
+outmdm2:
+		rts
 
-outptr: lda $fe
+outptr:
+		lda $fe
 		cmp #13
 		beq outptr0
 		jsr colorchk
 		bcc outptr4
 		jsr ctrlchk2
 		bcc outptr4
-outptr0: ldx ptrclm
+outptr0:
+		ldx ptrclm
 		ldy ptrclmn
 		jsr outadj
 		stx ptrclm
@@ -1039,7 +1145,8 @@ outptr0: ldx ptrclm
 		ldy #5
 		jsr chkflags
 		beq outptr4
-outptr1: ldx #4
+outptr1:
+		ldx #4
 		jsr chkout
 		lda $90
 		bmi outptr3
@@ -1050,10 +1157,13 @@ outptr1: ldx #4
 		lda ptrlnfd
 		beq outptr2
 		jsr chrout
-outptr2: lda #0
+outptr2:
+		lda #0
 		sta mprtr
-outptr3: jmp clrchn
-outptr4: rts
+outptr3:
+		jmp clrchn
+outptr4:
+		rts
 
 ;* output routine to fix 1200 and
 ;* do the transmit window
@@ -1080,26 +1190,31 @@ out:
 		lda $9e
 		jsr $e716
 		jmp out6
-out1: lda scnmode
+out1:
+		lda scnmode
 		bne out3
 		ldx #0
-out2: lda $7dd,x
+out2:
+		lda $7dd,x
 		sta $7dc,x
 		inx
 		cpx #$09
 		bne out2
 		lda $9e
 		sta $7e5
-out3: lda $9e
+out3:
+		lda $9e
 		jsr rsout
-out6: pla
+out6:
+		pla
 		tay
 		pla
 		tax
 		lda $9e
 		clc
 		rts
-out0: sta $9e
+out0:
+		sta $9e
 		txa
 		pha
 		tya
@@ -1107,10 +1222,12 @@ out0: sta $9e
 		jmp out3
 
 ;* output carriage return
-prcr: lda #$0d
+prcr:
+		lda #$0d
 		jmp xchrout
 ;* output delete character
-prdel: lda #$14
+prdel:
+		lda #$14
 		jmp xchrout
 
 ;********************************
@@ -1120,7 +1237,8 @@ prdel: lda #$14
 
 ;* get character into .a
 ;* handle mci access
-xgetin: jsr xgetchr
+xgetin:
+		jsr xgetchr
 		cmp #$13 ; home
 		beq xgetin
 		cmp #$5c ; british pound
@@ -1129,10 +1247,13 @@ xgetin: jsr xgetchr
 		and #$08
 		bne xgetin1
 		jmp xgetin
-xgetin1: lda #$5c ; british pound
-xgetin2: rts
+xgetin1:
+		lda #$5c ; british pound
+xgetin2:
+		rts
 
-xgetchr: jsr getchr
+xgetchr:
+		jsr getchr
 		jsr carchk
 		bne xgetchr1
 		jsr chatchk
@@ -1140,12 +1261,14 @@ xgetchr: jsr getchr
 		lda $fe
 		beq xgetchr
 		rts
-xgetchr1:lda #$0d
+xgetchr1:
+		lda #$0d
 		rts
 
 ;* input character to an$
 ;* waits for character
-inchr: jsr xgetin
+inchr:
+		jsr xgetin
 		lda $fe
 		sta buffer
 		lda #$01
@@ -1159,28 +1282,34 @@ inchr: jsr xgetin
 
 ;* get character
 ;* with case setting
-getchr: jsr getkbd
+getchr:
+		jsr getkbd
 		bne getchr1
 		jsr carchk4
 		bne getchr7
 		jsr getmod
-getchr1: cmp #$60
+getchr1:
+		cmp #$60
 		bcc getchr3
 		cmp #$80
 		bcs getchr3
 		adc #$60
-getchr3: cmp #$a0
+getchr3:
+		cmp #$a0
 		bcc getchr4
 		cmp #$bf
 		bcs getchr4
 		adc #$40
-getchr4: cmp #$e0
+getchr4:
+		cmp #$e0
 		bne getchr5
 		lda #$20
-getchr5: cmp #$de
+getchr5:
+		cmp #$de
 		bne getchr6
 		lda #$ff
-getchr6: tax
+getchr6:
+		tax
 		lda editor
 		and #$01
 		bne getchr8
@@ -1190,8 +1319,10 @@ getchr6: tax
 		bcc getchr8
 		cpx #$80
 		bcs getchr8
-getchr7: ldx #0
-getchr8: stx $fe
+getchr7:
+		ldx #0
+getchr8:
+		stx $fe
 		lda curdsp
 		beq getchr9
 		ldx #4
@@ -1222,8 +1353,10 @@ getchr8: stx $fe
 		lda #0
 		sta tsr
 		pla
-getchr8a:jsr dspidle
-getchr9: lda $fe
+getchr8a:
+		jsr dspidle
+getchr9:
+		lda $fe
 		ldx case
 		beq getchr11
 		cmp #$41
@@ -1231,21 +1364,26 @@ getchr9: lda $fe
 		cmp #$5b
 		bcs getchr11
 		ora #$80
-getchr11:ldx #7
-getchr12:cmp spchars,x
+getchr11:
+		ldx #7
+getchr12:
+		cmp spchars,x
 		beq getchr13
 		dex
 		bpl getchr12
 		bmi getchr14
-getchr13:cpx #6
+getchr13:
+		cpx #6
 		beq getchr14
 		txa
 		clc
 		adc #$85
-getchr14:sta $fe
+getchr14:
+		sta $fe
 		rts
 
-dspidle: sta idlesec
+dspidle:
+		sta idlesec
 		stx idleten
 		sty idlemin
 		lda scnmode
@@ -1262,28 +1400,34 @@ dspidle: sta idlesec
 		tya
 		ora #$b0
 		sta $4de
-dspidle1: rts
+dspidle1:
+		rts
 
-getkbd: jsr crsron
-getkbd0: ldx fkeybuf
+getkbd:
+		jsr crsron
+getkbd0:
+		ldx fkeybuf
 		beq getkbd2
 		inc fkeybuf
 		lda fkeybuf,x
 		bne getkbd1
 		lda #0
 		sta fkeybuf
-getkbd2: jsr $f142
+getkbd2:
+		jsr $f142
 		cmp #$85
 		bcc getkbd1
 		cmp #$8d
 		bcs getkbd1
 		lda #0
-getkbd1: cmp #0
+getkbd1:
+		cmp #0
 		rts
 
 ;* get character from the modem
 ;* and move recieve window
-getmdm: jsr rsinabl
+getmdm:
+		jsr rsinabl
 		sec
 		jsr rsget
 		bcs getmdm6
@@ -1295,7 +1439,8 @@ getmdm: jsr rsinabl
 		pla
 		and #$7f
 		pha
-getmdm1: lda scnmode
+getmdm1:
+		lda scnmode
 		bne getmdm5
 		lda #0
 		pha
@@ -1306,9 +1451,11 @@ getmdm1: lda scnmode
 		pla
 		lda #6
 		pha
-getmdm1a:pla
+getmdm1a:
+		pla
 		tay
-getmdm2: lda $7c3,y
+getmdm2:
+		lda $7c3,y
 		sta $7c2,y
 		iny
 		cpy #9
@@ -1323,10 +1470,13 @@ getmdm2: lda $7c3,y
 		ldx passmode
 		beq getmdm4
 		lda mask
-getmdm4: sta $7cb
-getmdm5: pla
+getmdm4:
+		sta $7cb
+getmdm5:
+		pla
 		rts
-getmdm6: lda #0
+getmdm6:
+		lda #0
 		rts
 
 ;********************************
@@ -1334,16 +1484,20 @@ getmdm6: lda #0
 ;* last revision: 8/30/87 *
 ;********************************
 
-spchars: byte ",:",34,"*?=",13,$5e
+spchars:
+		byte ",:",34,"*?=",13,$5e
 
-chkspcl:	stx cxsav
-chkspcl1:	cmp #$85
+chkspcl:
+		stx cxsav
+chkspcl1:
+		cmp #$85
 		bcc chkspcl2
 		cmp #$8d
 		bcs chkspcl2
 		tax
 		lda spchars-$85,x
-chkspcl2:	ldx cxsav
+chkspcl2:
+		ldx cxsav
 		rts
 
 ;check carrier
@@ -1352,7 +1506,8 @@ chkspcl2:	ldx cxsav
 ;1 if carrier dropped
 ;2 if time out
 
-carchk: lda local
+carchk:
+		lda local
 		bne carchk2
 		ldx #4
 		ldy #5
@@ -1365,43 +1520,51 @@ carchk: lda local
 		jsr disptime
 		lda #1
 		rts
-carchk1: lda tsr
+carchk1:
+		lda tsr
 		bne carchk2
 		lda editor
 		and #$40
 		bne carchk2
 		lda #2
 		rts
-carchk2: lda #0
+carchk2:
+		lda #0
 		rts
 ; check actual carrier
 ; 0 = ok
 ; 1 = drop
-carchk3: lda carrst
+carchk3:
+		lda carrst
 		and #127
 		rts
 
 ;check if it's ok to use the modem
 ; 0 = ok
 ; <>0 = no
-carchk4: ldx #4
+carchk4:
+		ldx #4
 		ldy #5
 		jsr chkflags
 		bne carchk5
 		lda local
 		bne carchk5
 		jmp carchk3
-carchk5:rts
+carchk5:
+		rts
 
-chatchk: ldx #8
+chatchk:
+		ldx #8
 		ldy #5
 		jmp chkflags
 
 		inable = $4303
 		disabl = $4306
 
-modtype:byte 0
-modst: word prgstart
+modtype:
+		byte 0
+modst:
+		word prgstart
 
 modtbl:
 		word prgstart ;0
@@ -1415,15 +1578,19 @@ modtbl:
 
 ;* program load routines
 
-;serial3a:	byte >serial,<serial
-;serial3b:	word 65536-serial
+;serial3a:
+;		byte >serial,<serial
+;serial3b:
+;		word 65536-serial
 
 ;* load various types of modules
 
-prgfile:	cpx #0
+prgfile:
+		cpx #0
 		bne prg0
 		ldx #8
-prg0:		stx filenum
+prg0:
+		stx filenum
 		sty modtype
 		cpy #8
 		bcc prg1
@@ -1470,7 +1637,8 @@ prg1:
 		plp
 		bcc prg2
 		rts
-prg2:		ldy modtype
+prg2:
+		ldy modtype
 		beq prg3
 		cpy #1
 		beq module
@@ -1485,7 +1653,8 @@ prg2:		ldy modtype
 		rts
 
 ;link program to module
-module:		jsr relink
+module:
+		jsr relink
 		jsr follow
 		lda modst
 		sta [$ac],y
@@ -1615,38 +1784,46 @@ dir:
 		jsr decimal
 		ldy #0
 		ldx #0
-dir3:		lda decchr,y
+dir3:
+		lda decchr,y
 		cmp #$30
 		beq dir3a
 		inx
-dir3a:		cpx #0
+dir3a:
+		cpx #0
 		bne dir3b
 		lda #$20
-dir3b:		sta buf2,y
+dir3b:
+		sta buf2,y
 		iny
 		cpy #5
 		bcc dir3
-dir4:		ldy #5
+dir4:
+		ldy #5
 		lda #$20
 		sta buf2,y
 		iny
-dir0:		jsr chrin
+dir0:
+		jsr chrin
 		cmp #$20
 		beq dir0
 		sta buf2,y
 		iny
-dir1:		jsr chrin
+dir1:
+		jsr chrin
 		beq dir2
 		sta buf2,y
 		iny
 		lda $90
 		beq dir1
-dir2:		lda buf2-1,y
+dir2:
+		lda buf2-1,y
 		cmp #$20
 		bne dir5
 		dey
 		bne dir2
-dir5:		sty var
+dir5:
+		sty var
 		lda #<buf2
 		sta var+1
 		lda #>buf2
@@ -1656,15 +1833,19 @@ dir5:		sty var
 		jmp clrchn
 
 ;* input from disk
-dskin:		cpx #0
+dskin:
+		cpx #0
 		bne dskin0a
 		stx filenum
-dskin0a:	cpy #0
+dskin0a:
+		cpy #0
 		bne bytin
-dskin0:		jsr chkin
+dskin0:
+		jsr chkin
 		lda #0
 		sta index
-dskin1:		jsr getin
+dskin1:
+		jsr getin
 		ldy index
 		cmp #13
 		beq dskin3
@@ -1681,7 +1862,8 @@ dskin1:		jsr getin
 		lda #$40
 		sta $90
 		ldy #1
-dskin3:		sty var
+dskin3:
+		sty var
 		lda #<buf2
 		sta var+1
 		lda #>buf2
@@ -1778,28 +1960,35 @@ irqtbl:
 
 ;* chat page
 
-irq1:		ldy #4
+irq1:
+		ldy #4
 		dey
 		bpl irq1a
 		ldy #4
-irq1a:		sty irq1+1
-irq1z:		ldx #5
+irq1a:
+		sty irq1+1
+irq1z:
+		ldx #5
 		dex
 		bpl irq1b
 		ldx #5
-irq1b:		stx irq1z+1
+irq1b:
+		stx irq1z+1
 		lda scnmode
 		bne irq1e
 		lda chatpage
 		bne irq1c
 		ldx #0
-irq1c:		lda pagecol,x
+irq1c:
+		lda pagecol,x
 		ldx #15
-irq1d:		sta $dbcc,x
+irq1d:
+		sta $dbcc,x
 		dex
 		bpl irq1d
 		crsrflg = *+1
-irq1e:		lda #$00
+irq1e:
+		lda #$00
 		beq nocrsr
 		lda sline
 		cmp topline
@@ -1807,21 +1996,26 @@ irq1e:		lda #$00
 		cmp botline
 		beq irq1f
 		bcs nocrsr
-irq1f:		lda irq1+1
+irq1f:
+		lda irq1+1
 		and #2
 		beq irq1g
 		lda #$80
-irq1g:		eor undchr
+irq1g:
+		eor undchr
 		ldx mcolor
-docrsr:		ldy 2
+docrsr:
+		ldy 2
 		curptr=*+1
 		sta $0518,y
 		txa
 		colptr=*+1
 		sta $d918,y
-nocrsr:		rts
+nocrsr:
+		rts
 
-crsron: lda crsrflg
+crsron:
+		lda crsrflg
 		bne crsron1
 		lda sline
 		cmp topline
@@ -1829,7 +2023,8 @@ crsron: lda crsrflg
 		cmp botline
 		beq crsron0
 		bcs crsron1
-crsron0: ldy 2
+crsron0:
+		ldy 2
 		lda curptr
 		sta $fb
 		lda curptr+1
@@ -1846,9 +2041,11 @@ crsron0: ldy 2
 		sta crsrflg
 		lda #3
 		sta irq1+1
-crsron1: jmp irq1e
+crsron1:
+		jmp irq1e
 
-crsroff: php
+crsroff:
+		php
 		sei
 		lda crsrflg
 		beq crsroff1
@@ -1857,19 +2054,23 @@ crsroff: php
 		lda undchr
 		ldx undcol
 		jsr docrsr
-crsroff1:plp
+crsroff1:
+		plp
 		rts
 
 ;* update time on screen
 
-timeflag:byte 0
+timeflag:
+		byte 0
 
-irq2: lda min
+irq2:
+		lda min
 		ldx timeflag
 		bne irq2a
 		cmp bootdate+5
 		beq ha872
-irq2a: sta bootdate+5
+irq2a:
+		sta bootdate+5
 		ldx #0
 		stx timeflag
 		jsr dotsr
@@ -1886,7 +2087,8 @@ irq2a: sta bootdate+5
 		bcc ha832
 		lda #1
 		sta bootdate
-ha832: ldy bootdate+1
+ha832:
+		ldy bootdate+1
 		lda bootdate+2
 		cmp ha560-1,y
 		bne ha84d
@@ -1897,7 +2099,8 @@ ha832: ldy bootdate+1
 		clc
 		adc #1
 		sta bootdate+1
-ha84d: lda bootdate+2
+ha84d:
+		lda bootdate+2
 		sed
 		clc
 		adc #1
@@ -1913,9 +2116,12 @@ ha84d: lda bootdate+2
 		clc
 		adc #1
 		sta bootdate+3
-ha86e: cld
-ha86f: jsr makdate
-ha872: lda scs
+ha86e:
+		cld
+ha86f:
+		jsr makdate
+ha872:
+		lda scs
 		jsr bcdtoa
 		pha
 		txa
@@ -1933,7 +2139,8 @@ ha872: lda scs
 		sbc scs
 		cld
 ; display tsr
-ha083: jsr bcdtoa
+ha083:
+		jsr bcdtoa
 		pha
 		txa
 		tay
@@ -1950,18 +2157,21 @@ ha083: jsr bcdtoa
 		sta jmptbl
 		lda #>copyrite
 		sta jmptbl+1
-tchk1: lda tsr
+tchk1:
+		lda tsr
 		cmp tsr2
 		sta tsr2
 		bne tchk2
 		jsr disptime
-tchk2: rts
+tchk2:
+		rts
 
 ;* make string out of current date
 ;* for d1$ (convert from 6 byte to
 ;* 11 byte format)
 
-makdate:	lda bootdate
+makdate:
+		lda bootdate
 		ora #$30
 		sta d1str
 		lda bootdate+1
@@ -1984,14 +2194,16 @@ makdate:	lda bootdate
 		jsr bcdtoa
 		sta d1str+9
 		stx d1str+10
-dispdate:	ldy bootdate
+dispdate:
+		ldy bootdate
 		dey
 		tya
 		asl
 		asl
 		tay
 		ldx #0
-dispd1:		lda days,y
+dispd1:
+		lda days,y
 		jsr dispdt
 		iny
 		cpx #4
@@ -2000,13 +2212,15 @@ dispd1:		lda days,y
 		cmp #$10
 		bcc dispd1a
 		sbc #6
-dispd1a:	tay
+dispd1a:
+		tay
 		dey
 		tya
 		asl
 		asl
 		tay
-dispd2:		lda months,y
+dispd2:
+		lda months,y
 		jsr dispdt
 		iny
 		cpx #8
@@ -2015,7 +2229,8 @@ dispd2:		lda months,y
 		cmp #$30
 		bne dispd3
 		lda #$20
-dispd3:		jsr dispdt
+dispd3:
+		jsr dispdt
 		lda d1str+6
 		jsr dispdt
 		lda #","
@@ -2037,16 +2252,17 @@ dispd3:		jsr dispdt
 		cmp #$30
 		bne dispd4
 		lda #$20
-dispd4:		jsr dispdt
+dispd4:
+		jsr dispdt
 		lda d1str+8
 		jsr dispdt
-lda #":"
+		lda #":"
 		jsr dispdt
 		lda d1str+9
 		jsr dispdt
 		lda d1str+10
 		jsr dispdt
-lda #":"
+		lda #":"
 		jsr dispdt
 		lda scs
 		pha
@@ -2067,27 +2283,34 @@ lda #":"
 		bcs dispd5
 		lda #$c1        ; capital A
 		bne dispd6
-dispd5:		lda #$d0        ; capital P
-dispd6:		jsr dispdt
+dispd5:
+		lda #$d0        ; capital P
+dispd6:
+		jsr dispdt
 		lda #$cd        ; capital M
 		jsr dispdt
 		lda #$20
 ;* convert to screen, store it
-dispdt:		pha
+dispdt:
+		pha
 		and caseflag
 		cmp #128
 		bcs dispdt1
-dispdt2:	cmp #64
+dispdt2:
+		cmp #64
 		bcc dispdt1
 		and #63
-dispdt1:	ora #$80
+dispdt1:
+		ora #$80
 		sta $0401,x
-dispdt3:	inx
+dispdt3:
+		inx
 		pla
 		rts
 
 ;* convert bcd to ascii
-bcdtoa: tax
+bcdtoa:
+		tax
 		lsr
 		lsr
 		lsr
@@ -2103,18 +2326,22 @@ bcdtoa: tax
 
 ;* display time remaining
 
-dotsr: lda tsr
+dotsr:
+		lda tsr
 		beq dotsr1
 		cmp #101
 		bcs dotsr1
 		dec tsr
-dotsr1:rts
+dotsr1:
+		rts
 
-irq8: lda tsr
+irq8:
+		lda tsr
 		cmp oldtsr
 		bne disptime
 		rts
-disptime:ldx #32
+disptime:
+		ldx #32
 		lda #$20
 		lda #$20
 		jsr dispdt
@@ -2127,54 +2354,72 @@ disptime:ldx #32
 		lda #"-"
 		tay
 		bne dt3
-dt01: sec
+dt01:
+		sec
 		sbc #1
-dt0: ldy #$30
-dt1: cmp #10
+dt0:
+		ldy #$30
+dt1:
+		cmp #10
 		bcc dt2
 		sbc #10
 		iny
 		bne dt1
-dt2: ora #$30
-dt3: pha
+dt2:
+		ora #$30
+dt3:
+		pha
 		tya
 		jsr dispdt
 		pla
 		jsr dispdt
-lda #":"
+		lda #":"
 		jmp dispdt
 
-irq3: jsr chkblnk
+irq3:
+		jsr chkblnk
 		beq irq3a
 		lda blnkflag
 		bne irq3a
 		inc blnkcntr
 		bne irq3b
-scrnoff: lda #1
+scrnoff:
+		lda #1
 		ldx #11
 		ldy #0
 		beq scrnon1
-scrnon: lda #0
+scrnon:
+		lda #0
 		ldx #27
 		ldy #11
-scrnon1: jsr scrnset
-irq3a: lda #0
+scrnon1:
+		jsr scrnset
+irq3a:
+		lda #0
 		sta blnkcntr
-irq3b: rts
-chkblnk: ldx #11
+irq3b:
+		rts
+chkblnk:
+		ldx #11
 		jmp chkflag
 
 ; toggle full screen
-setmode0:rts
-setmode: cpx scnmode
+setmode0:
+		rts
+setmode:
+		cpx scnmode
 		bne setmode0
-setmode1:cpx #0
+setmode1:
+		cpx #0
 		bne halfscn
-fullscn: jsr toglscn
-fullscn1:ldx #1
+fullscn:
+		jsr toglscn
+fullscn1:
+		ldx #1
 		ldy #24
 		lda #1
-setsize: stx topline
+setsize:
+		stx topline
 		sty botline
 		sta scnmode
 		rts
@@ -2227,11 +2472,13 @@ scnloop2:
 bits:
 		byte 1,2,4,8,16,32,64,128
 
-; serial4b:	word serial
+; serial4b:
+;		word serial
 
 ;* put check on screen for carrier
 
-irq5:		ldx #$fa
+irq5:
+		ldx #$fa
 		lda carrier
 		eor mxor
 		and #$10
@@ -2240,10 +2487,12 @@ irq5:		ldx #$fa
 		sta carrst
 		ldx #$a0
 		bne irq5d
-irq5a:		lda carrst
+irq5a:
+		lda carrst
 		ora #128
 		sta carrst
-irq5d:		lda topline
+irq5d:
+		lda topline
 		beq irq5c
 		stx $427
 		lda #$a0
@@ -2255,7 +2504,8 @@ irq5d:		lda topline
 		pla
 		lda #$fa
 		pha
-irq5b:		pla
+irq5b:
+		pla
 		sta $400
 irq5c:
 ;		lda serial4a
@@ -2265,24 +2515,30 @@ irq5c:
 ;		cmp serial4b+1
 ;		bne irq5e
 		rts
-;irq5e:		ldx #1
+;irq5e:
+;		ldx #1
 ;		jmp setmode
 
-;serial4a:	word serial
+;serial4a:
+;		word serial
 
-irq6: lda carrst
+irq6:
+		lda carrst
 		and #127
-irq6a: cmp #1
+irq6a:
+		cmp #1
 		beq irq6b
 		sta irq6a+1
 		cmp #0
 		bne irq6b
 		lda #1
 		sta flag
-irq6b: ldx #4
+irq6b:
+		ldx #4
 		ldy #5
 		jsr chkflags
-irq6c: cmp #0
+irq6c:
+		cmp #0
 		beq irq6d
 		sta irq6c+1
 		cmp #0
@@ -2292,10 +2548,12 @@ irq6c: cmp #0
 		beq irq6d
 		lda #1
 		sta flag
-irq6d: rts
+irq6d:
+		rts
 
 ;* display lightbar checkmarks
-irq7: ldy #1
+irq7:
+		ldy #1
 		lda bar
 		and #15
 		sta bar
@@ -2333,11 +2591,13 @@ irq7: ldy #1
 		lda chktbl+0,x
 		ldx #0
 		ldy #0
-irq7b: jsr irq7h
+irq7b:
+		jsr irq7h
 		cpx #20
 		bcc irq7b
 		pla
-irq7c: jsr irq7h
+irq7c:
+		jsr irq7h
 		cpx #40
 		bcc irq7c
 		pla
@@ -2346,30 +2606,37 @@ irq7c: jsr irq7h
 		sta $15
 		pla
 		sta $14
-irq7z: rts
+irq7z:
+		rts
 
-irq7d: lsr
+irq7d:
+		lsr
 		pha
 		lda #$20
 		bcc irq7e
 		lda #$7a
-irq7e: jsr irq7f
+irq7e:
+		jsr irq7f
 		pla
 		rts
 
-irq7f: ora #$80
+irq7f:
+		ora #$80
 		sta light,x
-irq7g: lda #$f1
+irq7g:
+		lda #$f1
 		sta $d8f0,x
 		inx
 		rts
 
-irq7h: pha
+irq7h:
+		pha
 		lda #$fc
 		cpx tmpbar
 		bne irq7i
 		lda #$f1
-irq7i: sta irq7g+1
+irq7i:
+		sta irq7g+1
 		pla
 		jsr irq7d
 		pha
@@ -2455,22 +2722,33 @@ chkflag5:
 		and chktbl,x
 		jmp chkflag8
 
-tmp14:		byte 0
-tmp15:		byte 0
-tmpbar:		byte 0
-tmpchk1:	byte 0
-tmpchk2:	byte 0
-chktbl:		byte 0,0,0,0
-bartbl:		word ltbar1,ltbar2
-ltbar1:		scn "SysAcsLocTsrChtNewPrtU/D"
-ltbar2:		scn "AscAnsExpUnvTrcBelNetFn1"
+tmp14:
+		byte 0
+tmp15:
+		byte 0
+tmpbar:
+		byte 0
+tmpchk1:
+		byte 0
+tmpchk2:
+		byte 0
+chktbl:
+		byte 0,0,0,0
+bartbl:
+		word ltbar1,ltbar2
+ltbar1:
+		scn "SysAcsLocTsrChtNewPrtU/D"
+ltbar2:
+		scn "AscAnsExpUnvTrcBelNetFn1"
 
-fkey:		ldx tmpkey
+fkey:
+		ldx tmpkey
 		lda 653
 		and #4
 		bne fkey1
 		inx
-fkey1:		txa
+fkey1:
+		txa
 		clc
 		adc #40
 		asl
@@ -2496,7 +2774,8 @@ fkey1:		txa
 		ldy #0
 		ldx fkeybuf
 		beq fkey3
-fkey2:		lda [3],y
+fkey2:
+		lda [3],y
 		sta fkeybuf+1,y
 		iny
 		dex
@@ -2505,13 +2784,16 @@ fkey2:		lda [3],y
 		sta fkeybuf+1,y
 		lda #1
 		sta fkeybuf
-fkey3:		pla
+fkey3:
+		pla
 		sta 4
 		pla
 		sta 3
-fkey4:		rts
+fkey4:
+		rts
 
-irq9: jsr $ffea
+irq9:
+		jsr $ffea
 		lda $cc
 		bne irq9f
 		dec $cd
@@ -2530,11 +2812,14 @@ irq9: jsr $ffea
 		sta $287
 		ldx $0286
 		lda $ce
-irq9e: eor #$80
+irq9e:
+		eor #$80
 		jsr $ea1c
-irq9f: jmp $ea87
+irq9f:
+		jmp $ea87
 
-irq10: lda sndtim1
+irq10:
+		lda sndtim1
 		beq irq10a
 		dec sndtim1
 		bne irq10d
@@ -2542,7 +2827,8 @@ irq10: lda sndtim1
 		ldx sndwav2
 		ldy sndwav3
 		jsr irq10c
-irq10a: lda sndtim2
+irq10a:
+		lda sndtim2
 		beq irq10d
 		dec sndtim2
 		bne irq10d
@@ -2555,7 +2841,8 @@ irq10a: lda sndtim2
 		cmp #255
 		beq irq10b
 		dec sndrept
-irq10b: lda sndtim1a
+irq10b:
+		lda sndtim1a
 		sta sndtim1
 		lda sndtim2a
 		sta sndtim2
@@ -2567,12 +2854,15 @@ irq10b: lda sndtim1a
 		tax
 		lda sndwav1
 		ora #1
-irq10c: sta $d404
+irq10c:
+		sta $d404
 		stx $d40b
 		sty $d412
-irq10d: rts
+irq10d:
+		rts
 
-irq11: lda $dc0d
+irq11:
+		lda $dc0d
 		and #4
 		beq irq11z
 		ldx #28
@@ -2582,11 +2872,14 @@ irq11: lda $dc0d
 		ldx #29
 		ldy #1
 		jsr chkflags
-irq11z: rts
+irq11z:
+		rts
 
-settim: lda #$08
+settim:
+		lda #$08
 		byte $2c
-setalm: lda #$88
+setalm:
+		lda #$88
 		sta $dc0f
 		cmp #$88
 		beq settim2
@@ -2596,10 +2889,12 @@ setalm: lda #$88
 		bne settim1
 		ldx #92
 		bne settim2
-settim1: cpx #92
+settim1:
+		cpx #92
 		bne settim2
 		ldx #12
-settim2: txa
+settim2:
+		txa
 		jsr settim3
 		sta hrs
 		tya
@@ -2611,13 +2906,16 @@ settim2: txa
 		lda #$08
 		sta $dc0f
 		rts
-settim3: ldx #0
-settim4: cmp #10
+settim3:
+		ldx #0
+settim4:
+		cmp #10
 		bcc settim5
 		sbc #10
 		inx
 		bne settim4
-settim5: sta $ff
+settim5:
+		sta $ff
 		txa
 		asl
 		asl
@@ -2626,7 +2924,8 @@ settim5: sta $ff
 		ora $ff
 		rts
 
-irq4: lda 197
+irq4:
+		lda 197
 		cmp oldkey
 		beq irq4c
 		sta oldkey
@@ -2650,50 +2949,71 @@ irq4: lda 197
 		iny
 		jsr irq4b
 		sta irq4a+2
-irq4a: jmp $ffff
-irq4b: lda ktbl1,y
-irq4c: rts
-irq4d: jmp fkey
+irq4a:
+		jmp $ffff
+irq4b:
+		lda ktbl1,y
+irq4c:
+		rts
+irq4d:
+		jmp fkey
 
-tmpkey: byte 0
-oldkey: byte 64
-shfkey: byte 0
+tmpkey:
+		byte 0
+oldkey:
+		byte 64
+shfkey:
+		byte 0
 
-ktbl1: word t1fk1,t1fk2
+ktbl1:
+		word t1fk1,t1fk2
 		word t1fk3,t1fk4
 		word t1fk5,t1fk6
 		word t1fk7,t1fk7
 
-t1init: ldy #0
+t1init:
+		ldy #0
 		jsr chkflags
 		ldx #<ktbl1
 		ldy #>ktbl1
-usekey: stx irq4b+1
+usekey:
+		stx irq4b+1
 		sty irq4b+2
 		rts
-t1fk1: ldx scnlock
+t1fk1:
+		ldx scnlock
 		bne t1fk3b
 		ldx scnmode
 		jmp setmode1
-t1fk2: lda blnkflag
+t1fk2:
+		lda blnkflag
 		bne t1fk2a
 		jmp scrnoff
-t1fk2a: jmp scrnon
-t1fk3: dec bar
-t1fk3a: inc irq7+1
-t1fk3b: rts
-t1fk4: sec
+t1fk2a:
+		jmp scrnon
+t1fk3:
+		dec bar
+t1fk3a:
+		inc irq7+1
+t1fk3b:
+		rts
+t1fk4:
+		sec
 		lda bar
 		sbc #8
-t1fk4a: sta bar
+t1fk4a:
+		sta bar
 		jmp t1fk3a
-t1fk5: inc bar
+t1fk5:
+		inc bar
 		jmp t1fk3a
-t1fk6: clc
+t1fk6:
+		clc
 		lda bar
 		adc #8
 		jmp t1fk4a
-t1fk7: lda bar
+t1fk7:
+		lda bar
 		asl
 		ora shfkey
 		pha
@@ -2706,53 +3026,68 @@ t1fk7: lda bar
 		cmp #6
 		beq t1fk7b
 		rts
-t1fk7a: jmp t3init ;acs
-t1fk7b: jmp t2init ;tsr
+t1fk7a:
+		jmp t3init ;acs
+t1fk7b:
+		jmp t2init ;tsr
 
 ;edit users time
-ktbl2: word t2fk1,t2fk2
+ktbl2:
+		word t2fk1,t2fk2
 		word t2fk3,t2fk4
 		word t2fk5,t2fk6
 		word t2fk7,t2fk7
 
-t2init: ldx #<ktbl2
+t2init:
+		ldx #<ktbl2
 		ldy #>ktbl2
 		jmp usekey
-t2fk1: lda #0
+t2fk1:
+		lda #0
 		byte $2c
-t2fk2: lda #101
-t2fk2a: sta tsr
+t2fk2:
+		lda #101
+t2fk2a:
+		sta tsr
 		jmp disptime
-t2fk3: lda tsr
+t2fk3:
+		lda tsr
 		cmp #101
 		bcs t2fk3a
 		inc tsr
 		jmp disptime
-t2fk3a:rts
-t2fk4: lda tsr
+t2fk3a:
+		rts
+t2fk4:
+		lda tsr
 		cmp #101
 		bcs t2fk3a
 		adc #10
 		bcc t2fk2a
-t2fk5: lda tsr
+t2fk5:
+		lda tsr
 		beq t2fk3a
 		dec tsr
 		jmp disptime
-t2fk6: lda tsr
+t2fk6:
+		lda tsr
 		cmp #10
 		bcc t2fk3a
 		sbc #10
 		bcs t2fk2a
-t2fk7: ldx #6
+t2fk7:
+		ldx #6
 		jmp t1init
 
 ;edit users access
-ktbl3: word t3fk1,t3fk2
+ktbl3:
+		word t3fk1,t3fk2
 		word t3fk5,t3fk5
 		word t3fk3,t3fk3
 		word t3fk7,t3fk7
 
-t3init: ldx #<ktbl3
+t3init:
+		ldx #<ktbl3
 		ldy #>ktbl3
 		jsr usekey
 		lda access
@@ -2760,21 +3095,28 @@ t3init: ldx #<ktbl3
 		ora #$b0
 		sta $049c
 		rts
-t3fk3: dec $049c
+t3fk3:
+		dec $049c
 		lda $049c
 		cmp #$b0
 		bcs t3fk3a
-t3fk2: lda #$b9
+t3fk2:
+		lda #$b9
 		sta $049c
-t3fk3a: rts
-t3fk5: inc $049c
+t3fk3a:
+		rts
+t3fk5:
+		inc $049c
 		lda $049c
 		cmp #$ba
 		bcc t3fk5a
-t3fk1: lda #$b0
+t3fk1:
+		lda #$b0
 		sta $049c
-t3fk5a: rts
-t3fk7: lda $049c
+t3fk5a:
+		rts
+t3fk7:
+		lda $049c
 		and #$7f
 		sta $049c
 		and #$0f
@@ -2794,7 +3136,8 @@ t3fk7: lda $049c
 ;* display bottom
 ;* also clear screen, and
 ;* home cursor, set color memory
-disp3: lda #2
+disp3:
+		lda #2
 		jsr disp
 		lda #$93 ; clear-screen
 		sta $fe
@@ -2803,7 +3146,8 @@ disp3: lda #2
 		rts
 
 ;* display top #2 : idle
-disp2: lda #0
+disp2:
+		lda #0
 		jsr disptop
 		lda #0
 		sta chatpage
@@ -2818,17 +3162,22 @@ disp2: lda #0
 		jmp chkflags
 
 ;* display top #1 : user online
-disp1: lda #1
+disp1:
+		lda #1
 		jsr disptop
 		inc irq7+1
 		rts
 
-disp4: lda #3
+disp4:
+		lda #3
 		jmp disptop
 
-dname: cbm "0:scn.t1"
-disptop: sta curdsp
-disp: stx dspdev
+dname:
+		cbm "0:scn.t1"
+disptop:
+		sta curdsp
+disp:
+		stx dspdev
 		clc
 		adc #$31
 		sta dname+7
@@ -2853,7 +3202,8 @@ disp: stx dspdev
 		jsr putvar ;d1$
 		ldx #39
 		lda #1
-cltp1: sta $d800,x
+cltp1:
+		sta $d800,x
 		dex
 		bpl cltp1
 		lda #$a0
@@ -2862,7 +3212,8 @@ cltp1: sta $d800,x
 		sta $41f
 		rts
 
-loadscn: sta dname+6
+loadscn:
+		sta dname+6
 		ldx #<dname
 		ldy #>dname
 		lda #8
@@ -2875,9 +3226,11 @@ loadscn: sta dname+6
 		lda #0
 		jsr $ffd5
 		jmp inable
-dspdev: byte 8
+dspdev:
+		byte 8
 
-setbaud:txa
+setbaud:
+		txa
 		jmp rsbaud
 
 
@@ -2886,15 +3239,18 @@ setbaud:txa
 ;********************************
 
 ;* get descriptor for tt$(.x)
-getarr:jsr findarr
+getarr:
+		jsr findarr
 		ldy #2
 		jmp usevar1
 
 ;* get and copy memory to buffer
-getln:jsr getarr
+getln:
+		jsr getarr
 		ldy var
 		sty index
-getln0:dey
+getln0:
+		dey
 		cpy #$ff
 		beq getln1
 		cpy #80
@@ -2902,36 +3258,43 @@ getln0:dey
 		lda [var+1],y
 		sta buffer,y
 		jmp getln0
-getln1:rts
+getln1:
+		rts
 
 ;* print tt$(.a)
-prtln: jsr getarr
+prtln:
+		jsr getarr
 		jmp outstr
 
 ;* put descriptor for tt$(.x) and
 ;* store buffer in memory
-putarr:jsr findarr
+putarr:
+		jsr findarr
 		ldy #2
 		jmp putvar1
 
 ;* put and store string
-putln: txa
+putln:
+		txa
 		pha
 		lda index
 		jsr makeroom
 		ldy index
 		beq putln2
 		dey
-putln1:lda buffer,y
+putln1:
+		lda buffer,y
 		sta [var+1],y
 		dey
 		bpl putln1
-putln2: pla
+putln2:
+		pla
 		tax
 		jmp putarr
 
 ;* find descriptor for tt$(.x)
-findarr:stx $47
+findarr:
+		stx $47
 		lda #0
 		asl $47
 		rol
@@ -2960,7 +3323,8 @@ findarr:stx $47
 		rts
 
 ;* find basic variable
-varnam: txa
+varnam:
+		txa
 		asl
 		tay
 		lda vars+1,y
@@ -2968,12 +3332,14 @@ varnam: txa
 		lda vars,y
 		sta $47
 		rts
-findvar: sta $45
+findvar:
+		sta $45
 		stx $46
 		jmp findvar1
 
 ;* output a$
-outastr: ldx #1
+outastr:
+		ldx #1
 		jsr chrgot
 		beq prtvar
 		jsr getstr
@@ -2983,11 +3349,13 @@ outastr: ldx #1
 		jmp outstr
 
 ;* print string variable
-prtvar: jsr usevar
+prtvar:
+		jsr usevar
 		jmp outstr
 
 ;* print string variable w/mci
-prtvar0: lda mci
+prtvar0:
+		lda mci
 		pha
 		lda #0
 		sta mci
@@ -2997,34 +3365,45 @@ prtvar0: lda mci
 		rts
 
 ;* get variable descriptor
-usevar: jsr varnam
+usevar:
+		jsr varnam
 		jmp usevar2
-usevar0: jsr findvar
-usevar2: ldy #4
-usevar1: lda [$47],y
+usevar0:
+		jsr findvar
+usevar2:
+		ldy #4
+usevar1:
+		lda [$47],y
 		sta var,y
 		dey
 		bpl usevar1
 		rts
 
 ;* put variable descriptor
-putvar: jsr varnam
+putvar:
+		jsr varnam
 		jmp putvar2
-putvar0: jsr findvar
-putvar2: ldy #4
-putvar1: lda var,y
+putvar0:
+		jsr findvar
+putvar2:
+		ldy #4
+putvar1:
+		lda var,y
 		sta [$47],y
 		dey
 		bpl putvar1
 		rts
 
-zero: lda #0
+zero:
+		lda #0
 		ldy #4
-zero1: sta var,y
+zero1:
+		sta var,y
 		dey
 		bpl zero1
 		rts
-minusone:jsr zero
+minusone:
+		jsr zero
 		lda #$81
 		sta var
 		rts
@@ -3106,15 +3485,19 @@ vars:
 ;********************************
 ;* decimal to ascii routine *
 ;********************************
-decimal: sta binary
+decimal:
+		sta binary
 		stx binary+1
 		ldy #$00
-dec0: lda dectbl1,y
+dec0:
+		lda dectbl1,y
 		ldx dectbl2,y
-dec1: sta binary+2
+dec1:
+		sta binary+2
 		stx binary+3
 		ldx #$30
-dec2: lda binary
+dec2:
+		lda binary
 		cmp binary+2
 		lda binary+1
 		sbc binary+3
@@ -3125,23 +3508,28 @@ dec2: lda binary
 		sta binary
 		inx
 		bne dec2
-dec3: txa
+dec3:
+		txa
 		sta decchr,y
 		iny
 		cpy #5
 		bne dec0
 		rts
-dectbl1: byte <10000,<1000,<100,<10,<1
-dectbl2: byte >10000,>1000,>100,>10,>1
+dectbl1:
+		byte <10000,<1000,<100,<10,<1
+dectbl2:
+		byte >10000,>1000,>100,>10,>1
 ;********************************
 ;* memory and trace update
 ;********************************
-swapgc: lda #>gc
+swapgc:
+		lda #>gc
 		ldy #>gchide
 		ldx #gclen
 		jmp swapper
 
-memory: clc
+memory:
+		clc
 		lda 51
 		cmp 49
 		lda 52
@@ -3160,7 +3548,8 @@ memory: clc
 		jsr clrarr
 		ldx #16
 		jmp farerr
-memory0: lda #0
+memory0:
+		lda #0
 		sta var
 		lda tsr
 		cmp tsr1
@@ -3169,14 +3558,17 @@ memory0: lda #0
 		sta var+1
 		ldx #29
 		jsr putvar ;tr%
-memory0a:inc scnlock
+memory0a:
+		inc scnlock
 		lda scnmode
 		bne memory0b
 		jsr memory1
-memory0b:dec scnlock
+memory0b:
+		dec scnlock
 		rts
 
-memory1: sec
+memory1:
+		sec
 		lda 51
 		sbc 49
 		sta num
@@ -3189,14 +3581,16 @@ memory1: sec
 		lda 50
 		cmp oldmem+1
 		beq trace
-memory2: lda num
+memory2:
+		lda num
 		sta oldmem
 		lda num+1
 		sta oldmem+1
 		lda #<$79b
 		ldx #>$79b
 		jsr prdec
-trace: lda 57
+trace:
+		lda 57
 		ldx 58
 		sta num
 		stx num+1
@@ -3205,7 +3599,8 @@ trace: lda 57
 		cpx oldline+1
 		bne trace1
 		rts
-trace1: sta oldline
+trace1:
+		sta oldline
 		stx oldline+1
 		ldx #24
 		ldy #5
@@ -3216,37 +3611,50 @@ trace1: sta oldline
 		sta $7c7
 		ldx #0
 		ldy #200
-trace2: lda 653
+trace2:
+		lda 653
 		and #1
 		beq trace3
 		dex
 		bne trace2
 		dey
 		bne trace2
-trace3: lda #<$7c2
+trace3:
+		lda #<$7c2
 		ldx #>$7c2
 		jsr prdec
-trace4: rts
+trace4:
+		rts
 
-prdec: sta $fb
+prdec:
+		sta $fb
 		stx $fc
 		lda num
 		ldx num+1
 		jsr decimal
 		ldy #4
-prdec1: lda decchr,y
+prdec1:
+		lda decchr,y
 		ora #$80
-prdec2: sta [$fb],y
+prdec2:
+		sta [$fb],y
 		dey
 		bpl prdec1
-prdec3: rts
-num: word 0
-oldline: word 0
-oldmem: word 0
-tsr1: byte 0
-token:byte 0
+prdec3:
+		rts
+num:
+		word 0
+oldline:
+		word 0
+oldmem:
+		word 0
+tsr1:
+		byte 0
+token:
+		byte 0
 
-forcegc:	lda #$c7 ; capital reverse G
+forcegc:
+		lda #$c7 ; capital reverse G
 		sta $41f
 		jsr swapgc
 		jsr gc
@@ -3255,7 +3663,8 @@ forcegc:	lda #$c7 ; capital reverse G
 		sta $41f
 		rts
 
-outscn: lda wrapflg
+outscn:
+		lda wrapflg
 		beq outscn1
 		lda $fe
 		cmp #32
@@ -3265,7 +3674,8 @@ outscn: lda wrapflg
 		bne outscn1
 		lda #13
 		sta $fe
-outscn1: lda #0
+outscn1:
+		lda #0
 		sta idlejif
 		tax
 		tay
@@ -3273,7 +3683,8 @@ outscn1: lda #0
 		jsr chkblnk
 		beq sc1
 		jsr scrnon
-sc1: jsr crsroff
+sc1:
+		jsr crsroff
 		jsr swap2
 		jsr swap
 		lda 214
@@ -3281,37 +3692,43 @@ sc1: jsr crsroff
 		bcs sc1a
 		lda topline
 		sta 214
-sc1a: lda 214
+sc1a:
+		lda 214
 		cmp botline
 		beq sc1b
 		bcc sc1b
 		jsr scroll
 		jmp sc1a
-sc1b: jsr sccrsr
+sc1b:
+		jsr sccrsr
 		lda $fe
 		and #127
 		cmp #32
 		bcs sc4
 		lda $fe
 		ldy #nchrs-1
-sc2: cmp chrs,y
+sc2:
+		cmp chrs,y
 		beq sc6
 		dey
 		bpl sc2
 		ldy #15
-sc3: cmp colors,y
+sc3:
+		cmp colors,y
 		beq sc4
 		dey
 		bne sc3
 		jmp sc8
-sc4: ldx 211
+sc4:
+		ldx 211
 		cpx #39
 		bne sc5
 		ldx 214
 		cpx botline
 		bne sc5
 		jsr scroll
-sc5: lda $fe
+sc5:
+		lda $fe
 		jsr $e716
 		ldx 211
 		cpx #40
@@ -3320,11 +3737,13 @@ sc5: lda $fe
 		sta 211
 		lda #39
 		sta 213
-sc8: jsr sccrsr
+sc8:
+		jsr sccrsr
 		jsr swap1
 		jsr swap
 		jmp crsron
-sc6: tya
+sc6:
+		tya
 		asl
 		tay
 		lda chrtbl,y
@@ -3332,9 +3751,11 @@ sc6: tya
 		lda chrtbl+1,y
 		sta sc7+2
 		lda $fe
-sc7: jsr $ffff
+sc7:
+		jsr $ffff
 		jmp sc8
-scret: ldx #0
+scret:
+		ldx #0
 		stx mprint
 		stx mspeed
 		stx mdigits
@@ -3383,36 +3804,46 @@ schome:
 		sta 214
 		lda #0
 		sta 211
-sccrsr: ldx 214
-sccrsr1: jsr $e9f0
+sccrsr:
+		ldx 214
+sccrsr1:
+		jsr $e9f0
 		jmp $ea24
-scrt: ldx 211
+scrt:
+		ldx 211
 		cpx #39
 		bne scrt1
-scdn: ldx 214
+scdn:
+		ldx 214
 		cpx botline
 		bne scrt1
 		pha
 		jsr scroll
 		pla
-scrt1: jmp $e716
+scrt1:
+		jmp $e716
 scdel:
-sclf: ldx 211
+sclf:
+		ldx 211
 		bne scrt1
-scup: ldx 214
+scup:
+		ldx 214
 		dex
 		cpx topline
 		bcs scrt1
 		rts
-scrvs: jmp $e716
-scbell: ldx #26
+scrvs:
+		jmp $e716
+scbell:
+		ldx #26
 		ldy #5
 		jsr chkflags
 		beq scbell1
 		ldx #2
 		ldy #0
 		jsr sound
-scbell1: rts
+scbell1:
+		rts
 
 scroll:
 		lda $ac
@@ -3518,9 +3949,10 @@ chrtbl:
 
 chrs:
 		byte 14,142,18,146,19,147,29,157,17,145,13,20,7
-		nchrs = *-chrs
+nchrs = *-chrs
 
-swap:          lda #39
+swap:
+		lda #39
 		sta 213
 		lda #0
 		sta 212
@@ -3528,16 +3960,21 @@ swap:          lda #39
 		sta 216
 
 		ldx 214
-fixlinks:      lda 217,x
+fixlinks:
+		lda 217,x
 		ora #128
 		sta 217,x
 		rts
 
-topline:       byte 7
-botline:       byte 22
-sline:         byte 7
+topline:
+		byte 7
+botline:
+		byte 22
+sline:
+		byte 7
 
-swap1:         inc scnlock
+swap1:
+		inc scnlock
 		sei
 		lda 646
 		sta mcolor
@@ -3557,7 +3994,8 @@ swap1:         inc scnlock
 		sta colptr+1
 		cli
 		rts
-swap2: dec scnlock
+swap2:
+		dec scnlock
 		lda mcolor
 		sta 646
 		lda mreverse
@@ -3576,7 +4014,8 @@ swap2: dec scnlock
 		sta 244
 		rts
 
-poscrsr: txa
+poscrsr:
+		txa
 		pha
 		tya
 		tax
@@ -3585,7 +4024,8 @@ poscrsr: txa
 		clc
 		jmp $fff0
 
-getmod:		jsr getmdm
+getmod:
+		jsr getmdm
 		sta $fe
 		pha
 		ldx #16
@@ -3627,22 +4067,29 @@ getmod1:
 ;		lda serial4a
 ;		jsr outh
 ;		pla
-;getmod2:	ldx #0
+;getmod2:
+;		ldx #0
 ;		stx getmodn
-getmod3:	cmp #0
+getmod3:
+		cmp #0
 		rts
 
-;getmodn:	byte 0
-;getmodt:	byte 9,13,1,7,5 ;image
+;getmodn:
+;		byte 0
+;getmodt:
+;		byte 9,13,1,7,5 ;image
 
-outh:		and #$0f
+outh:
+		and #$0f
 		ora #$30
 		cmp #$3a
 		bcc outh1
 		adc #6
-outh1:		jmp outm
+outh1:
+		jmp outm
 
-outmod:		lda $fe
+outmod:
+		lda $fe
 		ldx modclm
 		ldy modclmn
 		jsr outadj
@@ -3655,7 +4102,8 @@ outmod:		lda $fe
 		cpx #0
 		bne outmod0
 		jmp outm
-outmod0:              ldx #19
+outmod0:
+		ldx #19
 		ldy #5
 		jsr chkflags
 		tax
@@ -3675,18 +4123,23 @@ outmod0:              ldx #19
 		bcc outmod0d
 		cmp #224        ; 192-223 use tblctoa2
 		bcs outmod0e    ; 224-255 pass
-outmod0a:             lda mupcase
+outmod0a:
+		lda mupcase
 		bne outmod0c
 		lda tblctoa2,y
 		bne outmod1
-outmod0c:             lda tblctoa3,y
+outmod0c:
+		lda tblctoa3,y
 		bne outmod1
-outmod0d:             lda tblctoa1,y
+outmod0d:
+		lda tblctoa1,y
 		bne outmod1
-outmod0e:             tax
+outmod0e:
+		tax
 		lda tblcta,x
 		beq outmod3
-outmod1: pha
+outmod1:
+		pha
 		and #$7f
 		cmp #32
 		pla
@@ -3709,21 +4162,27 @@ outmod1: pha
 		beq outmodlf
 		jsr colorchk
 		bcc outmodc
-outmod2:         jmp outm
-outmod3:         rts
+outmod2:
+		jmp outm
+outmod3:
+		rts
 
-outmodh:         ldx interm
+outmodh:
+		ldx interm
 		bne outmodh1
 		jsr outm
 		lda #$20
 		jsr outm
-outmodh1:        lda #dish
+outmodh1:
+		lda #dish
 		jmp outm
 
-outmodm: lda interm
+outmodm:
+		lda interm
 		bne outmodm1
 		jsr outmodr0
-outmodm1:ldx #17
+outmodm1:
+		ldx #17
 		ldy #5
 		jsr chkflags
 		beq outmodm2
@@ -3731,56 +4190,73 @@ outmodm1:ldx #17
 		jsr outm
 		lda #10
 		jmp outm
-outmodm2:lda #13
+outmodm2:
+		lda #13
 		jmp outm
 
-outmodup:lda #$41
+outmodup:
+		lda #$41
 		bne outmodcm
-outmoddn:lda #$42
+outmoddn:
+		lda #$42
 		bne outmodcm
-outmodrt:lda #$43
+outmodrt:
+		lda #$43
 		bne outmodcm
-outmodlf:lda #$44
-outmodcm:pha
+outmodlf:
+		lda #$44
+outmodcm:
+		pha
 		ldx #18
 		ldy #5
 		jsr chkflags
 		bne outmodmc
 		pla
 		rts
-outmodmc:          lda #27
+outmodmc:
+		lda #27
 		jsr outm
 		lda #91 ; bracket
 		jsr outm
 		pla
 		jmp outm
 
-outmodr0:          lda #$33
+outmodr0:
+		lda #$33
 		ldx #$34
 		jmp outmodr
-outmodr1:          lda #$34
+outmodr1:
+		lda #$34
 		ldx #$33
-outmodr:           sta ansir1+1
+outmodr:
+		sta ansir1+1
 		stx ansir2+1
 		jmp ansi
 
-outmodc: ldx #15
-outmodc2:cmp colors,x
+outmodc:
+		ldx #15
+outmodc2:
+		cmp colors,x
 		beq outmodc3
 		dex
 		bne outmodc2
-outmodc3:lda ansiclrs,x
+outmodc3:
+		lda ansiclrs,x
 		sta ansicol+1
 		lda ansiints,x
 		sta ansiint+1
 		jmp ansi
 
-ansiclrs:	byte "7716524333107247"
-ansiints:	byte "0100000100110110"
+ansiclrs:
+		byte "7716524333107247"
+ansiints:
+		byte "0100000100110110"
 
-noansi:		rts
+noansi:
+		rts
 
-ansi:		ldx #18
+ansi:
+		ldx #18
 		ldy #5
 		jsr chkflags
 		beq noansi
@@ -3789,19 +4265,24 @@ ansi:		ldx #18
 		jsr outm
 		lda #"["
 		jsr outm
-ansiint:	lda #$30 ; "0"
+ansiint:
+		lda #$30 ; "0"
 		jsr outm
 		lda #";"
 		jsr outm
-ansir1:		lda #$33 ; "3"
+ansir1:
+		lda #$33 ; "3"
 		jsr outm
-ansicol:	lda #$31 ; "1"
+ansicol:
+		lda #$31 ; "1"
 		jsr outm
 		lda #";"
 		jsr outm
-ansir2:		lda #$34 ; "4"
+ansir2:
+		lda #$34 ; "4"
 		jsr outm
-ansibak:	lda #$30 ; "0"
+ansibak:
+		lda #$30 ; "0"
 		jsr outm
 		lda #$6d ; "m"
 		jmp outm
@@ -3810,12 +4291,13 @@ ansibak:	lda #$30 ; "0"
 ;* translation tables *
 
 
-tblcta:		byte $00, $01, $02, $03, $04, $05, $06, $07
+tblcta:
+		byte $00, $01, $02, $03, $04, $05, $06, $07
 		byte $08, $09, $0a, $0b, $0c, $0d, $00, $0f
 		byte $10, $11, $12, $13, $08, $15, $16, $17
 		byte $18, $19, $1a, $1b, $1c, $1d, $1e, $1f
 		byte " !",34,"#$%&'()*+,-./"
-byte "0123456789:;<=>?"
+		byte "0123456789:;<=>?"
 		byte "@abcdefghijklmnopqrstuvwxyz[\]^", $5f
 		byte "-ABCDEFGHIJKLMNOPQRSTUVWXYZ*-!**"
 		byte 0,129,0,0,0,0,0,0,0,0,0,0,0,$d,0,0
@@ -3826,22 +4308,29 @@ byte "0123456789:;<=>?"
 		byte " !---!*!-*!****-"
 		byte "****!!!---******"
 
-tblatc:		byte $00,$00,$02,$00,$04,$00,$00,$00
+tblatc:
+		byte $00,$00,$02,$00,$04,$00,$00,$00
 		byte $14,$09,$00,$00,$93,$0d,$0e,$0f
 		byte 0,$11,0,$13,20,$15,$16,$17,$18,$19,0,27,0,0,0,0
 		byte " !",34,"#$%&'()*+,-./"
-byte "0123456789:;<=>?"
+		byte "0123456789:;<=>?"
 		cbm "`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~", 127
 		cbm 0,"abcdefghijklmnopqrstuvwxyz",0,0,0,0,20
-tblctoa1:	byte 032,221,220,196,095,179,178,179
+
+tblctoa1:
+		byte 032,221,220,196,095,179,178,179
 		byte 220,047,222,195,201,192,191,220
 		byte 218,193,194,180,221,221,222,223
 		byte 223,220,217,187,200,217,188,176
-tblctoa2:	byte 196,065,066,067,068,069,070,071
+
+tblctoa2:
+		byte 196,065,066,067,068,069,070,071
 		byte 072,073,074,075,076,077,078,079
 		byte 080,081,082,083,084,085,086,087
 		byte 088,089,090,197,221,179,178,092
-tblctoa3:       byte 196,042,179,196,196,196,196,179
+
+tblctoa3:
+		byte 196,042,179,196,196,196,196,179
 		byte 179,191,192,217,192,092,047,218
 		byte 191,254,196,042,179,218,042,254
 		byte 042,179,042,197,221,179,227,092
@@ -3894,33 +4383,45 @@ callswap:
 		pla
 		rts
 
-calljmp: jmp $c000
+calljmp:
+		jmp $c000
 
-callpage:	byte $00
-calltemp:	byte $00
+callpage:
+		byte $00
+calltemp:
+		byte $00
 
-;serial2a:	word serial +$00ff
+;serial2a:
+;		word serial +$00ff
 
-callf000:	sta calljmp+1
+callf000:
+		sta calljmp+1
 		lda #>$f000
 		jmp docall
-callf400:	sta calljmp+1
+callf400:
+		sta calljmp+1
 		lda #>$f400
 		jmp docall
-callf800:	sta calljmp+1
+callf800:
+		sta calljmp+1
 		lda #>$f800
 		jmp docall
-callfc00:	sta calljmp+1
+callfc00:
+		sta calljmp+1
 		lda #>$fc00
 		jmp docall
 
-inline:		lda #$00
+inline:
+		lda #$00
 		byte $2c
-inline0:	lda #$03
+inline0:
+		lda #$03
 		byte $2c
-password:	lda #$06
+password:
+		lda #$06
 		jmp callf000
-useeditr:	lda #$09
+useeditr:
+		lda #$09
 		jmp callf000
 ;		pha
 ;		lda serial2a
@@ -3931,34 +4432,46 @@ useeditr:	lda #$09
 ;		bne useedit1
 ;		pla
 ;		rts
-;useedit1:	pla
+;useedit1:
+;		pla
 ;		ldx #1
 ;		txa
 ;		rts
 
-term:		lda #$00
+term:
+		lda #$00
 		byte $2c
-chatmode:	lda #$03
+chatmode:
+		lda #$03
 		byte $2c
-clrarr:		lda #$06
+clrarr:
+		lda #$06
 		byte $2c
-setvars:	lda #$09
+setvars:
+		lda #$09
 		byte $2c
-btmvar:		lda #$0c
+btmvar:
+		lda #$0c
 		jmp callf400
 
-read0:		lda #$00
+read0:
+		lda #$00
 		byte $2c
-newuser:	lda #$03
+newuser:
+		lda #$03
 		byte $2c
-arraysav:	lda #$06
+arraysav:
+		lda #$06
 		byte $2c
-arrayres:	lda #$09
+arrayres:
+		lda #$09
 		jmp callf800
-copyrite:	lda #$0c
+copyrite:
+		lda #$0c
 		jsr callf800
 		jmp outastr
-sound:		lda #$0f
+sound:
+		lda #$0f
 		jmp callf800
 
 ;		ldx #2
@@ -3979,11 +4492,14 @@ sound:		lda #$0f
 ;		sta bsnval-1,x
 ;		rts
 
-;serial2b:	word serial +$00ff
+;serial2b:
+;		word serial +$00ff
 
-convert:	lda #$00
+convert:
+		lda #$00
 		byte $2c
-convstr:	lda #$03
+convstr:
+		lda #$03
 		jmp callfc00
 
 ; put intro program in
@@ -3995,8 +4511,10 @@ convstr:	lda #$03
 		jmp setup
 		byte $ff ;intro
 
-;serial1a:	word serial
-;serial1b:	word serial+$0123
+;serial1a:
+;		word serial
+;serial1b:
+;		word serial+$0123
 
 ;* intro program
 
@@ -4026,7 +4544,8 @@ loadpic:
 ;		bpl loadpic1
 ;		lda #0
 ;		sta picflag
-loadpic1:	jsr dopic
+loadpic1:
+		jsr dopic
 ;checkchk:
 ;		jsr checksn
 ;		lda checkbad
@@ -4075,7 +4594,8 @@ loadpic1:	jsr dopic
 
 		lda #$60
 		ldy #0
-rsloop:		sta rs232,y
+rsloop:
+		sta rs232,y
 		dey
 		bne rsloop
 
@@ -4103,7 +4623,8 @@ rsloop:		sta rs232,y
 
 		ldx #dopic-run1
 		stx $c6
-putkey:		lda run1-1,x
+putkey:
+		lda run1-1,x
 		sta $0276,x
 		dex
 		bne putkey
@@ -4111,15 +4632,18 @@ putkey:		lda run1-1,x
 		sta 646
 		jmp [$0302]
 
-run1:		cbm " run"
+run1:
+		cbm " run"
 		byte 13
 
 ;* uncrunch picture
-dopic:		lda picflag
+dopic:
+		lda picflag
 		beq dopic1
 ;		jmp $5f03
 
-dopic1:		rts
+dopic1:
+		rts
 
 
 ;* remove picture
@@ -4148,13 +4672,15 @@ nopic:
 		jsr $ffd2
 		lda #$00
 		sta $d021
-nopic1:		rts
+nopic1:
+		rts
 
 
 ;* load p.setup
 
 
-psetup:		lda file3
+psetup:
+		lda file3
 		sta var
 		lda #<(file3+1)
 		sta var+1
@@ -4167,17 +4693,23 @@ psetup:		lda file3
 ;* filenames
 
 
-file1:		byte 10
+file1:
+		byte 10
 		cbm "screen 1.3"
-file2:		byte 2
+file2:
+		byte 2
 		cbm "im"
-file3:		byte 5
+file3:
+		byte 5
 		cbm "setup"
-file4:		byte 12
+file4:
+		byte 12
 		cbm "ml.extra 1.3"
 
-devnum:		byte 8
-picflag:	byte 0
+devnum:
+		byte 8
+picflag:
+		byte 0
 
 ;********************************
 ;* setup routines *
@@ -4269,13 +4801,15 @@ setup5:
 ;* setup i/o windows
 ;* also 1200 baud fix
 
-iosetup:	lda $0326
+iosetup:
+		lda $0326
 		cmp #<newout
 		bne hcb0e
 		lda $0327
 		cmp #>newout
 		beq hcb28
-hcb0e:		lda $0326
+hcb0e:
+		lda $0326
 		sta oldout+1
 		lda $0327
 		sta oldout+2
@@ -4283,11 +4817,13 @@ hcb0e:		lda $0326
 		sta $0326	
 		lda #>newout
 		sta $0327
-hcb28:		rts
+hcb28:
+		rts
 
 ;* setup irq vector
 
-setirq: lda #127
+setirq:
+		lda #127
 		sta 56333
 		lda #<raster
 		sta 788
@@ -4304,7 +4840,8 @@ setirq: lda #127
 		rts
 ;* initial setup of screen
 ;* colors/ clear/ etc
-setscrn: lda #$0b
+setscrn:
+		lda #$0b
 		sta $d020
 		lda #$00
 		sta $d021
@@ -4317,7 +4854,8 @@ setscrn: lda #$0b
 		jsr makdate
 		jmp dispdate
 
-setmem:		lda 776
+setmem:
+		lda 776
 		ldx 777
 		sta oldvec+1
 		stx oldvec+2
@@ -4352,7 +4890,8 @@ setmem:		lda 776
 
 ;* find basic variable
 
-getvarp: txa
+getvarp:
+		txa
 		asl
 		tay
 		lda varlist+1,y
@@ -4366,7 +4905,7 @@ getvarp: txa
 ;* variables used by ml *
 ;********************************
 
-varlist: 
+varlist:
 		byte $41, $ce         ;  0 an$
 		byte $41, $80         ;  1 a$
 		byte $42, $80         ;  2 b$
@@ -4420,9 +4959,11 @@ varlist:
 ;find all vars used by ml, and
 ;get their pointers
 
-setptrs: lda #47
+setptrs:
+		lda #47
 		sta tmp1
-setp1: ldx tmp1
+setp1:
+		ldx tmp1
 		jsr getvarp
 		lda tmp1
 		asl
@@ -4435,24 +4976,28 @@ setp1: ldx tmp1
 		bpl setp1
 		rts
 
-pload: ldx $2b
+pload:
+		ldx $2b
 		ldy $2c
 		jsr pload2
 		bcc pload1
 		rts
-pload1: ldx $2b
+pload1:
+		ldx $2b
 		ldy $2c
 		stx $ac
 		sty $ad
 		ldx #<imstart
 		ldy #>imstart
 		jmp plink
-pload2: stx $ac
+pload2:
+		stx $ac
 		sty $ad
 		cmp #7
 		bcs pload3
 		lda #8
-pload3: sta filenum
+pload3:
+		sta filenum
 		lda #0
 		jsr $ff90
 		lda #1
@@ -4468,7 +5013,8 @@ pload3: sta filenum
 		ldy $ad
 		jmp $ffd5
 
-plink: txa
+plink:
+		txa
 		pha
 		tya
 		pha
@@ -4485,7 +5031,8 @@ plink: txa
 		sta $2c
 		pla
 		sta $2b
-plink1: ldy #0
+plink1:
+		ldy #0
 		lda [$ac],y
 		sta $71
 		iny
@@ -4499,20 +5046,24 @@ plink1: ldy #0
 		lda $72
 		sta $ad
 		jmp plink1
-plink2: pla
+plink2:
+		pla
 		sta [$ac],y
 		dey
 		pla
 		sta [$ac],y
 		rts
 
-date2:		cbm "Wed Feb 14, 1990 12:25 PM   "
+date2:
+		cbm "Wed Feb 14, 1990 12:25 PM   "
 
-padimprg:	lda #<imstart
+padimprg:
+		lda #<imstart
 		sta $14
 		lda #>imstart
 		sta $15
-padim1:		ldy #1
+padim1:
+		ldy #1
 		lda [$14],y
 		beq padim2
 		iny
@@ -4530,7 +5081,8 @@ padim1:		ldy #1
 		sta $15
 		stx $14
 		jmp padim1
-padim2: ldx $14
+padim2:
+		ldx $14
 		ldy $15
 		stx modtbl+12
 		sty modtbl+13
@@ -4608,13 +5160,16 @@ ecschk:
 		jsr ecs
 		jmp swapagn
 
-putintr: cpx #sizintr
+putintr:
+		cpx #sizintr
 		bcs putintr1
 		tya
 		sta basintr,x
-putintr1:rts
+putintr1:
+		rts
 
-getintr:	cpx #sizintr
+getintr:
+		cpx #sizintr
 		bcs putintr1
 		lda #0
 		sta var
@@ -4629,7 +5184,8 @@ getintr:	cpx #sizintr
 ; rs232 input buffer
 
 
-rsinb:		lda #1
+rsinb:
+		lda #1
 		sta local
 		ldx #0
 		jsr setmode
@@ -4646,7 +5202,8 @@ rsinb:		lda #1
 		ldx #0
 		jmp prtvar0 ;an$
 
-bootvers:	byte $93
+bootvers:
+		byte $93
 		cbm " ML 1.3 Revision "
 		byte $5c ; british pound
 		cbm "%a"
@@ -4666,16 +5223,19 @@ bootvers:	byte $93
 
 ; get a comma and a parameter
 
-getparm: jsr chrgot
+getparm:
+		jsr chrgot
 		ldx #0
 		cmp #","
 		bne getparm1
 		jsr getbytc
-getparm1:rts
+getparm1:
+		rts
 
 ; get 3 paramters
 
-usetbl2: jsr getparm
+usetbl2:
+		jsr getparm
 		stx 780
 		jsr getparm
 		stx 781
@@ -4688,26 +5248,30 @@ usetbl2: jsr getparm
 
 ; far call to the error handler
 
-farerr:		lda #$37
+farerr:
+		lda #$37
 		sta 1
 		jmp $a437
 
 ; raster interrupt routine
 
-raster: lda #$00
+raster:
+		lda #$00
 		bne rast1
 		lda scnmode
 		bne rast0
 		lda #23
 		sta $d018
-rast0: lda #106
+rast0:
+		lda #106
 		sta $d012
 		lda #1
 		sta $d019
 		inc raster+1
 		jmp $febc
 
-rast1: nop
+rast1:
+		nop
 		lda mupcase
 		and #1
 		asl
@@ -4764,7 +5328,8 @@ getversn1:
 		ldx #30
 		jmp putvar ;a%
 
-trapoff:	lda #<$e38b
+trapoff:
+		lda #<$e38b
 		ldx #>$e38b
 		jmp trap1
 
@@ -4773,11 +5338,13 @@ trapon:
 
 ;		lda #<trap
 ;		ldx #>trap
-trap1:		sta $300
+trap1:
+		sta $300
 		stx $301
 		rts
 
-outadj: sty outadjs
+outadj:
+		sty outadjs
 		cmp #13
 		beq outadj1
 		cmp #20
@@ -4790,16 +5357,21 @@ outadj: sty outadjs
 		cmp #32
 		bcs outadj3
 		rts
-outadj1: ldx #1
-outadj2: dex
+outadj1:
+		ldx #1
+outadj2:
 		dex
-outadj3: inx
+		dex
+outadj3:
+		inx
 		cpx outadjs
 		bcc outadj4
 		ldx #0
-outadj4: rts
+outadj4:
+		rts
 
-scrnset: sta blnkflag
+scrnset:
+		sta blnkflag
 		sta $d030
 		stx $d011
 		sty $d020
@@ -4856,7 +5428,8 @@ oldout:
 
 ; find a basic variable
 
-findvar1:lda 1
+findvar1:
+		lda 1
 		pha
 		lda #$37
 		sta 1
@@ -4865,7 +5438,8 @@ findvar1:lda 1
 
 ; relink basic program lines
 
-relink: lda 1
+relink:
+		lda 1
 		pha
 		lda #$37
 		sta 1
@@ -4874,20 +5448,23 @@ relink: lda 1
 
 ; make a dynamic string
 
-makeroom: tax
+makeroom:
+		tax
 		lda $01
 		pha
 		lda #$37
 		sta $01
 		txa
 		jsr makerm1
-exitint: pla
+exitint:
+		pla
 		sta 1
 		rts
 
 ; the error trap routine
 
-trap:		stx $030c
+trap:
+		stx $030c
 		lda $39
 		sta $030d
 		lda $3a
@@ -4903,42 +5480,52 @@ trap:		stx $030c
 
 ; the wedge to print free memory
 
-mem:		lda #$36
+mem:
+		lda #$36
 		sta $01
 		jsr memory
 		lda #$37
 		sta $01
 		jsr chrget
-mem1:		cmp #"&"
+mem1:
+		cmp #"&"
 		bne mem2
 		jsr chrget
 		jsr usetbl
 		jsr chrgot
 		jmp mem1
-mem2:		lda $7a
+mem2:
+		lda $7a
 		bne mem3
 		dec $7b
-mem3:		dec $7a
-oldvec:		jmp $ffff
+mem3:
+		dec $7a
+oldvec:
+		jmp $ffff
 
 ; the new system irq routine
 
-newirq: lda 1
+newirq:
+		lda 1
 		pha
 		lda #54
 		sta 1
-irqt: lda #$00
+irqt:
+		lda #$00
 		beq newirq0
 		dec irqt+1
 		bne newirq1
-newirq0: jsr irq
+newirq0:
+		jsr irq
 		lda irqcount
 		sta irqt+1
-newirq1: pla
+newirq1:
+		pla
 		sta 1
 		jmp $ea81
 
-getstr: lda 1
+getstr:
+		lda 1
 		pha
 		lda #55
 		sta 1
@@ -4952,15 +5539,18 @@ getstr: lda 1
 		ldy $23
 		rts
 
-pagecol: byte 1,15,12,11,12,15
-caseflag:byte 255
+pagecol:
+		byte 1,15,12,11,12,15
+caseflag:
+		byte 255
 
 		dup 0,$ce00-*
 
 ; buffer page
 
-d1str:           cbm "           "
-cbm "Tue Jan  1, 1988 12:00 PM   "
+d1str:
+		cbm "           "
+		cbm "Tue Jan  1, 1988 12:00 PM   "
 
 ; buf2
 
@@ -4972,40 +5562,50 @@ cbm "Tue Jan  1, 1988 12:00 PM   "
 		dup 0, buffer-*
 		dup $20, 80
 
-
 ; date in 6 byte bcd format
 
 bootdate:
-dateday:        byte $05
-datemon:        byte $03
-datedate:       byte $10
-dateyear:       byte $88
+dateday:
+		byte $05
+datemon:
+		byte $03
+datedate:
+		byte $10
+dateyear:
+		byte $88
 		byte $12,$00
 
 ; storage for conversion routines
 
-binary: byte 0,0,0,0
+binary:
+		byte 0,0,0,0
 
 ; days in each month in bcd
 
-ha560:		byte $31,$28,$31,$30,$31,$30,$31,$31,$30,$00
-decchr:		byte $30,$30,$30,$30,$30,$31,$30,$31
+ha560:
+		byte $31,$28,$31,$30,$31,$30,$31,$31,$30,$00
+decchr:
+		byte $30,$30,$30,$30,$30,$31,$30,$31
 
 ; storage for rom bank values
 
-rom2: byte 0
-rom3: byte 0
+rom2:
+		byte 0
+rom3:
+		byte 0
 
 ; the revision number of this ml
 
-rvisnum: word revision
+rvisnum:
+		word revision
 
 ; the date this ml was made
 
-version: cbm version_string
-
+version:
+		cbm version_string
 
 ; version 1.3
 
-versnum: byte $81,$26,$66,$66,$66
+versnum:
+		byte $81,$26,$66,$66,$66
 
