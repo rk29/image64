@@ -11,6 +11,12 @@ scnpos = 2
 dish = $08     ; disable case-shift 
 ensh = $09     ; enable case-shift
 swlc = $0e     ; switch to lower case
+swuc = $8e     ; switch to upper case
+carriage_return = 13
+cbm_backspace = 20
+ascii_backspace = 8
+ascii_bel = 7
+ascii_escape = 27
 
 cursor_right = $1d
 cursor_left =  $9d
@@ -20,6 +26,11 @@ reverse_on =   $12
 reverse_off =  $92
 clear_screen = $93
 cursor_home = $13
+british_pound = $5c
+
+function_key_5 = 137
+function_key_6 = 139
+function_key_7 = 140
 
 cursor_black =    $90
 cursor_white =    $05

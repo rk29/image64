@@ -1,10 +1,6 @@
 include "equat.s"
 
-usetbl1 = $cd03
-buffer = $ce77
-buf2 = $ce27
-
-org $1000,"extra.prg"
+org $1000, "extra.prg"
 
 ; $d000 - editor
 
@@ -17,7 +13,6 @@ editor_version = "02/23/90 03:14p"
 ;* editor sub-system
 ;*********************
 
-;
 arrays = $2f
 temp = $6f
 temp1 = $5f
@@ -25,7 +20,7 @@ temp2 = $60
 delx = $52
 numx = $14
 numy = $15
-;
+
 comm = $03f9
 temp3 = $03f7
 case1 = $03f4
@@ -53,64 +48,6 @@ done:
 		ldx 781
 		ldy 782
 		rts
-
-getdes:
-		lda #33
-		jmp usetbl1
-putdes:
-		lda #34
-		jmp usetbl1
-getlnx:
-		lda #35
-		jmp usetbl1
-putlnx:
-		lda #36
-		jmp usetbl1
-putvar:
-		lda #30
-		jmp usetbl1
-outastr:
-		lda #0
-		jmp usetbl1
-xgetin:
-		lda #23
-		jmp usetbl1
-
-xchrout:
-		sta $fe
-		pha
-		jsr xchrout1
-		pla
-		rts
-xchrout1:
-		lda #24
-		jmp usetbl1
-prtln:
-		lda #39
-		jmp usetbl1
-chkflags:
-		lda #52
-		jmp usetbl1
-inline:
-		lda #1
-		ldy #0
-		jmp usetbl1
-
-prdel:
-		lda #$14
-		jmp xchrout
-prcr:
-		lda #$0d
-		jmp xchrout
-bell:
-		lda #$07
-		jmp xchrout
-prcol:
-		lda #":"
-		jmp xchrout
-prspc:
-		lda #" "
-		jmp xchrout
 
 entry3:
 		jmp deldot
@@ -149,7 +86,6 @@ getc1:
 		beq getc2
 		bcs command
 
-
 getc2:
 		ldx modes
 		jsr inline
@@ -166,11 +102,11 @@ drop:
 		ldx #0
 		jmp done
 
-
-ret: jsr line
-jmp main
-command: jmp dodot
-
+ret:
+		jsr line
+		jmp main
+command:
+		jmp dodot
 
 xdels:
 		cpx #0
@@ -181,23 +117,28 @@ xdel1:
 		dex
 		jmp xdels
 
-line: ldx mline
-cpx lines
-bcc line1
-beq line1
-rts
-line1: lda flags
-and #1
-beq store
-insln: ldx cline
-jmp inslnx
-store: ldx cline
-jsr putlnx
-inc cline
-inc mline
-rts
+line:
+		ldx mline
+		cpx lines
+		bcc line1
+		beq line1
+		rts
+line1:
+		lda flags
+		and #1
+		beq store
+insln:
+		ldx cline
+		jmp inslnx
+store:
+		ldx cline
+		jsr putlnx
+		inc cline
+		inc mline
+		rts
 
-dotmsg:		byte 8
+dotmsg:
+		byte 8
 		cbm "Command:"
 
 dodot:
@@ -223,27 +164,32 @@ com1:
 		and #127
 		beq com2
 		jmp drop
-com2: lda comchar
-cmp #"."
-bne getcom0
-ldx dotmsg
-jsr xdels
-lda #"."
-jmp getc1
-deldot: ldx dotmsg
-jsr xdels
-jmp getc1
-getcom0: cmp #20
-beq deldot
-ldx #$00
-getcom: cmp commands+1,x
-beq gotcom
-inx
-cpx commands
-bne getcom
-ldx #2
-jmp done
-gotcom:		stx comm
+com2:
+		lda comchar
+		cmp #"."
+		bne getcom0
+		ldx dotmsg
+		jsr xdels
+		lda #"."
+		jmp getc1
+deldot:
+		ldx dotmsg
+		jsr xdels
+		jmp getc1
+getcom0:
+		cmp #20
+		beq deldot
+		ldx #$00
+getcom:
+		cmp commands+1,x
+		beq gotcom
+		inx
+		cpx commands
+		bne getcom
+		ldx #2
+		jmp done
+gotcom:
+		stx comm
 		txa
 		asl
 		tay
@@ -256,52 +202,80 @@ gotcom:		stx comm
 		lda comtxt+1,y
 		tay
 		jsr prmsg3
-comjump:	jsr $ffff
+comjump:
+		jsr $ffff
 		jmp main0
-stack:		byte 0
-comchar:	byte 0
+stack:
+		byte 0
+comchar:
+		byte 0
 
-
-commands:	byte 22
+commands:
+		byte 22
 		cbm "abcdefhijklmnorsvxyz"
 		byte ensh
 		cbm "#"
 cindnt = help
-comvecs:	word abort,   border,  margin, delet,   edit,  find,   help,   insert
-		word justify, repl,    clist,  mciread, clrtx, linnum, cread,  csave
-		word cvers,   exit,    cmove,  ccopy,   help,  scale,  cindnt
+comvecs:
+		word abort, border, margin, delet, edit, find, help, insert
+		word justify, repl, clist, mciread, clrtx, linnum, cread, csave
+		word cvers, exit, cmove, ccopy, help, scale, cindnt
 
-comtxt:		word tabrt,   tbrdr,   tmrgn,  tdele,   tedit, tfind,  thelp,  tinst
-		word tjust,   trepl,   tlist,  tmcir,   tclrt, tline,  tread,  tsave
-		word tvers,   texit,   tmove,  tcopy,   thelp, tscale, tindnt
+comtxt:
+		word tabrt, tbrdr, tmrgn, tdele, tedit, tfind, thelp, tinst
+		word tjust, trepl, tlist, tmcir, tclrt, tline, tread, tsave
+		word tvers, texit, tmove, tcopy, thelp, tscale, tindnt
 
-tabrt:		cbm "Abort",0
-tbrdr:		cbm "Border",0
-tdele:		cbm "Delete",0
-tedit:		cbm "Edit",0
-tfind:		cbm "Find",0
-thelp:		cbm "Help!",0
-tinst:		cbm "Insert",0
-tjust:		cbm "Justify (C,E,I,L,P,R,U)",0
-trepl:		cbm "Replace",0
-tlist:		cbm "List",0
-tmcir:		cbm "MCI Read",0
-tclrt:		cbm "Clear Text",0
-tread:		cbm "Read",0
-tsave:		cbm "Save Text",0
-texit:		cbm "Exit",0
-tline:		cbm "Line Numbers",0
-tmrgn:		cbm "Columns",0
-tcopy:		cbm "Copy",0
-tmove:		cbm "Move",0
-tscale:		cbm "Scale",0
-tindnt:		cbm "Indent",0
-tvers:		cbm "Version",0
+tabrt:
+		cbm "Abort",0
+tbrdr:
+		cbm "Border",0
+tdele:
+		cbm "Delete",0
+tedit:
+		cbm "Edit",0
+tfind:
+		cbm "Find",0
+thelp:
+		cbm "Help!",0
+tinst:
+		cbm "Insert",0
+tjust:
+		cbm "Justify (C,E,I,L,P,R,U)",0
+trepl:
+		cbm "Replace",0
+tlist:
+		cbm "List",0
+tmcir:
+		cbm "MCI Read",0
+tclrt:
+		cbm "Clear Text",0
+tread:
+		cbm "Read",0
+tsave:
+		cbm "Save Text",0
+texit:
+		cbm "Exit",0
+tline:
+		cbm "Line Numbers",0
+tmrgn:
+		cbm "Columns",0
+tcopy:
+		cbm "Copy",0
+tmove:
+		cbm "Move",0
+tscale:
+		cbm "Scale",0
+tindnt:
+		cbm "Indent",0
+tvers:
+		cbm "Version",0
 
-abort: jsr getcr
-lda #0
-ldx #0
-jmp done
+abort:
+		jsr getcr
+		lda #0
+		ldx #0
+		jmp done
 
 border:
 		ldx #1
@@ -343,16 +317,23 @@ border2:
 		inx
 		inx
 		jmp inslnx
-border3:	rts
-border1:	jmp dontdo
+border3:
+		rts
+border1:
+		jmp dontdo
 
-tbrdr1:		byte 139
-		cbm "Character:",0
-char:		byte 0
-tmpx:		byte 0
-tmpy:		byte 0
-;
-delet:		ldx mline
+tbrdr1:
+		byte function_key_6
+		cbm "Character:", 0
+char:
+		byte 0
+tmpx:
+		byte 0
+tmpy:
+		byte 0
+
+delet:
+		ldx mline
 		dex
 		ldy mline
 		dey
@@ -362,12 +343,14 @@ delet:		ldx mline
 		ldx #<delmsg1
 		ldy #>delmsg1
 		jsr prmsg3
-dele2:		lda numx
+dele2:
+		lda numx
 		cmp numy
 		beq dele3
 		lda #$53 ; "s"
 		jsr xchrout
-dele3:		jsr prspc
+dele3:
+		jsr prspc
 		lda numx
 		jsr prtnum
 		lda numx
@@ -378,26 +361,34 @@ dele3:		jsr prspc
 		jsr prmsg3
 		lda numy
 		jsr prtnum
-dele4:		ldx #<delmsg3
+dele4:
+		ldx #<delmsg3
 		ldy #>delmsg3
 		jsr prmsg3
 		jmp dellns
-delet1:		jmp dontdo
+delet1:
+		jmp dontdo
 
-delmsg1:	cbm "(Line",0
-delmsg2:	cbm " To ",0
-delmsg3:	cbm " Deleted.)",13,0
+delmsg1:
+		cbm "(Line",0
+delmsg2:
+		cbm " To ",0
+delmsg3:
+		cbm " Deleted.)",13,0
 
-edit:		ldx mline
+edit:
+		ldx mline
 		dex
 		ldy mline
 		dey
 		beq edit1
 		jsr getxy
 		jmp editlns
-edit1:		jmp dontdo
+edit1:
+		jmp dontdo
 
-find:		ldx #1
+find:
+		ldx #1
 		ldy mline
 		dey
 		beq find1
@@ -426,8 +417,9 @@ find2:
 find1:
 		jmp dontdo
 
-tfind1:		cbm "Search Phrase:",0
-;
+tfind1:
+		cbm "Search Phrase:",0
+
 repl:
 		ldx #1
 		ldy mline
@@ -475,8 +467,10 @@ repl2:
 repl1:
 		jmp dontdo
 
-trepl1:		cbm "Search Phrase:",0
-trepl2:		cbm "Replace With :",0
+trepl1:
+		cbm "Search Phrase:",0
+trepl2:
+		cbm "Replace With:",0
 
 help:
 		jsr getcr
@@ -497,7 +491,8 @@ insert:
 insert1:
 		rts
 
-justify:	ldx mline
+justify:
+		ldx mline
 		dex
 		beq justif0
 		jsr xgetin
@@ -506,87 +501,108 @@ justify:	ldx mline
 		cmp #$43 ; "c"
 		bne justif0a
 		ldx #0
-justif0a:	cmp #$45 ; "e"
+justif0a:
+		cmp #$45 ; "e"
 		bne justif0b
 		ldx #1
-justif0b:	cmp #$50 ; "p"
+justif0b:
+		cmp #$50 ; "p"
 		bne justif0c
 		ldx #2
-justif0c:	cmp #$4c ; "l"
+justif0c:
+		cmp #$4c ; "l"
 		bne justif0d
 		ldx #3
-justif0d:	cmp #$52 ; "r"
+justif0d:
+		cmp #$52 ; "r"
 		bne justif0e
 		ldx #4
-justif0e:	cmp #$49 ; "i"
+justif0e:
+		cmp #$49 ; "i"
 		bne justif0f
 		ldx #5
-justif0f:	cmp #$55 ; "u"
+justif0f:
+		cmp #$55 ; "u"
 		bne justif0g
 		ldx #6
-justif0g:	cpx #$ff
+justif0g:
+		cpx #$ff
 		bne justify1
-justif0:	jmp dontdo
-;
-tcen:		cbm "Center",0
-texp:		cbm "Expand",0
-tpak:		cbm "Packed",0
-tlft:		cbm "Left",0
-trgt:		cbm "Right",0
-tind:		cbm "Indent",0
-tund:		cbm "Un-Indent",0
+justif0:
+		jmp dontdo
 
-justcom:	byte 0
-justtxt:	word tcen,texp,tpak,tlft,trgt,tind,tund
-justcoms:	word jcenter,jexpand,jpacked,jleft,jright,jindent,jundent
+tcen:
+		cbm "Center",0
+texp:
+		cbm "Expand",0
+tpak:
+		cbm "Packed",0
+tlft:
+		cbm "Left",0
+trgt:
+		cbm "Right",0
+tind:
+		cbm "Indent",0
+tund:
+		cbm "Un-Indent",0
 
-justify1:stx justcom
-ldx #15
-jsr xdels
-ldx justcom
-txa
-asl
-tay
-lda justtxt,y
-tax
-lda justtxt+1,y
-tay
-jsr prmsg3
-lda justcom
-asl
-tay
-lda justcoms+1,y
-tax
-lda justcoms,y
-jmp repjust
-;
+justcom:
+		byte 0
+justtxt:
+		word tcen, texp, tpak, tlft, trgt, tind, tund
+justcoms:
+		word jcenter, jexpand, jpacked, jleft, jright, jindent, jundent
+
+justify1:
+		stx justcom
+		ldx #15
+		jsr xdels
+		ldx justcom
+		txa
+		asl
+		tay
+		lda justtxt,y
+		tax
+		lda justtxt+1,y
+		tay
+		jsr prmsg3
+		lda justcom
+		asl
+		tay
+		lda justcoms+1,y
+		tax
+		lda justcoms,y
+		jmp repjust
+
 clist:
-lda #$81
-sta mciflg
-lda #$80
-sta flag1
-jmp read0
-;
+		lda #$81
+		sta mciflg
+		lda #$80
+		sta flag1
+		jmp read0
+
 mciread:
-lda #$00
-sta mciflg
-lda #$00
-sta flag1
-lda #$01
-sta wrapfl
-jmp read0
-;
-clrtx:
-jsr getcr
-ldx stack
-txs
-jmp entry1
-;
-cread:		lda #$81
+		lda #$00
 		sta mciflg
 		lda #$00
 		sta flag1
-read0:		ldx #1
+		lda #$01
+		sta wrapfl
+		jmp read0
+
+clrtx:
+		jsr getcr
+		ldx stack
+		txs
+		jmp entry1
+
+cread:
+		lda #$81
+		sta mciflg
+		lda #$00
+		sta flag1
+read0:
+		ldx #1
 		ldy mline
 		dey
 		beq read1
@@ -600,10 +616,13 @@ read0:		ldx #1
 		lda #0
 		sta mci
 		rts
-read1:		jmp dontdo
+read1:
+		jmp dontdo
 
-mciflg:		byte 0
-wrapfl:		byte 0
+mciflg:
+		byte 0
+wrapfl:
+		byte 0
 
 csave:
 		jsr getcr
@@ -673,323 +692,341 @@ marmsg:
 		cbm "Set To:",0
 
 ccopy:
-ldx #1
-ldy mline
-dey
-beq copy1
-jsr getxy
-ldx #<cpymsg
-ldy #>cpymsg
-jsr prmsg3
-lda numx
-pha
-ldx mline
-jsr getnumm
-lda numx
-beq copy1
-cmp mline
-beq copy0a
-bcs copy1
+		ldx #1
+		ldy mline
+		dey
+		beq copy1
+		jsr getxy
+		ldx #<cpymsg
+		ldy #>cpymsg
+		jsr prmsg3
+		lda numx
+		pha
+		ldx mline
+		jsr getnumm
+		lda numx
+		beq copy1
+		cmp mline
+		beq copy0a
+		bcs copy1
 copy0a:
-sta cline
-pla
-sta numx
-ldx cline
-cpx numx
-bcc copy0
-dex
-cpx numy
-bcc copy1
+		sta cline
+		pla
+		sta numx
+		ldx cline
+		cpx numx
+		bcc copy0
+		dex
+		cpx numy
+		bcc copy1
 copy0:
-jmp cpylns
+		jmp cpylns
 copy1:
-lda mline
-sta cline
-jmp dontdo
+		lda mline
+		sta cline
+		jmp dontdo
 
-cpymsg:		cbm "Copy To:",0
+cpymsg:
+		cbm "Copy To:",0
 
 cmove:
-ldx #1
-ldy mline
-dey
-beq move1
-jsr getxy
-ldx #<movmsg
-ldy #>movmsg
-jsr prmsg3
-lda numx
-pha
-ldx mline
-jsr getnumm
-lda numx
-beq move1
-cmp mline
-beq move0a
-bcs move1
-move0a:sta cline
-pla
-sta numx
-ldx cline
-cpx numx
-bcc move0
-dex
-cpx numy
-bcc move1
+		ldx #1
+		ldy mline
+		dey
+		beq move1
+		jsr getxy
+		ldx #<movmsg
+		ldy #>movmsg
+		jsr prmsg3
+		lda numx
+		pha
+		ldx mline
+		jsr getnumm
+		lda numx
+		beq move1
+		cmp mline
+		beq move0a
+		bcs move1
+move0a:
+		sta cline
+		pla
+		sta numx
+		ldx cline
+		cpx numx
+		bcc move0
+		dex
+		cpx numy
+		bcc move1
 move0:
-jmp movlns
+		jmp movlns
 move1:
-lda mline
-sta cline
-jmp dontdo
+		lda mline
+		sta cline
+		jmp dontdo
 
-movmsg:		cbm "Move To:",0
+movmsg:
+		cbm "Move To:",0
 
 scale:
-lda #scalelen
-ldx #<scalemsg
-ldy #>scalemsg
-jmp prmsg0
+		lda #scalelen
+		ldx #<scalemsg
+		ldy #>scalemsg
+		jmp prmsg0
 
-scalemsg:	byte 139
-		byte $5c, "_101", $5c, "_202", $5c, "_303", 139
-		byte "0123456789012345678901234567890123456789", 139
+scalemsg:
+		byte function_key_6
+		cbm $5c, "_101", $5c, "_202", $5c, "_303", function_key_6
+		cbm "0123456789012345678901234567890123456789", function_key_6
 scalelen = *-scalemsg
 
 cvers:
-lda #verslen
-ldx #<versmsg
-ldy #>versmsg
-jmp prmsg0
+		lda #verslen
+		ldx #<versmsg
+		ldy #>versmsg
+		jmp prmsg0
 
-versmsg:	byte 139
+versmsg:
+		byte function_key_6
 		cbm "Image 1.3 Editor ("+editor_version+")"
-		byte 139
+		byte function_key_6
 verslen = *-versmsg
 
 delc:
-sty temp
-cpy index
-beq delc2
+		sty temp
+		cpy index
+		beq delc2
 delc1:
-lda buffer+1,y
-sta buffer,y
-iny
-cpy index
-bcc delc1
+		lda buffer+1,y
+		sta buffer,y
+		iny
+		cpy index
+		bcc delc1
 delc2:
-ldy index
-beq delc3
-dec index
+		ldy index
+		beq delc3
+		dec index
 delc3:
-ldy temp
-rts
-;
-insc:
-sty temp
-ldy index
-beq insc2
-cpy temp
-bcc insc2
-cpy llen
-bcs insc3
-insc1:lda buffer,y
-sta buffer+1,y
-dey
-cpy temp
-bpl insc1
-insc2:
-inc index
-insc3:
-ldy temp
-lda #" "
-sta buffer,y
-rts
-;
-repjust:
-sta jump+1
-stx jump+2
-lda delx
-clc
-adc #8
-sta delx
-ldx #1
-ldy mline
-dey
-jsr getxy
-doj0:
-ldx numx
-dex
-cpx numy
-bcs doj2
-inx
-jsr getlnx
-ldx index
-beq doj1
-dex
-cpx llen
-bcs doj1
-lda index
-jsr jump
-ldx numx
-jsr putlnx
-doj1:
-ldx numx
-cpx numy
-beq doj2
-inc numx
-bne doj0
-doj2:
-ldx #<jdone
-ldy #>jdone
-jmp prmsg3
-jump:
-jmp $ffff
+		ldy temp
+		rts
 
-jdone:		cbm "Done.",0
-;
+insc:
+		sty temp
+		ldy index
+		beq insc2
+		cpy temp
+		bcc insc2
+		cpy llen
+		bcs insc3
+insc1:
+		lda buffer,y
+		sta buffer+1,y
+		dey
+		cpy temp
+		bpl insc1
+insc2:
+		inc index
+insc3:
+		ldy temp
+		lda #" "
+		sta buffer,y
+		rts
+
+repjust:
+		sta jump+1
+		stx jump+2
+		lda delx
+		clc
+		adc #8
+		sta delx
+		ldx #1
+		ldy mline
+		dey
+		jsr getxy
+doj0:
+		ldx numx
+		dex
+		cpx numy
+		bcs doj2
+		inx
+		jsr getlnx
+		ldx index
+		beq doj1
+		dex
+		cpx llen
+		bcs doj1
+		lda index
+		jsr jump
+		ldx numx
+		jsr putlnx
+doj1:
+		ldx numx
+		cpx numy
+		beq doj2
+		inc numx
+		bne doj0
+doj2:
+		ldx #<jdone
+		ldy #>jdone
+		jmp prmsg3
+jump:
+		jmp $ffff
+
+jdone:
+		cbm "Done.",0
+
 jleft:
-lda index
-beq jleft1
-lda buffer
-cmp #" "
-bne jleft1
-ldy #0
-jsr delc
-jmp jleft
+		lda index
+		beq jleft1
+		lda buffer
+		cmp #" "
+		bne jleft1
+		ldy #0
+		jsr delc
+		jmp jleft
 jleft1:
-rts
-;
+		rts
+
 jright:
-lda index
-cmp llen
-bcs jright1
-ldy #$00
-jsr insc
-jmp jright
+		lda index
+		cmp llen
+		bcs jright1
+		ldy #$00
+		jsr insc
+		jmp jright
 jright1:
-rts
-;
+		rts
+
 jcenter:
-jsr jleft
-lda llen
-sec
-sbc index
-beq jcenter2
-bcc jcenter2
-ldy #$00
-lsr
-tax
-jcenter1:jsr insc
-dex
-bne jcenter1
-jcenter2:rts
-;
+		jsr jleft
+		lda llen
+		sec
+		sbc index
+		beq jcenter2
+		bcc jcenter2
+		ldy #$00
+		lsr
+		tax
+jcenter1:
+		jsr insc
+		dex
+		bne jcenter1
+jcenter2:
+		rts
+
 jpacked:
-jsr jleft
-lda index
-beq jpacked4
-ldy #$00
-jpacked1:lda buffer,y
-iny
-cmp #" "
-bne jpacked2
-cpy index
-bcs jpacked3
-bcs jpacked3
-lda buffer,y
-cmp #" "
-bne jpacked2
-dey
-jsr delc
-jpacked2:cpy index
-bcc jpacked1
-jpacked3:ldy index
-beq jpacked4
-dey
-beq jpacked4
-lda buffer,y
-cmp #" "
-bne jpacked4
-sty index
-jpacked4:rts
-;
+		jsr jleft
+		lda index
+		beq jpacked4
+		ldy #$00
+jpacked1:
+		lda buffer,y
+		iny
+		cmp #" "
+		bne jpacked2
+		cpy index
+		bcs jpacked3
+		bcs jpacked3
+		lda buffer,y
+		cmp #" "
+		bne jpacked2
+		dey
+		jsr delc
+jpacked2:
+		cpy index
+		bcc jpacked1
+jpacked3:
+		ldy index
+		beq jpacked4
+		dey
+		beq jpacked4
+		lda buffer,y
+		cmp #" "
+		bne jpacked4
+		sty index
+jpacked4:
+		rts
+
 jexpand:
-jsr jpacked
-jexpand1:ldx #$00
-lda index
-cmp llen
-bcs jexpand5
-ldy #$00
-jexpand2:lda buffer,y
-cmp #" "
-bne jexpand4
-jsr insc
-inx
-lda index
-cmp llen
-bcs jexpand5
-jexpand3:lda buffer,y
-cmp #" "
-bne jexpand4
-iny
-cpy index
-bcc jexpand3
-bcs jexpand1
-jexpand4:iny
-cpy index
-bcc jexpand2
-cpx #$00
-beq jexpand5
-cpy index
-bcs jexpand1
-jexpand5:rts
-;
+		jsr jpacked
+jexpand1:
+		ldx #$00
+		lda index
+		cmp llen
+		bcs jexpand5
+		ldy #$00
+jexpand2:
+		lda buffer,y
+		cmp #" "
+		bne jexpand4
+		jsr insc
+		inx
+		lda index
+		cmp llen
+		bcs jexpand5
+jexpand3:
+		lda buffer,y
+		cmp #" "
+		bne jexpand4
+		iny
+		cpy index
+		bcc jexpand3
+		bcs jexpand1
+jexpand4:
+		iny
+		cpy index
+		bcc jexpand2
+		cpx #$00
+		beq jexpand5
+		cpy index
+		bcs jexpand1
+jexpand5:
+		rts
+
 jindent:
-ldy #0
-jmp insc
+		ldy #0
+		jmp insc
 jundent:
-ldy #0
-jmp delc
-;
+		ldy #0
+		jmp delc
+
 jbordr:
-ldy index
-iny
-cpy llen
-bcs jbordr2
-ldy #0
-jsr insc
-lda char
-sta buffer
-ldy index
-lda #" "
+		ldy index
+		iny
+		cpy llen
+		bcs jbordr2
+		ldy #0
+		jsr insc
+		lda char
+		sta buffer
+		ldy index
+		lda #" "
 jbordr1:
-sta buffer,y
-iny
-cpy llen
-bcc jbordr1
-sty index
-dey
-lda char
-sta buffer,y
+		sta buffer,y
+		iny
+		cpy llen
+		bcc jbordr1
+		sty index
+		dey
+		lda char
+		sta buffer,y
 jbordr2:
-rts
-;
+		rts
+
 prtlns:
-lda mciflg
-sta mci
-ldx numx
-jsr prtlnx
-lda chat
-bne prtln1
-ldx numx
-cpx numy
-beq prtln1
-inc numx
-bne prtlns
+		lda mciflg
+		sta mci
+		ldx numx
+		jsr prtlnx
+		lda chat
+		bne prtln1
+		ldx numx
+		cpx numy
+		beq prtln1
+		inc numx
+		bne prtlns
 prtln1:
-rts
-;
+		rts
+
 prtlnx:
 		txa
 		pha
@@ -1022,82 +1059,88 @@ prtlnx3:
 		rts
 
 findlns:
-ldx numx
-jsr getlnx
-ldx #0
-stx ftmpx
+		ldx numx
+		jsr getlnx
+		ldx #0
+		stx ftmpx
 findln5:
-ldy #0
+		ldy #0
 findln2:
-lda buffer,x
-cmp buf2,y
-bne findln3
-iny
-cpy flen
-bcs findln6
-inx
-cpx index
-bcc findln2
+		lda buffer,x
+		cmp buf2,y
+		bne findln3
+		iny
+		cpy flen
+		bcs findln6
+		inx
+		cpx index
+		bcc findln2
 findln3:
-inc ftmpx
-ldx ftmpx
-cpx index
-bcc findln5
+		inc ftmpx
+		ldx ftmpx
+		cpx index
+		bcc findln5
 findln7:
-inc numx
-ldx numx
-dex
-cpx numy
-bcc findlns
-rts
+		inc numx
+		ldx numx
+		dex
+		cpx numy
+		bcc findlns
+		rts
 findln6:
-ldx numx
-jsr prtlnx
-jmp findln7
-flen:		byte 0
-ftmpx:		byte 0
-rtmpx:		byte 0
-rlen:		byte 0
-fflg:		byte 0
-;
+		ldx numx
+		jsr prtlnx
+		jmp findln7
+flen:
+		byte 0
+ftmpx:
+		byte 0
+rtmpx:
+		byte 0
+rlen:
+		byte 0
+fflg:
+		byte 0
+
 repllns:
-ldx numx
-jsr getlnx
-ldx #0
-stx ftmpx
-stx fflg
+		ldx numx
+		jsr getlnx
+		ldx #0
+		stx ftmpx
+		stx fflg
 replln5:
-ldy #0
-replln2:lda buffer,x
-cmp buf2,y
-bne replln3
-iny
-cpy flen
-bcs replln6
-inx
-cpx index
-bcc replln2
+		ldy #0
+replln2:
+		lda buffer,x
+		cmp buf2,y
+		bne replln3
+		iny
+		cpy flen
+		bcs replln6
+		inx
+		cpx index
+		bcc replln2
 replln3:
-inc ftmpx
-ldx ftmpx
-cpx index
-bcc replln5
+		inc ftmpx
+		ldx ftmpx
+		cpx index
+		bcc replln5
 replln7:
-lda fflg
-beq repllna
-ldx numx
-jsr prtlnx
+		lda fflg
+		beq repllna
+		ldx numx
+		jsr prtlnx
 repllna:
-inc numx
-ldx numx
-dex
-cpx numy
-bcc repllns
-rts
+		inc numx
+		ldx numx
+		dex
+		cpx numy
+		bcc repllns
+		rts
 replln6:
-lda fflg
-bne replln9
-ldx numx
+		lda fflg
+		bne replln9
+		ldx numx
 		jsr prtlnx
 replln9:
 		inc fflg
@@ -1152,43 +1195,45 @@ replln1:
 		jsr prmsg3
 		jmp replln7
 
-trepln:		cbm "Too Big. Can't Replace.",13,0
+trepln:
+		cbm "Too Big. Can't Replace.",13,0
 
 dellns:
-ldx numy
-jsr dellnx
-ldx numy
-cpx numx
-beq dellns1
-dec numy
-bne dellns
+		ldx numy
+		jsr dellnx
+		ldx numy
+		cpx numx
+		beq dellns1
+		dec numy
+		bne dellns
 dellns1:
-rts
-;
+		rts
+
 editlns:
-ldx numx
-jsr editlnx
-ldx numx
-cpx numy
-beq editlns1
-inc numx
-bne editlns
-editlns1:rts
-;
+		ldx numx
+		jsr editlnx
+		ldx numx
+		cpx numy
+		beq editlns1
+		inc numx
+		bne editlns
+editlns1:
+		rts
+
 dellnx:
-stx temp
-inx
-jsr getdes
-ldx temp
-jsr putdes
-inc temp
-ldx temp
-cpx mline
-bcc dellnx
-dec mline
-dec cline
-rts
-;
+		stx temp
+		inx
+		jsr getdes
+		ldx temp
+		jsr putdes
+		inc temp
+		ldx temp
+		cpx mline
+		bcc dellnx
+		dec mline
+		dec cline
+		rts
+
 inslnx:
 		stx temp
 		cpx mline
@@ -1256,18 +1301,22 @@ editln5:
 		jsr prmsg
 		jmp main
 
-editln9:	ldy index
+editln9:
+		ldy index
 		beq editln10
 		ldx temp3
 		jmp putlnx
 
-editln10:	lda editnoc
+editln10:
+		lda editnoc
 		ldx #<(editnoc+1)
 		ldy #>(editnoc+1)
 		jmp prmsg
 
-editnoc:	cbm 13,"(No Change.)",13
-editext:	cbm 13,"Command:Exit",13
+editnoc:
+		cbm 13, "(No Change.)",13
+editext:
+		cbm 13, "Command:Exit",13
 
 del11:
 		ldx #$0b
@@ -1293,117 +1342,153 @@ clear1:
 		rts
 
 clearln:
-jsr getdes
-lda #$00
-sta var
-ldx numx
-jsr putdes
-rts
-;
-cpylns:
-ldx numx
-jsr cpylnx
-ldx numx
-cpx numy
-beq cpyln1
-inc numx
-bne cpylns
-cpyln1:
-rts
-;
-movlns:
-ldx numx
-jsr movlnx
-ldx numx
-cpx numy
-beq movln1
-inc numx
-bne movlns
-movln1:
-rts
-;
-cpylnx:
-jsr getlnx
-ldx mline
-cpx lines
-bcs cpylnx3
-ldx cline
-cpx mline
-beq cpylnx1
-jsr inslnx
-jmp cpylnx2
-cpylnx1:
-jsr putlnx
-inc cline
-inc mline
-cpylnx2:
-ldx cline
-cpx numy
-bcs cpylnx3
-inc numx
-inc numy
-cpylnx3:
-rts
-;
-movlnx:
-stx temp
-cpx cline
-bcc movlnx1
-jsr getdes
-lda var
-pha
-lda var+1
-pha
-lda var+2
-pha
-movlnx0a:ldx temp
-dex
-jsr getdes
-ldx temp
-jsr putdes
-dec temp
-ldx temp
-cpx cline
-bcs movlnx0a
-pla
-sta var+2
-pla
-sta var+1
-pla
-sta var
-ldx cline
-jsr putdes
-inc cline
-rts
-movlnx1:
-jsr getdes
-lda var
-pha
-lda var+1
-pha
-lda var+2
-pha
-movlnx1a:ldx temp
-inx
-jsr getdes
-ldx temp
-jsr putdes
-inc temp
-ldx temp
-cpx cline
-bcc movlnx1a
-pla
-sta var+2
-pla
-sta var+1
-pla
-sta var
-dec numx
-dec numy
-ldx cline
-dex
-jmp putdes
+		jsr getdes
+		lda #$00
+		sta var
+		ldx numx
+		jsr putdes
+		rts
 
+cpylns:
+		ldx numx
+		jsr cpylnx
+		ldx numx
+		cpx numy
+		beq cpyln1
+		inc numx
+		bne cpylns
+cpyln1:
+		rts
+
+movlns:
+		ldx numx
+		jsr movlnx
+		ldx numx
+		cpx numy
+		beq movln1
+		inc numx
+		bne movlns
+movln1:
+		rts
+
+cpylnx:
+		jsr getlnx
+		ldx mline
+		cpx lines
+		bcs cpylnx3
+		ldx cline
+		cpx mline
+		beq cpylnx1
+		jsr inslnx
+		jmp cpylnx2
+cpylnx1:
+		jsr putlnx
+		inc cline
+		inc mline
+cpylnx2:
+		ldx cline
+		cpx numy
+		bcs cpylnx3
+		inc numx
+		inc numy
+cpylnx3:
+		rts
+
+movlnx:
+		stx temp
+		cpx cline
+		bcc movlnx1
+		jsr getdes
+		lda var
+		pha
+		lda var+1
+		pha
+		lda var+2
+		pha
+movlnx0a:
+		ldx temp
+		dex
+		jsr getdes
+		ldx temp
+		jsr putdes
+		dec temp
+		ldx temp
+		cpx cline
+		bcs movlnx0a
+		pla
+		sta var+2
+		pla
+		sta var+1
+		pla
+		sta var
+		ldx cline
+		jsr putdes
+		inc cline
+		rts
+movlnx1:
+		jsr getdes
+		lda var
+		pha
+		lda var+1
+		pha
+		lda var+2
+		pha
+movlnx1a:
+		ldx temp
+		inx
+		jsr getdes
+		ldx temp
+		jsr putdes
+		inc temp
+		ldx temp
+		cpx cline
+		bcc movlnx1a
+		pla
+		sta var+2
+		pla
+		sta var+1
+		pla
+		sta var
+		dec numx
+		dec numy
+		ldx cline
+		dex
+		jmp putdes
+
+getdes:
+		lda #33
+		jmp usetbl1
+putdes:
+		lda #34
+		jmp usetbl1
+getlnx:
+		lda #35
+		jmp usetbl1
+putlnx:
+		lda #36
+		jmp usetbl1
+putvar:
+		lda #30
+		jmp usetbl1
+outastr:
+		lda #0
+		jmp usetbl1
+xgetin:
+		lda #23
+		jmp usetbl1
+xchrout1:
+		lda #24
+		jmp usetbl1
+prtln:
+		lda #39
+		jmp usetbl1
+chkflags:
+		lda #52
+		jmp usetbl1
+inline:
+		lda #1
+		ldy #0
+		jmp usetbl1
 
 prtnum:
 		sta var+1
@@ -1437,168 +1522,172 @@ doline:
 		ldx #<msg3
 		ldy #>msg3
 		jsr prmsg3
-doln1:		lda flags
+doln1:
+		lda flags
 		and #1
 		beq noinst
 		lda #$c9 ; "I"
 		jsr xchrout
-noinst:		lda flags
+noinst:
+		lda flags
 		and #3
 		beq noline
 		lda cline
 		jsr prtnum
 		jsr prcol
 		jsr prcr
-noline:		lda #0
+noline:
+		lda #0
 		sta index
 		lda case1
 		sta case
 		rts
 
-msg3:		cbm "** End Of Memory **",13
+msg3:
+		cbm "** End Of Memory **",13
 		cbm "Type 'S' To Save, Or 'H' For Help.",13,0
 
 getnumm:
-stx numx
-jsr gettxm
-jmp getnum0
+		stx numx
+		jsr gettxm
+		jmp getnum0
 getnum:
-stx numx
-jsr gettx
+		stx numx
+		jsr gettx
 getnum0:
-ldy index
-beq getnum1
-ldy #0
-lda numx
-jsr getn
-sta numx
+		ldy index
+		beq getnum1
+		ldy #0
+		lda numx
+		jsr getn
+		sta numx
 getnum1:
-rts
+		rts
 getx:
-stx numx
-stx numy
-jsr gettx
+		stx numx
+		stx numy
+		jsr gettx
 getx0:
-ldy index
-beq getx1
-ldy #0
-lda numx
-jsr getn
-sta numx
-sta numy
+		ldy index
+		beq getx1
+		ldy #0
+		lda numx
+		jsr getn
+		sta numx
+		sta numy
 getx1:
-jmp chknums
-
+		jmp chknums
 
 getxy:
-stx numx
-sty numy
-jsr gettx
-ldy index
-beq getxy1
-ldy #0
-lda numx
-jsr getn
-sta numx
-cpy index
-bcc getxy2
-lda numx
-sta numy
-jmp chknums
+		stx numx
+		sty numy
+		jsr gettx
+		ldy index
+		beq getxy1
+		ldy #0
+		lda numx
+		jsr getn
+		sta numx
+		cpy index
+		bcc getxy2
+		lda numx
+		sta numy
+		jmp chknums
 getxy1:
-lda temp
-cmp #$85
-bne getx1
-lda #1
-sta numx
+		lda temp
+		cmp #$85
+		bne getx1
+		lda #1
+		sta numx
 getxy2:
-iny
-cpy index
-bcc getxy3
-ldx mline
-dex
-stx numy
-jmp chknums
+		iny
+		cpy index
+		bcc getxy3
+		ldx mline
+		dex
+		stx numy
+		jmp chknums
 getxy3:
-lda numy
-jsr getn
-sta numy
+		lda numy
+		jsr getn
+		sta numy
 chknums:
-ldx numy
-cpx numx
-bcc dontdo0
-ldx mline
-dex
-cpx numx
-bcc dontdo0
-cpx numy
-bcc dontdo0
-ldx numx
-beq dontdo0
-ldx numy
-beq dontdo0
-rts
+		ldx numy
+		cpx numx
+		bcc dontdo0
+		ldx mline
+		dex
+		cpx numx
+		bcc dontdo0
+		cpx numy
+		bcc dontdo0
+		ldx numx
+		beq dontdo0
+		ldx numy
+		beq dontdo0
+		rts
 dontdo0:
-ldx stack
-txs
-jmp main
+		ldx stack
+		txs
+		jmp main
 dontdo:
-ldx delx
-jsr xdels
-ldx stack
-txs
-jmp com1
-;
+		ldx delx
+		jsr xdels
+		ldx stack
+		txs
+		jmp com1
+
 getn:
-sta temp1
-ldx #0
-getn1:lda buffer,y
-cmp #"0"
-bcc getn3
-cmp #":"
-bcs getn3
-cpx #0
-bne getn2
-stx temp1
-inx
+		sta temp1
+		ldx #0
+getn1:
+		lda buffer,y
+		cmp #"0"
+		bcc getn3
+		cmp #":"
+		bcs getn3
+		cpx #0
+		bne getn2
+		stx temp1
+		inx
 getn2:
-and #$0f
-sta temp
-lda temp1
-asl
-asl
-clc
-adc temp1
-asl
-clc
-adc temp
-sta temp1
-iny
-cpy index
-bcc getn1
+		and #$0f
+		sta temp
+		lda temp1
+		asl
+		asl
+		clc
+		adc temp1
+		asl
+		clc
+		adc temp
+		sta temp1
+		iny
+		cpy index
+		bcc getn1
 getn3:
-lda temp1
-rts
-;
+		lda temp1
+		rts
+
 gettxm:
-jsr prspc
-lda modes
-and #8
-ora #$45
-tax
-ldy #$81
-jmp gettx0
-;
+		jsr prspc
+		lda modes
+		and #8
+		ora #$45
+		tax
+		ldy #$81
+		jmp gettx0
+
 gettx:
-jsr prspc
-ldx #$c4
-ldy #$00
-jsr gettx0
-bne gettx2
-jsr prdel
-jmp dontdo
+		jsr prspc
+		ldx #$c4
+		ldy #$00
+		jsr gettx0
+		bne gettx2
+		jsr prdel
+		jmp dontdo
 gettx2:
-rts
+		rts
 
 gettx0:
 		lda llen
@@ -1617,31 +1706,60 @@ gettx0:
 		cmp #20
 		rts
 
-prcolor:	lda #3
+prdel:
+		lda #cbm_backspace
+		jmp xchrout
+prcr:
+		lda #carriage_return
+		jmp xchrout
+bell:
+		lda #ascii_bel
+		jmp xchrout
+prcol:
+		lda #":"
+		jmp xchrout
+prspc:
+		lda #" "
+		jmp xchrout
+
+prcolor:
+		lda #3
 		ldx #<color
 		ldy #>color
 		jmp prmsg0
 
-color:		byte $5c
+color:
+		byte $5c
 		cbm "q0"
 
+xchrout:
+		sta $fe
+		pha
+		jsr xchrout1
+		pla
+		rts
 
-prbuf:		lda index
+prbuf:
+		lda index
 		ldx #<buffer
 		ldy #>buffer
 		jsr prmsg
 		jmp prcr
 
-prmsg0:		pha
+prmsg0:
+		pha
 		lda #0
 		sta mci
 		jmp prmsg2
 
-prmsg1:		pha
+prmsg1:
+		pha
 		lda #1
 		sta mci
-prmsg2:		pla
-prmsg:		sta var
+prmsg2:
+		pla
+prmsg:
+		sta var
 		stx var+1
 		sty var+2
 		sta delx
@@ -1651,10 +1769,12 @@ prmsg:		sta var
 		lda #1
 		sta mci
 		rts
-prmsg3:		stx var+1
+prmsg3:
+		stx var+1
 		sty var+2
 		ldy #0
-prmsg4:		lda [var+1],y
+prmsg4:
+		lda [var+1],y
 		beq prmsg5
 		sta $fe
 		lda var+1
@@ -1669,7 +1789,8 @@ prmsg4:		lda [var+1],y
 		sta var+1
 		iny
 		bne prmsg4
-prmsg5:		sty delx
+prmsg5:
+		sty delx
 		rts
 
 		cbm editor_version
@@ -1677,11 +1798,12 @@ prmsg5:		sty delx
 offset 0
 namespace ""
 
-dup 0,$2000-*
+; pad to the next module
+		dup 0, $2000-*
 
 ;;;;;
 ;;;;;
-;;;;;; $e000 - garbage collect
+;;;;; $e000 - garbage collect
 ;;;;;
 ;;;;;
 
@@ -1693,6 +1815,7 @@ size = 128
 
 ; setup gc parameters
 
+; gc:
 		lda 3
 		pha
 		lda 4
@@ -1713,7 +1836,8 @@ size = 128
 		ldx 56
 		sta hi
 		stx hi+1
-gc0:		lda #0
+gc0:
+		lda #0
 		sta gcindex
 
 ; loop thru scalars
@@ -1722,13 +1846,15 @@ gc0:		lda #0
 		ldx 46
 		sta 3
 		stx 4
-gc1:		lda 3
+gc1:
+		lda 3
 		cmp 47
 		bne gc1a
 		lda 4
 		cmp 48
 		beq gc4
-gc1a:		ldy #0
+gc1a:
+		ldy #0
 		lda [3],y
 		bmi gc2
 		iny
@@ -1742,19 +1868,22 @@ gc1a:		ldy #0
 		jsr add3
 		jmp gc1
 
-gc2:		lda #7
+gc2:
+		lda #7
 		jsr add3
 		jmp gc1
 
 ; loop thru arrays
 
-gc4:		lda 3
+gc4:
+		lda 3
 		cmp 49
 		bne gc4a
 		lda 4
 		cmp 50
 		beq gc6
-gc4a:		ldy #0
+gc4a:
+		ldy #0
 		lda [3],y
 		bmi gc5
 		iny
@@ -1762,7 +1891,8 @@ gc4a:		ldy #0
 		bpl gc5
 		iny
 		jsr doarray
-gc5:		ldy #2
+gc5:
+		ldy #2
 		clc
 		lda 3
 		adc [3],y
@@ -1773,13 +1903,15 @@ gc5:		ldy #2
 		stx 3
 		sta 4
 		jmp gc4
-gc6:		lda gcindex
+gc6:
+		lda gcindex
 		beq gc7
 		jsr collect
 		lda gcindex
 		cmp #size
 		beq gc0
-gc7:		pla
+gc7:
+		pla
 		sta 8
 		pla
 		sta 7
@@ -1793,14 +1925,17 @@ gc7:		pla
 		sta 3
 		rts
 
-add3:		clc
+add3:
+		clc
 		adc 3
 		sta 3
 		bcc add3a
 		inc 4
-add3a:		rts
+add3a:
+		rts
 
-doarray:	clc
+doarray:
+		clc
 		lda [3],y
 		adc 3
 		sta 7
@@ -1818,13 +1953,15 @@ doarray:	clc
 		clc
 		adc #5
 		jsr add3
-doarray1:	lda 3
+doarray1:
+		lda 3
 		cmp 7
 		bne doarray2
 		lda 4
 		cmp 8
 		beq doarray3
-doarray2:	ldy #0
+doarray2:
+		ldy #0
 		jsr dostr
 		clc
 		lda 3
@@ -1833,14 +1970,17 @@ doarray2:	ldy #0
 		bcc doarray1
 		inc 4
 		jmp doarray1
-doarray3:	pla
+doarray3:
+		pla
 		sta 4
 		pla
 		sta 3
 		rts
 
-dostr0:		rts
-dostr:		lda [3],y
+dostr0:
+		rts
+dostr:
+		lda [3],y
 		tax
 		iny
 		lda [3],y
@@ -1863,7 +2003,8 @@ dostr:		lda [3],y
 		ldx gcindex
 		beq dostr4
 		ldx #0
-dostr1:		lda 6
+dostr1:
+		lda 6
 		cmp tbldh,x
 		bcc dostr6
 		bne dostr2
@@ -1871,11 +2012,13 @@ dostr1:		lda 6
 		cmp tbldl,x
 		bcc dostr6
 		beq dostr5
-dostr2:		stx temp
+dostr2:
+		stx temp
 		cpx #size-1
 		beq dostr4
 		ldx #size-1
-dostr3:		lda tblpl-1,x
+dostr3:
+		lda tblpl-1,x
 		sta tblpl,x
 		lda tblph-1,x
 		sta tblph,x
@@ -1886,7 +2029,8 @@ dostr3:		lda tblpl-1,x
 		dex
 		cpx temp
 		bne dostr3
-dostr4:		lda 3
+dostr4:
+		lda 3
 		sta tblpl,x
 		lda 4
 		sta tblph,x
@@ -1898,17 +2042,22 @@ dostr4:		lda 3
 		cmp #size
 		beq dostr5
 		inc gcindex
-dostr5:		rts
-dostr6:		inx
+dostr5:
+		rts
+dostr6:
+		inx
 		cpx gcindex
 		bcc dostr1
 		cpx #size
 		bcc dostr4
 		rts
 
-collect0:	rts
-collect:	ldx #0
-collect1:	cpx gcindex
+collect0:
+		rts
+collect:
+		ldx #0
+collect1:
+		cpx gcindex
 		beq collect0
 		lda tblpl,x
 		sta 3
@@ -1932,7 +2081,8 @@ collect1:	cpx gcindex
 		txa
 		tay
 		dey
-collect2:	lda [5],y
+collect2:
+		lda [5],y
 		sta [hi],y
 		dey
 		dex
@@ -1946,19 +2096,28 @@ collect2:	lda [5],y
 		ldx temp
 		inx
 		jmp collect1
-;
-gcindex:	byte 0
-temp:		byte 0
-lo:		word 0
 
-tblpl:		dup 0, 129
-tblph:		dup 0, 129
-tbldl:		dup 0, 129
-tbldh:		dup 0, 129
+gcindex:
+		byte 0
+temp:
+		byte 0
+lo:
+		word 0
+
+tblpl:
+		dup 0, 129
+tblph:
+		dup 0, 129
+tbldl:
+		dup 0, 129
+tbldh:
+		dup 0, 129
 
 offset 0
 namespace ""
-dup 0,$2400-*
+
+; pad to the start of the next module
+		dup 0, $2400-*
 
 ;;;;;
 ;;;;;
@@ -1983,7 +2142,7 @@ namespace "ecs"
 ; 3-4..command
 ; 5-6..file
 ; 7....credits
-;
+
 ;long format
 ; 0......flag (same as short)
 ; 1-2....access
@@ -1991,41 +2150,36 @@ namespace "ecs"
 ; 10-23..file (14 chars)
 ; 24-31..password (7 chars)
 ; 32.....credits
-;
+
+; ecs:
 		cpx #0
 		bne ecs1
 		jmp ecschk
-ecs1:		dex
+ecs1:
+		dex
 		bne ecs2
 		jmp ecsgoto
-ecs2:		dex
+ecs2:
+		dex
 		bne ecs3
 		jmp ecsget
-ecs3:		dex
+ecs3:
+		dex
 		bne ecs4
 		jmp ecsput
-ecs4:		dex
+ecs4:
+		dex
 		bne ecs5
 		jmp ecsload
-ecs5:		dex
+ecs5:
+		dex
 		bne ecs6
 		jmp ecssave
-ecs6:		rts
+ecs6:
+		rts
 
-getln:
-		lda #35
-		jmp usetbl1
-putln:
-		lda #36
-		jmp usetbl1
-usevar:
-		lda #29
-		jmp usetbl1
-putvar:
-		lda #30
-		jmp usetbl1
-
-ecsgoto:	ldx #30
+ecsgoto:
+		ldx #30
 		jsr usevar ;a%
 		lda var+1
 		sta $14
@@ -2040,11 +2194,13 @@ ecsgoto:	ldx #30
 		sta 1
 		rts
 
-ecschk:		ldx #0
+ecschk:
+		ldx #0
 		jsr usevar ;an$
 		ldy var
 		sty index
-ecsc2:		lda [var+1],y
+ecsc2:
+		lda [var+1],y
 		sta buffer,y
 		dey
 		bpl ecsc2
@@ -2055,7 +2211,8 @@ ecsc2:		lda [var+1],y
 		lda #0
 		sta acc
 		sta acc+1
-ecsc3:		rol acc
+ecsc3:
+		rol acc
 		rol acc+1
 		dex
 		bpl ecsc3
@@ -2070,7 +2227,8 @@ ecsc3:		rol acc
 		sta var+3
 		lda #>ecsdefs
 		sta var+4
-ecsscan:	lda [var+3],y
+ecsscan:
+		lda [var+3],y
 		tax
 		and #64
 		beq ecsnext
@@ -2079,7 +2237,8 @@ ecsscan:	lda [var+3],y
 		beq ecsscan1
 		and zzf
 		beq ecsnext
-ecsscan1:	ldy #1
+ecsscan1:
+		ldy #1
 		lda [var+3],y
 		and acc
 		bne ecsscan2
@@ -2087,28 +2246,33 @@ ecsscan1:	ldy #1
 		lda [var+3],y
 		and acc+1
 		beq ecsnext
-ecsscan2:	ldy #0
+ecsscan2:
+		ldy #0
 		lda [var+3],y
 		pha
 		and #8
 		bne ecsscan3
 		jsr ecslong
 		jmp ecsscan4
-ecsscan3:	jsr ecsshort
-ecsscan4:	pla
+ecsscan3:
+		jsr ecsshort
+ecsscan4:
+		pla
 		bcc ecsnext
 ; got it!
 		bmi ecsscan5
 		lda #5
 		bne ecsquit
-ecsscan5:	lsr
+ecsscan5:
+		lsr
 		lsr
 		lsr
 		lsr
 		and #3
 		clc
 		adc #1
-ecsquit:	sta var+1
+ecsquit:
+		sta var+1
 		lda #0
 		sta var
 		sta var+2
@@ -2117,7 +2281,8 @@ ecsquit:	sta var+1
 		ldx #30
 		jmp putvar ;a%
 
-ecsnext:	ldy #0
+ecsnext:
+		ldy #0
 		lda [var+3],y
 		and #$c0
 		beq ecsquit
@@ -2127,7 +2292,8 @@ ecsnext:	ldy #0
 		and #8
 		bne ecsnext1
 		ldx #32
-ecsnext1:	clc
+ecsnext1:
+		clc
 		txa
 		adc var+3
 		sta var+3
@@ -2139,15 +2305,18 @@ ecsnext1:	clc
 		lda #0
 		beq ecsquit
 
-acc:		word 0
-zzf:		byte 0
-
+acc:
+		word 0
+zzf:
+		byte 0
 
 ; check long command, cc=not equal
 
-ecslong:	ldx #0
+ecslong:
+		ldx #0
 		ldy #3
-ecslong1:	lda [var+3],y
+ecslong1:
+		lda [var+3],y
 		beq ecslong2
 		cmp buffer,x
 		bne ecslong3
@@ -2155,30 +2324,36 @@ ecslong1:	lda [var+3],y
 		inx
 		cpx #7
 		bne ecslong1
-ecslong2:		cpx index
+ecslong2:
+		cpx index
 		beq ecslong4
 
 ;nope
 
-ecslong3:	clc
+ecslong3:
+		clc
 		rts
 
 ;yup
 
-ecslong4:	ldy #24
+ecslong4:
+		ldy #24
 		lda [var+3],y
 		beq ecslong5
-		;do password later
-ecslong5:	ldy #10
+;do password later
+ecslong5:
+		ldy #10
 		ldx #0
-ecslong6:	lda [var+3],y
+ecslong6:
+		lda [var+3],y
 		beq ecslong7
 		sta buffer,x
 		iny
 		inx
 		cpx #14
 		bcc ecslong6
-ecslong7:	stx index
+ecslong7:
+		stx index
 		stx var
 		lda #<buffer
 		sta var+1
@@ -2188,14 +2363,16 @@ ecslong7:	stx index
 		jsr putvar ;b$
 		ldy #24
 		ldx #0
-ecslong8:	lda [var+3],y
+ecslong8:
+		lda [var+3],y
 		beq ecslong9
 		sta buf2,x
 		iny
 		inx
 		cpx #8
 		bcc ecslong8
-ecslong9:	stx index
+ecslong9:
+		stx index
 		stx var
 		lda #<buf2
 		sta var+1
@@ -2215,17 +2392,20 @@ ecslong9:	stx index
 
 ; check short command,cc=not equal
 
-ecsshort:	ldy #0
+ecsshort:
+		ldy #0
 		lda [var+3],y
 		and #4
 		beq ecsshrt1
 		lda index
 		cmp #2
 		bcs ecsshrt2
-ecsshrt1:	lda index
+ecsshrt1:
+		lda index
 		cmp #2
 		bne ecsshrt3
-ecsshrt2:	ldy #3
+ecsshrt2:
+		ldy #3
 		lda [var+3],y
 		cmp buffer
 		bne ecsshrt3
@@ -2234,10 +2414,12 @@ ecsshrt2:	ldy #3
 		cmp buffer+1
 		beq ecsshrt4
 ; nope
-ecsshrt3:	clc
+ecsshrt3:
+		clc
 		rts
 ; yup
-ecsshrt4:	ldy #5
+ecsshrt4:
+		ldy #5
 		lda [var+3],y
 		sta buffer
 		ldy #6
@@ -2271,14 +2453,16 @@ ecsshrt4:	ldy #5
 		jsr putvar ;a$
 		sec
 		rts
-;
-ecsget:		ldx #0
+
+ecsget:
+		ldx #0
 		stx $6b
 		lda #<ecsdefs
 		sta $69
 		lda #>ecsdefs
 		sta $6a
-ecsg1:		inc $6b
+ecsg1:
+		inc $6b
 		jsr ecsgetln
 		lda $6a
 		cmp #>ecsdefnd
@@ -2286,7 +2470,8 @@ ecsg1:		inc $6b
 		ldy #0
 		lda [$69],y
 		bne ecsg1
-ecsg2:		lda $6b
+ecsg2:
+		lda $6b
 		sta var+1
 		lda #0
 		sta var
@@ -2296,14 +2481,16 @@ ecsg2:		lda $6b
 		ldx #30
 		jmp putvar ;a%
 
-ecsput:		sty $6c
+ecsput:
+		sty $6c
 		lda #0
 		sta $6b
 		lda #<ecsdefs
 		sta $69
 		lda #>ecsdefs
 		sta $6a
-ecsp1:		inc $6b
+ecsp1:
+		inc $6b
 		jsr ecsputln
 		lda $6a
 		cmp #>ecsdefnd
@@ -2311,10 +2498,13 @@ ecsp1:		inc $6b
 		lda $6b
 		cmp $6c
 		bne ecsp1
-ecsp2:		rts
+ecsp2:
+		rts
 
-ecsgetln:	ldy #31
-ecsgl1:		lda [$69],y
+ecsgetln:
+		ldy #31
+ecsgl1:
+		lda [$69],y
 		sta buffer,y
 		dey
 		bpl ecsgl1
@@ -2323,7 +2513,8 @@ ecsgl1:		lda [$69],y
 		and #8
 		bne ecsgl2
 		ldy #32
-ecsgl2:		sty index
+ecsgl2:
+		sty index
 		tya
 		clc
 		adc $69
@@ -2334,15 +2525,18 @@ ecsgl2:		sty index
 		ldx $6b
 		jmp putln
 
-ecsputln:	ldx $6b
+ecsputln:
+		ldx $6b
 		jsr getln
 		ldy #7
 		lda buffer
 		and #8
 		bne ecspl1
 		ldy #31
-ecspl1:		sty index
-ecspl2:		lda buffer,y
+ecspl1:
+		sty index
+ecspl2:
+		lda buffer,y
 		sta [$69],y
 		dey
 		bpl ecspl2
@@ -2355,7 +2549,21 @@ ecspl2:		lda buffer,y
 		sta $6a
 		rts
 
-ecsload:	ldx #1
+getln:
+		lda #35
+		jmp usetbl1
+putln:
+		lda #36
+		jmp usetbl1
+usevar:
+		lda #29
+		jmp usetbl1
+putvar:
+		lda #30
+		jmp usetbl1
+
+ecsload:
+		ldx #1
 		jsr usevar ;a$
 		lda var
 		ldx var+1
@@ -2372,7 +2580,8 @@ ecsload:	ldx #1
 		ldy #>ecsdefs
 		jmp loadf
 
-ecssave:	ldx #1
+ecssave:
+		ldx #1
 		jsr usevar ;a$
 		lda var
 		ldx var+1
@@ -2395,12 +2604,15 @@ ecssave:	ldx #1
 
 align 32
 
-ecsdefs:		byte 0
-ecsdefnd = ecs+$a00
+ecsdefs:
+		byte 0
+ecsdefnd = ecs + $a00
 
 offset 0
 namespace ""
-dup 0,$3000-*
+
+; pad to the start of the next module
+		dup 0, $3000-*
 
 ;;;;;
 ;;;;;
@@ -2411,7 +2623,6 @@ dup 0,$3000-*
 offset $c000-*
 namespace "swap1"
 
-;
 		jmp inline
 		jmp inline0
 		jmp password
@@ -2565,20 +2776,24 @@ in1:
 		lda #3
 		sta chat
 		jmp ctrlm
-in1a:		jsr chatchk
+in1a:
+		jsr chatchk
 		beq in1b
 		jsr chatmode
 		jmp inline0
-in1b:		lda $fe
+in1b:
+		lda $fe
 		ldy index
 		ldx #ctrl_len
-in2:		cmp ctrlchrs,x
+in2:
+		cmp ctrlchrs,x
 		beq in3
 		dex
 		bpl in2
 		jsr ctrlchk
 		bcc in1
-put:		cpy llen
+put:
+		cpy llen
 		bcc put0
 		jmp wrap
 put0:
@@ -2592,61 +2807,62 @@ put0:
 put1:
 		jmp in1
 
-ctrlchrs:	byte $04, ensh,13,20,$15,$16,$17,$18,$19,swlc,$02,"."
+ctrlchrs:
+		byte $04, ensh,13,20, $15,$16,$17,$18,$19,swlc,$02, "."
 ctrl_len = * - ctrlchrs - 1
 
 ctrl:
-word ctrld,ctrli,ctrlm
-word ctrlt,ctrlu,ctrlv
-word ctrlw,ctrlx,ctrly
-word ctrln,ctrlb,dot
+		word ctrld,ctrli,ctrlm
+		word ctrlt,ctrlu,ctrlv
+		word ctrlw,ctrlx,ctrly
+		word ctrln,ctrlb,dot
 in3:
-txa
-asl
-tax
-lda ctrl,x
-sta ctrljm+1
-lda ctrl+1,x
-sta ctrljm+2
-ldy index
+		txa
+		asl
+		tax
+		lda ctrl,x
+		sta ctrljm+1
+		lda ctrl+1,x
+		sta ctrljm+2
+		ldy index
 ctrljm:
-jmp $ffff
-;
+		jmp $ffff
+
 ctrld:
-ldx tmp1
-beq ctrld3
-cpx index
-beq ctrld3
+		ldx tmp1
+		beq ctrld3
+		cpx index
+		beq ctrld3
 ctrld1:
-cpy tmp1
-bcs ctrld2
-lda buffer+1,y
-sta buffer,y
-iny
-bne ctrld1
+		cpy tmp1
+		bcs ctrld2
+		lda buffer+1,y
+		sta buffer,y
+		iny
+		bne ctrld1
 ctrld2:
-dec tmp1
+		dec tmp1
 ctrld3:
-jmp in1
-;
+		jmp in1
+
 ctrli:
-ldx tmp1
-cpx llen
-bcs ctrli3
+		ldx tmp1
+		cpx llen
+		bcs ctrli3
 ctrli1:
-cpx index
-beq ctrli2
-lda buffer-1,x
-sta buffer,x
-dex
-jmp ctrli1
+		cpx index
+		beq ctrli2
+		lda buffer-1,x
+		sta buffer,x
+		dex
+		jmp ctrli1
 ctrli2:
-inc tmp1
-lda #" "
-sta buffer,y
+		inc tmp1
+		lda #" "
+		sta buffer,y
 ctrli3:
-jmp in1
-;
+		jmp in1
+
 ctrlm:
 		jsr prcr
 		lda index
@@ -2676,10 +2892,12 @@ ctrlt1:
 		sta chat
 		rts
 
-ctrlt3:		pla
+ctrlt3:
+		pla
 		eor #128
 		jmp xchrout
-ctrlt4:		ldx mci
+ctrlt4:
+		ldx mci
 		bmi ctrlt6
 		jsr colorchk
 		bcc ctrlt5
@@ -2692,16 +2910,18 @@ ctrlt4:		ldx mci
 		cmp #cursor_right
 		beq ctrlt3
 		pla
-ctrlt6:		jmp prdel
-ctrlt5:		rts
-;
+ctrlt6:
+		jmp prdel
+ctrlt5:
+		rts
+
 ctrlu:
-cpy tmp1
-bcs ctrlu1
-lda buffer,y
-jmp put
+		cpy tmp1
+		bcs ctrlu1
+		lda buffer,y
+		jmp put
 ctrlu1:
-jmp in1
+		jmp in1
 
 ctrlv:
 		jsr prcr
@@ -2768,22 +2988,23 @@ ctrlb1:
 		lda buffer-1,y
 		jsr ctrlt4
 		dey
-bne ctrlb1
-sty index
+		bne ctrlb1
+		sty index
 ctrlb2:
-jmp in1
-;
-dot:cpy #0
-bne dot1
-lda editor
-and #2
-beq dot1
-lda #1
-sta chat
-rts
+		jmp in1
+
+dot:
+		cpy #0
+		bne dot1
+		lda editor
+		and #2
+		beq dot1
+		lda #1
+		sta chat
+		rts
 dot1:
-lda #"."
-jmp put
+		lda #"."
+		jmp put
 
 wrap:
 		sta tmp2
@@ -2820,30 +3041,30 @@ wrap2:
 		jsr putvar ;w$
 		jmp ctrlm
 wrap3:
-ldx #0
-sty tmp3
-iny
-cpy index
-bcs wrap5
+		ldx #0
+		sty tmp3
+		iny
+		cpy index
+		bcs wrap5
 wrap4:
-lda buffer,y
-sta buf2,x
-jsr prdel
-inx
-iny
-cpy index
-bcc wrap4
+		lda buffer,y
+		sta buf2,x
+		jsr prdel
+		inx
+		iny
+		cpy index
+		bcc wrap4
 wrap5:
-lda tmp2
-sta buf2,x
-inx
-stx var
-lda #<buf2
-sta var+1
-lda #>buf2
-sta var+2
-ldx #$1b
-jsr putvar ;w$
+		lda tmp2
+		sta buf2,x
+		inx
+		stx var
+		lda #<buf2
+		sta var+1
+		lda #>buf2
+		sta var+2
+		ldx #$1b
+		jsr putvar ;w$
 wrap6:
 		ldy tmp3
 		iny
@@ -2878,7 +3099,8 @@ ctrlchk:
 		and #1
 		beq ctrlch0
 		pla
-ctrlchk1:	jsr colorchk
+ctrlchk1:
+		jsr colorchk
 		bcc ctrlch2
 		cmp #reverse_on
 		beq ctrlch2
@@ -2894,24 +3116,24 @@ ctrlchk1:	jsr colorchk
 		beq ctrlch2
 		pha
 ctrlch0:
-pla
-cmp #32
-bcc ctrlch1
-cmp #128
-bcc ctrlch2
-cmp #160
-bcs ctrlch2
-cmp #133
-bcc ctrlch1
-cmp #141
-bcs ctrlch1
+		pla
+		cmp #32
+		bcc ctrlch1
+		cmp #128
+		bcc ctrlch2
+		cmp #160
+		bcs ctrlch2
+		cmp #133
+		bcc ctrlch1
+		cmp #141
+		bcs ctrlch1
 ctrlch2:
-sec
-rts
+		sec
+		rts
 ctrlch1:
-clc
-rts
-;
+		clc
+		rts
+
 ; carry clear if color chr
 colorchk:
 		sty cytmp
@@ -2928,7 +3150,6 @@ colrch1:
 		ldy cytmp
 		clc
 		rts
-
 
 ;* password input routine *
 
@@ -2947,32 +3168,36 @@ password:
 		rts
 
 useeditr:
-lda edittbl,x
-sta editjmp+1
-jsr editswap
-editjmp:jsr $1000
-editswap:pha
-txa
-pha
-tya
-pha
-lda #$10
-ldy #$d0
-ldx #16
-jsr swapper
-pla
-tay
-pla
-tax
-pla
-rts
+		lda edittbl,x
+		sta editjmp+1
+		jsr editswap
+editjmp:
+		jsr $1000
+editswap:
+		pha
+		txa
+		pha
+		tya
+		pha
+		lda #$10
+		ldy #$d0
+		ldx #16
+		jsr swapper
+		pla
+		tay
+		pla
+		tax
+		pla
+		rts
 
 edittbl:
 		byte 0,3,6
 
 offset 0
 namespace ""
-dup 0,$3400-*
+
+; pad to the start of the next module
+		dup 0, $3400-*
 
 ;;;;;
 ;;;;;
@@ -2983,7 +3208,6 @@ dup 0,$3400-*
 offset $c000-*
 namespace "swap2"
 
-;
 		jmp term
 		jmp chatmode
 		jmp clrarr
@@ -3000,6 +3224,9 @@ dskin:
 		jmp usetbl1
 tenwait:
 		lda #22
+		jmp usetbl1
+xgetin:
+		lda #23
 		jmp usetbl1
 xchrout:
 		sta $fe
@@ -3127,7 +3354,6 @@ chat5:
 ;* setup routines *
 ;********************************
 
-
 ;* setup important variables
 setvars:
 		jsr zero
@@ -3153,115 +3379,124 @@ setvars2:
 ;* terminal mode *
 ;********************************
 term0:
-lda #0
-sta interm
-rts
+		lda #0
+		sta interm
+		rts
 term:
-lda #1
-sta interm
-lda 653
-cmp #6
-beq term0
-jsr getkbd
-beq term1
-ldx 203
-cpx #63
-bne term2
-ldx 653
-cpx #2
-beq term3
+		lda #1
+		sta interm
+		lda 653
+		cmp #6
+		beq term0
+		jsr getkbd
+		beq term1
+		ldx 203
+		cpx #63
+		bne term2
+		ldx 653
+		cpx #2
+		beq term3
 term2:
-sta $fe
-jsr outmod
+		sta $fe
+		jsr outmod
 term1:
-jsr getmod
-lda $fe
-beq term
-jsr outansi
-jmp term
+		jsr getmod
+		lda $fe
+		beq term
+		jsr outansi
+		jmp term
 term3:
-jsr rsdisab
-lda 56576
-pha
-and #$fb
-sta 56576
-ldx #4
-jsr tenwait
-pla
-sta 56576
-jsr rsinabl
-jmp term
-;
+		jsr rsdisab
+		lda 56576
+		pha
+		and #$fb
+		sta 56576
+		ldx #4
+		jsr tenwait
+		pla
+		sta 56576
+		jsr rsinabl
+		jmp term
+
 ;output to screen, interpret ansi
-outansi:	lda nchk1
+outansi:
+		lda nchk1
 		and #2
 		bne outansi2
 		jmp outscn
-outansi0:	ldx #0
+outansi0:
+		ldx #0
 		stx ansiptr
 		jmp outscn
-outansi1:	inx
+outansi1:
+		inx
 		stx ansiptr
 		rts
-outansi2:lda $fe
-ldx ansiptr
-sta ansibuf,x
-lda ansibuf
-cmp #27
-bne outansi0
-cpx #1
-bcc outansi1
-lda ansibuf+1
-cmp #"["
-bne outansi0
-cpx #2
-bcc outansi1
-lda ansibuf,x
-cmp #";"
-beq outansi1
-cmp #"0"
-bcc outansi3
-cmp #":"
-bcc outansi1
-outansi3:	ldx #2
+outansi2:
+		lda $fe
+		ldx ansiptr
+		sta ansibuf,x
+		lda ansibuf
+		cmp #ascii_escape
+		bne outansi0
+		cpx #1
+		bcc outansi1
+		lda ansibuf+1
+		cmp #"["
+		bne outansi0
+		cpx #2
+		bcc outansi1
+		lda ansibuf,x
+		cmp #";"
+		beq outansi1
+		cmp #"0"
+		bcc outansi3
+		cmp #":"
+		bcc outansi1
+outansi3:
+		ldx #2
 		stx ansiptr
-		cmp #$4d
+		cmp #"m"
 		beq ansim
-		cmp #$c1
+		cmp #"A"
 		beq ansia
-		cmp #$c2
+		cmp #"B"
 		beq ansib
-		cmp #$c3
+		cmp #"C"
 		beq ansic
-		cmp #$c4
+		cmp #"D"
 		beq ansid
-		cmp #$c6
+		cmp #"F"
 		beq ansih
-		cmp #$c8
+		cmp #"H"
 		beq ansih
-		cmp #$ca
+		cmp #"J"
 		beq ansij
 		jmp outansi0
-;
-ansim0:		lda #0
+
+ansim0:
+		lda #0
 		sta ansiptr
 		sta ansibuf
 		sta ansibuf+1
 		rts
 
-ansim:		jsr ansiparm
+ansim:
+		jsr ansiparm
 		bcs ansim0
 		cmp #0
 		bne ansim1
 		lda #reverse_off
 		jsr outscn0
 		jmp ansim
-ansim1:		cmp #7
+ansim1:
+		cmp #7
 		bne ansim2
 		lda #reverse_on
 		jsr outscn0
 		jmp ansim
-ansim2:		cmp #30
+ansim2:
+		cmp #30
 		bcc ansim
 		cmp #38
 		bcs ansim
@@ -3271,44 +3506,51 @@ ansim2:		cmp #30
 		lda ansiclrs,x
 		jsr outscn0
 		jmp ansim
-;
-ansia:		lda #cursor_up
-ansia1:		sta reptchr
+
+ansia:
+		lda #cursor_up
+ansia1:
+		sta reptchr
 		jsr ansiparm
 		bcc ansia2
 		lda #1
-ansia2:		sta reptcnt
+ansia2:
+		sta reptcnt
 		jsr ansirept
 		jmp ansim0
-;
-ansib:		lda #cursor_down
+
+ansib:
+		lda #cursor_down
 		jmp ansia1
-ansic:		lda #cursor_right
+ansic:
+		lda #cursor_right
 		jmp ansia1
-ansid:		lda #cursor_left
+ansid:
+		lda #cursor_left
 		jmp ansia1
-;
+
 ansij:
-lda #clear_screen
-jsr outscn0
-jmp ansim0
-;
+		lda #clear_screen
+		jsr outscn0
+		jmp ansim0
+
 ansih0:
-jmp ansim0
+		jmp ansim0
 ansih:
-jsr ansiparm
-bcs ansih0
-sec
-sbc #1
-sta ansiposv
-lda 211
-sta ansiposh
-jsr ansiparm
-bcs ansih1
-sec
-sbc #1
-sta ansiposh
-ansih1:		lda #cursor_home
+		jsr ansiparm
+		bcs ansih0
+		sec
+		sbc #1
+		sta ansiposv
+		lda 211
+		sta ansiposh
+		jsr ansiparm
+		bcs ansih1
+		sec
+		sbc #1
+		sta ansiposh
+ansih1:
+		lda #cursor_home
 		jsr outscn0
 		lda #cursor_down
 		ldx ansiposv
@@ -3317,66 +3559,80 @@ ansih1:		lda #cursor_home
 		ldx ansiposh
 		jsr ansirpt0
 		jmp ansim0
-;
-ansirpt0:sta reptchr
-stx reptcnt
-ansirept:lda reptcnt
-beq ansirpt1
-lda reptchr
-jsr outscn0
-dec reptcnt
-jmp ansirept
-ansirpt1:rts
-;
-reptcnt:byte 0
-reptchr:byte 0
-ansibuf:
-byte "                  "
-ansiptr:byte 0
-ansiposh:byte 0
-ansiposv:byte 0
-ansiprm:
-byte 0
 
-ansiclrs:	byte cursor_black, cursor_red, cursor_green, cursor_yellow
+ansirpt0:
+		sta reptchr
+		stx reptcnt
+ansirept:
+		lda reptcnt
+		beq ansirpt1
+		lda reptchr
+		jsr outscn0
+		dec reptcnt
+		jmp ansirept
+ansirpt1:
+		rts
+
+reptcnt:
+		byte 0
+reptchr:
+		byte 0
+ansibuf:
+		byte "                  "
+ansiptr:
+		byte 0
+ansiposh:
+		byte 0
+ansiposv:
+		byte 0
+ansiprm:
+		byte 0
+
+ansiclrs:
+		byte cursor_black, cursor_red, cursor_green, cursor_yellow
 		byte cursor_blue, cursor_purple, cursor_cyan, cursor_white
-;
-ansiparm:lda #0
-sta ansiprm
-ldx ansiptr
-lda ansibuf,x
-inc ansiptr
-cmp #";"
-bne ansiprm2
-ansiprm1:ldx ansiptr
-lda ansibuf,x
-inc ansiptr
-ansiprm2:cmp #"0"
-bcc ansiprm3
-cmp #":"
-bcc ansiprm4
-clc
-lda ansiprm
-rts
-ansiprm3:sec
-lda ansiprm
-rts
-ansiprm4:pha
-lda ansiprm
-asl
-asl
-clc
-adc ansiprm
-asl
-sta ansiprm
-pla
-sec
-sbc #"0"
-clc
-adc ansiprm
-sta ansiprm
-jmp ansiprm1
-;
+
+ansiparm:
+		lda #0
+		sta ansiprm
+		ldx ansiptr
+		lda ansibuf,x
+		inc ansiptr
+		cmp #";"
+		bne ansiprm2
+ansiprm1:
+		ldx ansiptr
+		lda ansibuf,x
+		inc ansiptr
+ansiprm2:
+		cmp #"0"
+		bcc ansiprm3
+		cmp #":"
+		bcc ansiprm4
+		clc
+		lda ansiprm
+		rts
+ansiprm3:
+		sec
+		lda ansiprm
+		rts
+ansiprm4:
+		pha
+		lda ansiprm
+		asl
+		asl
+		clc
+		adc ansiprm
+		asl
+		sta ansiprm
+		pla
+		sec
+		sbc #"0"
+		clc
+		adc ansiprm
+		sta ansiprm
+		jmp ansiprm1
+
 ;print string variable to bottom
 btmvar:
 		inc scnlock
@@ -3439,88 +3695,91 @@ btmx:
 
 ;* clear the (.x+1)th array
 clrarr:
-lda 47
-sta 71
-lda 48
-sta 72
+		lda 47
+		sta 71
+		lda 48
+		sta 72
 clrar1:
-ldy #2
-lda [71],y
-sta 20
-iny
-lda [71],y
-sta 21
-cpx #0
-beq clrar3
-clc
-lda 20
-adc 71
-sta 71
-lda 21
-adc 72
-sta 72
-lda 71
-cmp 49
-bne clrar2
-lda 72
-cmp 50
-beq clrar7
+		ldy #2
+		lda [71],y
+		sta 20
+		iny
+		lda [71],y
+		sta 21
+		cpx #0
+		beq clrar3
+		clc
+		lda 20
+		adc 71
+		sta 71
+		lda 21
+		adc 72
+		sta 72
+		lda 71
+		cmp 49
+		bne clrar2
+		lda 72
+		cmp 50
+		beq clrar7
 clrar2:
-dex
-jmp clrar1
+		dex
+		jmp clrar1
 clrar3:
-clc
-lda 71
-adc #7
-sta 71
-lda 72
-adc #0
-sta 72
-sec
-lda 20
-sbc #7
-sta 20
-lda 21
-sbc #0
-sta 21
+		clc
+		lda 71
+		adc #7
+		sta 71
+		lda 72
+		adc #0
+		sta 72
+		sec
+		lda 20
+		sbc #7
+		sta 20
+		lda 21
+		sbc #0
+		sta 21
 clrar4:
-ldy #0
-tya
-sta [71],y
-inc 71
-bne clrar5
-inc 72
+		ldy #0
+		tya
+		sta [71],y
+		inc 71
+		bne clrar5
+		inc 72
 clrar5:
-lda 20
-bne clrar6
-dec 21
+		lda 20
+		bne clrar6
+		dec 21
 clrar6:
-dec 20
-bne clrar4
-lda 21
-bne clrar4
+		dec 20
+		bne clrar4
+		lda 21
+		bne clrar4
 clrar7:
-rts
-;
+		rts
+
 spchars:
-byte ",:",34,"*?=",13,"^"
-;
+		byte ",:", 34, "*?=", carriage_return, "^"
+
 chkspcl:
-cmp #$85
-bcc chkspcl1
-cmp #$8d
-bcs chkspcl1
-stx cxsav
-sec
-sbc #$85
-tax
-lda spchars,x
-ldx cxsav
-chkspcl1:rts
+		cmp #$85
+		bcc chkspcl1
+		cmp #$8d
+		bcs chkspcl1
+		stx cxsav
+		sec
+		sbc #$85
+		tax
+		lda spchars,x
+		ldx cxsav
+chkspcl1:
+		rts
 
 offset 0
 namespace ""
-dup 0,$3800-*
+
+; pad to the start of the next module
+		dup 0, $3800-*
 
 ;;;;;
 ;;;;;
@@ -3537,7 +3796,6 @@ namespace "swap3"
 		jmp arrayres
 		jmp copyrite
 		jmp sound
-		jmp $ffff
 
 ; jump table routines
 
@@ -3550,6 +3808,25 @@ dskin:
 tenwait:
 		lda #22
 		jmp usetbl1
+xgetin:
+		lda #23
+		jmp usetbl1
+xchrout:
+		sta $fe
+xchrout1:
+		pha
+		txa
+		pha
+		tya
+		pha
+		lda #24
+		jsr usetbl1
+		pla
+		tay
+		pla
+		tax
+		pla
+		rts
 usevar:
 		lda #29
 		jmp usetbl1
@@ -3597,34 +3874,37 @@ output:
 setvars:
 		lda #57
 		jmp usetbl1
-;
+
 ;********************************
 ;* file read routines           *
 ;********************************
 
-
 ;* unabortable for new user
 
 newuser:
-cpx #$00
-beq newuser1
-stx filenum
-newuser1:	lda #$01
+		cpx #$00
+		beq newuser1
+		stx filenum
+newuser1:
+		lda #$01
 		sta readmode
 		jsr readfile2
 		lda #$00
-sta readmode
-rts
+		sta readmode
+		rts
 
 ;* main file reader
 
-readfile:	cpx #$00
+readfile:
+		cpx #$00
 		beq readfile1
 		stx filenum
-readfile1:	cpy #0
+readfile1:
+		cpy #0
 		beq readfile2
 		jmp movie
-readfile2:	ldx filenum
+readfile2:
+		ldx filenum
 		ldy #0
 		jsr dskin
 		lda $90
@@ -3634,12 +3914,14 @@ readfile2:	ldx filenum
 		lda buf2
 		cmp #"^"
 		beq readfile5
-readfile3:	jsr zero
+readfile3:
+		jsr zero
 		lda index
 		cmp #80
 		beq readfile4
 		jsr minusone
-readfile4:	ldx #$0f
+readfile4:
+		ldx #$0f
 		jsr putvar ;lp
 		jsr zero
 		ldx #$11
@@ -3653,65 +3935,69 @@ readfile4:	ldx #$0f
 		jsr usevar ;rc
 		lda var
 		beq readfile2
-readfile5:	rts
-;
+readfile5:
+		rts
+
 ;********************************
 ;* movie view
 ;********************************
 movie:
-sty movdly
+		sty movdly
 movie1:
-ldx filenum
-jsr chkin
-jsr chrin
-sta $fe
-jsr readst
-pha
-jsr clrchn
-ldx movdly
-ldy #0
-dl1:
-dey
-bne dl1
-dex
-bne dl1
-jsr output
-pla
-ldx chat
-bne movie2
-tax
-beq movie1
-movie2:
-rts
-movdly:
-byte 0
-;
-;* copy pointers for arrays *
-arraysav:ldx #3
-arsv1:
-lda $2f,x
-sta arryptrs,x
-dex
-bpl arsv1
-rts
-;
-;* restore pointers for arrays *
-arrayres:lda $2f
-sta $ac
-lda $30
-sta $ad
-ldx #3
-arrs1:
-lda arryptrs,x
-sta $2f,x
-dex
-bpl arrs1
-lda $2f
-sta $ae
-lda $30
-sta $af
+		ldx filenum
+		jsr chkin
+		jsr chrin
+		sta $fe
+		jsr readst
+		pha
+		jsr clrchn
+		ldx movdly
 		ldy #0
-arrs2:		lda [$ac],y
+dl1:
+		dey
+		bne dl1
+		dex
+		bne dl1
+		jsr output
+		pla
+		ldx chat
+		bne movie2
+		tax
+		beq movie1
+movie2:
+		rts
+movdly:
+		byte 0
+
+;* copy pointers for arrays *
+arraysav:
+		ldx #3
+arsv1:
+		lda $2f,x
+		sta arryptrs,x
+		dex
+		bpl arsv1
+		rts
+
+;* restore pointers for arrays *
+arrayres:
+		lda $2f
+		sta $ac
+		lda $30
+		sta $ad
+		ldx #3
+arrs1:
+		lda arryptrs,x
+		sta $2f,x
+		dex
+		bpl arrs1
+		lda $2f
+		sta $ae
+		lda $30
+		sta $af
+		ldy #0
+arrs2:
+		lda [$ac],y
 		sta [$ae],y
 		lda $ae
 		cmp $31
@@ -3720,196 +4006,203 @@ arrs2:		lda [$ac],y
 		cmp $32
 		bne arrs3
 		jmp setvars
-arrs3:		clc
+arrs3:
+		clc
 		inc $ac
 		bne arrs3a
 		inc $ad
-arrs3a:		inc $ae
+arrs3a:
+		inc $ae
 		bne arrs3b
 		inc $af
-arrs3b:		jmp arrs2
-arryptrs:	byte "1234"
+arrs3b:
+		jmp arrs2
+arryptrs:
+		byte "1234"
 
 ; print copyright message
 
 copyrite:
+		lda $cc00
+		sta $a000
+		lda $cc01
+		sta $a001
+
+		jsr encode
+
+		lda #1
+		sta var
+		lda #<bsnpre
+		sta var+1
+		lda #>bsnpre
+		sta var+2
+		ldx #1
+		jsr putvar ;a$
+
+		lda bsnval
+		sta var+1
+		lda bsnval+1
+		sta var
+		ldx #31
+		jsr putvar ;a%
+
+		lda #copylen
+		sta var
+		lda #<copymsg
+		sta var+1
+		lda #>copymsg
+		sta var+2
+		ldx #0
+		jsr putvar ;an$
+
+		ldx #0
+		jsr prtvar0 ;an$
+
+encode:
+		ldy #copylen-1
+encloop:
+		lda copymsg,y
+		eor #$ff
+		sta copymsg,y
+		dey
+		bpl encloop
 		rts
 
-;		lda $cc00
-;		sta $a000
-;		lda $cc01
-;		sta $a001
+enc 255
 
-;		jsr encode
-
-;		lda #1
-;		sta var
-;		lda #<bsnpre
-;		sta var+1
-;		lda #>bsnpre
-;		sta var+2
-;		ldx #1
-;		jsr putvar ;a$
-
-;		lda bsnval
-;		sta var+1
-;		lda bsnval+1
-;		sta var
-;		ldx #31
-;		jsr putvar ;a%
-
-;		lda #copylen
-;		sta var
-;		lda #<copymsg
-;		sta var+1
-;		lda #>copymsg
-;		sta var+2
-;		ldx #0
-;		jsr putvar ;an$
-
-;		ldx #0
-;		jsr prtvar0 ;an$
-;
-;encode:
-;		ldy #copylen-1
-;encloop:
-;		lda copymsg,y
-;		eor #$ff
-;		sta copymsg,y
-;		dey
-;		bpl encloop
-;		rts
-
-;		enc 255
-;copymsg:
-;		byte $8b, $5c, "_"
-;		cbm "08IMAGE BBS V1.3 S# "
-;		byte $5c
-;		cbm "$a"
-;		byte $5c
-;		cbm "#4"
-;		byte $5c
-;		cbm "%b"
-;		byte $8b, $5c, "_"
-;		cbm "04(C)1989 NEW IMAGE SOFTWARE, INC."
-;		byte $8b
-;		enc 0
-; copylen = *-copymsg
+copymsg:
+		byte $8b, $5c, "_"
+		cbm "08IMAGE BBS V1.3 S# "
+		byte $5c
+		cbm "$a"
+		byte $5c
+		cbm "#4"
+		byte $5c
+		cbm "%b"
+		byte $8b, $5c, "_"
+		cbm "04(C)1989 NEW IMAGE SOFTWARE, INC."
+		byte $8b
+enc 0
+copylen = *-copymsg
 
 sound:
-lda sndrept
-beq sound1
+		lda sndrept
+		beq sound1
 sound0:
-rts
+		rts
 sound1:
-cpx #1
-bne sound2
-ldx #1
-ldy #5
-jsr chkflags
-ldx #1
-ldy #10
-cmp #0
-beq sound2
-ldy #255
+		cpx #1
+		bne sound2
+		ldx #1
+		ldy #5
+		jsr chkflags
+		ldx #1
+		ldy #10
+		cmp #0
+		beq sound2
+		ldy #255
 sound2:
-cpx #0
-bne sound3
-sty sndrept
-ldx #27
-ldy #5
-jsr chkflags
-bne sound0
-ldx #0
-ldy sndrept
-sound3:txa
-asl
-asl
-asl
-asl
-tax
-sty sndrept
-lda #$0f
-sta $d418
-lda #0
-sta $d404
-sta $d40b
-sta $d412
-lda sndtbl+4,x
-and #$fe
-sta sndwav1
-lda sndtbl+9,x
-and #$fe
-sta sndwav2
-lda sndtbl+14,x
-and #$fe
-sta sndwav3
-lda sndtbl+15,x
-pha
-lsr
-lsr
-lsr
-lsr
-tay
-lda timetbl,y
-sta sndtim1
-sta sndtim1a
-pla
-and #$0f
-tay
-lda timetbl,y
-sta sndtim2
-sta sndtim2a
-ldy #0
-sty sndcnt
+		cpx #0
+		bne sound3
+		sty sndrept
+		ldx #27
+		ldy #5
+		jsr chkflags
+		bne sound0
+		ldx #0
+		ldy sndrept
+sound3:
+		txa
+		asl
+		asl
+		asl
+		asl
+		tax
+		sty sndrept
+		lda #$0f
+		sta $d418
+		lda #0
+		sta $d404
+		sta $d40b
+		sta $d412
+		lda sndtbl+4,x
+		and #$fe
+		sta sndwav1
+		lda sndtbl+9,x
+		and #$fe
+		sta sndwav2
+		lda sndtbl+14,x
+		and #$fe
+		sta sndwav3
+		lda sndtbl+15,x
+		pha
+		lsr
+		lsr
+		lsr
+		lsr
+		tay
+		lda timetbl,y
+		sta sndtim1
+		sta sndtim1a
+		pla
+		and #$0f
+		tay
+		lda timetbl,y
+		sta sndtim2
+		sta sndtim2a
+		ldy #0
+		sty sndcnt
 sound4:
-lda sndvec,y
-tay
-lda sndtbl,x
-sta $d400,y
-inc sndcnt
-ldy sndcnt
-inx
-cpy #15
-bne sound4
-rts
-;
+		lda sndvec,y
+		tay
+		lda sndtbl,x
+		sta $d400,y
+		inc sndcnt
+		ldy sndcnt
+		inx
+		cpy #15
+		bne sound4
+		rts
+
 sndcnt:
-byte 0
+		byte 0
 sndvec:
-byte 0,1,5,6,4,7,8,12,13,11,14,15,19,20,18
-;
+		byte 0,1,5,6,4,7,8,12,13,11,14,15,19,20,18
+
 timetbl:
-byte 010,020,030,040
-byte 050,060,070,080
-byte 090,100,110,120
-byte 150,180,240,001
-;
+		byte 010,020,030,040
+		byte 050,060,070,080
+		byte 090,100,110,120
+		byte 150,180,240,001
+
 sndtbl:
+
 ;(0) beep
-byte $00,$40,$10,$f0,$11
-byte $00,$00,$00,$00,$00
-byte $00,$00,$00,$00,$00
-byte $10
+		byte $00, $40, $10, $f0, $11
+		byte $00, $00, $00, $00, $00
+		byte $00, $00, $00, $00, $00
+		byte $10
 ;(1) ding
-byte $44,$40,$0b,$00,$15
-byte $00,$00,$00,$00,$00
-byte $d8,$2a,$00,$00,$00
-byte $50
+		byte $44,$40, $0b,$00, $15
+		byte $00, $00, $00, $00, $00
+		byte $d8,$2a,$00, $00, $00
+		byte $50
 ;(2) bell
-byte $00,$60,$09,$00,$11
-byte $00,$60,$09,$00,$11
-byte $00,$60,$09,$00,$11
-byte $20
+		byte $00, $60, $09,$00, $11
+		byte $00, $60, $09,$00, $11
+		byte $00, $60, $09,$00, $11
+		byte $20
 ;(3) bong
-byte $44,$10,$0d,$00,$15
-byte $30,$08,$0b,$00,$15
-byte $1c,$04,$0d,$00,$15
-byte $e0
+		byte $44,$10, $0d,$00, $15
+		byte $30, $08,$0b,$00, $15
+		byte $1c,$04,$0d,$00, $15
+		byte $e0
 
 offset 0
 namespace ""
-dup 0,$3c00-*
+
+; pad to the start of the next module
+		dup 0, $3c00-*
 
 ;;;;;
 ;;;;;
@@ -3920,31 +4213,36 @@ dup 0,$3c00-*
 offset $c000 - *
 namespace "swap4"
 
-;
-hc000:		jmp convdate
-hc003:		cpx #1
+hc000:
+		jmp convdate
+hc003:
+		cpx #1
 		beq conv1
-;		cpx #2
-;		beq conv2
-;		cpx #3
-;		beq conv3
+		cpx #2
+		beq conv2
+		cpx #3
+		beq conv3
 		rts
-;
-conv1:		jmp convname
-; conv2:	jmp convdisk
-; conv3:	jmp strnsrch
-;
+
+conv1:
+		jmp convname
+conv2:
+		jmp convdisk
+conv3:
+		jmp strnsrch
+
 ; jump table routines
-;
+
 usevar:
 		lda #29
 		jmp usetbl1
-;putvar:
-;		lda #30
-;		jmp usetbl1
-;
+putvar:
+		lda #30
+		jmp usetbl1
+
 ;* convert date to string *
-convdate:	lda datebuf
+convdate:
+		lda datebuf
 		ldy #0
 		and #$f
 		beq convert0
@@ -3952,44 +4250,50 @@ convdate:	lda datebuf
 		bcs convert0
 		adc #12
 		tay
-convert0:tya
-ldx #0
-jsr convput
-lda datebuf+4
-and #$f
-pha
-lda datebuf+3
-and #$f
-beq convert1
-pla
-clc
-adc #10
-pha
-convert1:pla
-ldy #0
-cmp #13
-bcs converta
-tay
-converta:tya
-jsr convput
-ldx #10
-convert2:lda convvec,x
-tay
-beq convert3
-lda datebuf,x
-sta date1,y
-convert3:dex
-bpl convert2
-ldx #6
-convert4:lda convvec2,x
-tay
-lda convtbl2,x
-sta date1,y
-iny
-dex
-bpl convert4
-lda date1+17
-		and #"1"
+convert0:
+		tya
+		ldx #0
+		jsr convput
+		lda datebuf+4
+		and #$f
+		pha
+		lda datebuf+3
+		and #$f
+		beq convert1
+		pla
+		clc
+		adc #10
+		pha
+convert1:
+		pla
+		ldy #0
+		cmp #13
+		bcs converta
+		tay
+converta:
+		tya
+		jsr convput
+		ldx #10
+convert2:
+		lda convvec,x
+		tay
+		beq convert3
+		lda datebuf,x
+		sta date1,y
+convert3:
+		dex
+		bpl convert2
+		ldx #6
+convert4:
+		lda convvec2,x
+		tay
+		lda convtbl2,x
+		sta date1,y
+		iny
+		dex
+		bpl convert4
+		lda date1+17
+		and #$31 ; "1"
 		jsr convert6
 		sta date1+17
 		lda date1+8
@@ -3997,47 +4301,55 @@ lda date1+17
 		sta date1+8
 		lda datebuf+7
 		ldx #$d0 ; "P"
-		cmp #"8"
+		cmp #$38 ; "8"
 		bcs convert5
 		ldx #$c1 ; "A"
-convert5:	stx date1+23
+convert5:
+		stx date1+23
 		rts
-convert6:	cmp #"0"
+convert6:
+		cmp #$30 ; "0"
 		bne convert7
 		lda #" "
-convert7:	rts
-;
-convput:	asl
+convert7:
+		rts
+
+convput:
+		asl
 		asl
 		tay
-convp1:		lda datetext,y
+convp1:
+		lda datetext,y
 		iny
 		sta date1,x
-inx
-cmp #" "
-bne convp1
-rts
-;
+		inx
+		cmp #" "
+		bne convp1
+		rts
+
 ;* months and days
-datetext:	cbm "??? Jan Feb Mar "
+datetext:
+		cbm "??? Jan Feb Mar "
 		cbm "Apr May Jun Jul "
 		cbm "Aug Sep Oct Nov "
 		cbm "Dec Sun Mon Tue "
 		cbm "Wed Thu Fri Sat "
-;
+
 convvec:
 		byte 0,14,15,0,0,8,9,17,18,20,21
 
 convtbl2:
-		byte ", 19 :"
+		cbm ", 19 :"
 convvec2:
 		byte 10,11,12,13,16,19,22
 
-convname:	ldx #0
+convname:
+		ldx #0
 		jsr usevar ;an$
 		ldy #0
 		ldx #1
-convn1:		cpy var
+convn1:
+		cpy var
 		beq convn6
 		lda [var+1],y
 		jsr isalpha
@@ -4046,16 +4358,22 @@ convn1:		cpy var
 		bne convn2
 		ora #$80
 		bne convn3
-convn2:		and #$7f
-convn3:		sta [var+1],y
+convn2:
+		and #$7f
+convn3:
+		sta [var+1],y
 		ldx #0
 		beq convn5
-convn4:		ldx #1
-convn5:		iny
+convn4:
+		ldx #1
+convn5:
+		iny
 		bne convn1
-convn6:		rts
-;
-isalpha:	cmp #65
+convn6:
+		rts
+
+isalpha:
+		cmp #65
 		bcc isalpha0
 		cmp #91
 		bcc isalpha1
@@ -4063,72 +4381,85 @@ isalpha:	cmp #65
 		bcc isalpha0
 		cmp #219
 		bcc isalpha1
-isalpha0:	clc
+isalpha0:
+		clc
 		rts
-isalpha1:	sec
+isalpha1:
+		sec
 		rts
-;
-;convdisk:	ldx #0
-;		jsr usevar ;an$
-;		ldy #0
-;convd1:		cpy var
-;		beq convd3
-;		lda [var+1],y
-;		cmp #133
-;		bcc convd2
-;		cmp #140
-;		bcs convd2
-;		sbc #132
-;		tax
-;		lda convd4,x
-;		sta [var+1],y
-;convd2:		iny
-;		bne convd1
-;convd3:		rts
-;
-;convd4:
-; byte ",:", 135, "*?=", 139, 140
-;
-;strnsrch:	ldx #0
-;		jsr usevar ;an$
-;		ldy #0
-;		cpy var
-;		beq strns4
-;l1:		lda [var+1],y
-;		sta buffer,y
-;		iny
-;		cpy var
-;		bcc l1
-;		sty index
-;		ldx #1
-;		jsr usevar ;a$
-;		ldx #0
-;		cpx var
-;		beq strns4
-;strns1:		stx var+3
-;		ldy #0
-;strns2:		lda [var+1],y
-;		cmp buffer,x
-;		bne strns3
-;		iny
-;		cpy var
-;		bcs strns5
-;		inx
-;		cpx index
-;		bcc strns2
-;strns3:		ldx var+3
-;		inx
-;		cpx index
-;		bcc strns1
-;strns4:		ldx #255
-;		stx var+3
-;strns5:		ldx var+3
-;		inx
-;		stx var+1
-;		lda #0
-;		sta var
-;		ldx #30
-;		jmp putvar ;a%
+
+convdisk:
+		ldx #0
+		jsr usevar ;an$
+		ldy #0
+convd1:
+		cpy var
+		beq convd3
+		lda [var+1],y
+		cmp #133
+		bcc convd2
+		cmp #140
+		bcs convd2
+		sbc #132
+		tax
+		lda convd4,x
+		sta [var+1],y
+convd2:
+		iny
+		bne convd1
+convd3:
+		rts
+
+convd4:
+		byte ",:", function_key_5, "*?=", function_key_6, function_key_7
+
+strnsrch:
+		ldx #0
+		jsr usevar ;an$
+		ldy #0
+		cpy var
+		beq strns4
+l1:
+		lda [var+1],y
+		sta buffer,y
+		iny
+		cpy var
+		bcc l1
+		sty index
+		ldx #1
+		jsr usevar ;a$
+		ldx #0
+		cpx var
+		beq strns4
+strns1:
+		stx var+3
+		ldy #0
+strns2:
+		lda [var+1],y
+		cmp buffer,x
+		bne strns3
+		iny
+		cpy var
+		bcs strns5
+		inx
+		cpx index
+		bcc strns2
+strns3:
+		ldx var+3
+		inx
+		cpx index
+		bcc strns1
+strns4:
+		ldx #255
+		stx var+3
+strns5:
+		ldx var+3
+		inx
+		stx var+1
+		lda #0
+		sta var
+		ldx #30
+		jmp putvar ;a%
 
 offset 0
 namespace ""
