@@ -4411,7 +4411,7 @@ convd3:
 		rts
 
 convd4:
-		byte ",:", function_key_5, "*?=", function_key_6, function_key_7
+		byte ",:", function_key_5, "*?=", function_key_6, function_key_8
 
 strnsrch:
 		ldx #0

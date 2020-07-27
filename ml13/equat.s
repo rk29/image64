@@ -28,9 +28,9 @@ clear_screen = $93
 cursor_home = $13
 british_pound = $5c
 
-function_key_5 = 137
+function_key_2 = 137
 function_key_6 = 139
-function_key_7 = 140
+function_key_8 = 140
 
 cursor_black =    $90
 cursor_white =    $05
