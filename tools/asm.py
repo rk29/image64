@@ -8,14 +8,20 @@ encode_value = 0
 address_offset = 0
 address = 0
 
+def maybe_print(s):
+	pass
+#	if (address >= 0x6f70) and (address < 0x6f80):
+#		print(s)
+
 def emit_byte(b):
-#	print "%04x: %02x" % (address, b)
+	global address
+	maybe_print("%04x: %02x" % (address, b))
 	if b < 0 or b > 255:
 		raise Exception("byte value out of range (%s)" % b)
-	global address
 	address = address + 1
 	if pass_number == 3:
-		outfile.write(chr(b ^ encode_value))
+		output = bytes([b ^ encode_value])
+		outfile.write(output)
 
 def emit_word(w):
 	emit_byte(w & 0xFF)
@@ -104,6 +110,7 @@ def demote_mode(mode):
 	return mode
 	
 def assemble_op(opcode, mode, operand):
+	global address
 	emit_byte(opcode)
 	operand = int(operand)
 	if mode in [ MODE_IMMEDIATE, MODE_ZEROPAGE, MODE_ZEROPAGE_X, MODE_ZEROPAGE_Y, MODE_INDIRECT_X, MODE_INDIRECT_Y]:
@@ -112,6 +119,7 @@ def assemble_op(opcode, mode, operand):
 		emit_word(operand & 0xFFFF)
 	elif mode == MODE_RELATIVE:
 		offset = operand - (address + address_offset + 1)
+		maybe_print("%04x: operand %04x relative offset %d pass %d assembly offset %04x" % (address, operand, offset, pass_number, address_offset))
 		if (offset < -128) or (offset > 127):
 			if (pass_number == 3):
 				print(address, operand, offset)
@@ -121,6 +129,7 @@ def assemble_op(opcode, mode, operand):
 		emit_byte(offset & 0xFF)
 
 def assemble(f, op):
+	global address
 	opcodes = ops[op]
 	mode, operand = parse_operand(f)
 	if operand < 0x100:
@@ -130,6 +139,7 @@ def assemble(f, op):
 	if (MODE_RELATIVE in opcodes) and (mode == MODE_ABSOLUTE):
 		mode = MODE_RELATIVE
 	if mode in opcodes:
+		maybe_print("%04x: operation %s mode %s operand %04x" % (address, op, mode, operand))
 		assemble_op(opcodes[mode], mode, operand)
 	else:
 		raise Exception("invalid operation mode (%s) for opcode '%s'" % (mode, op))
@@ -193,7 +203,9 @@ def directive_org(f):
 
 	if pass_number == 3:
 		global outfile
-		outfile = open(filename, "w")
+		global symbol_filename
+		outfile = open(filename, "wb")
+		symbol_filename = filename + ".sym"
 		emit_word(addr)
 
 	global address
@@ -214,6 +226,12 @@ def directive_word(f):
 			done = 1
 			unlex(tok, value)	
 	
+def ascii_to_cbm(s):
+	result = ""
+	for ch in s:
+		result = result + chr(asc_to_cbm[ord(ch)])
+	return result
+
 def directive_cbm(f):
 	done = 0
 	while not done:
@@ -229,6 +247,12 @@ def directive_cbm(f):
 		if tok != TOK_COMMA:
 			done = 1
 			unlex(tok, value)
+
+def ascii_to_screen(s):
+	result = ""
+	for ch in s:
+		result = result + chr(cbm_to_scn[asc_to_cbm[ord(ch)]])
+	return result
 
 def directive_scn(f):
 	done = 0
@@ -293,8 +317,7 @@ ops = {
 	"eor" : { "IMM" : 0x49, "ZP" : 0x45, "ZPX" : 0x55,               "ABS" : 0x4D, "ABSX" : 0x5D, "ABSY" : 0x59, "INDX" : 0x41, "INDY" : 0x51 }, 
 	"lda" : { "IMM" : 0xA9, "ZP" : 0xA5, "ZPX" : 0xB5,               "ABS" : 0xAD, "ABSX" : 0xBD, "ABSY" : 0xB9, "INDX" : 0xA1, "INDY" : 0xB1 },
 	"ldx" : { "IMM" : 0xA2, "ZP" : 0xA6,               "ZPY" : 0xB6, "ABS" : 0xAE,                "ABSY" : 0xBE }, 
-# FIXME check on ldy zp,y. I don't think it exists.
-	"ldy" : { "IMM" : 0xA0, "ZP" : 0xA4,               "ZPY" : 0xB4, "ABS" : 0xAC,                "ABSY" : 0xBC }, 
+	"ldy" : { "IMM" : 0xA0, "ZP" : 0xA4, "ZPX" : 0xB4,               "ABS" : 0xAC,                "ABSY" : 0xBC }, 
 	"ora" : { "IMM" : 0x09, "ZP" : 0x05, "ZPX" : 0x15,               "ABS" : 0x0D, "ABSX" : 0x1D, "ABSY" : 0x19, "INDX" : 0x01, "INDY" : 0x11 }, 
 	"sbc" : { "IMM" : 0xE9, "ZP" : 0xE5, "ZPX" : 0xF5,               "ABS" : 0xED, "ABSX" : 0xFD, "ABSY" : 0xF9, "INDX" : 0xE1, "INDY" : 0xF1 }, 
 	"sta" : {               "ZP" : 0x85, "ZPX" : 0x95,               "ABS" : 0x8D, "ABSX" : 0x9D, "ABSY" : 0x99, "INDX" : 0x81, "INDY" : 0x91 },
@@ -310,7 +333,7 @@ ops = {
 	"lsr" : { "IMP" : 0x4A, "ZP" : 0x46, "ZPX" : 0x56,               "ABS" : 0x4E, "ABSX" : 0x5E }, 
 	"rol" : { "IMP" : 0x2A, "ZP" : 0x26, "ZPX" : 0x36,               "ABS" : 0x2E, "ABSX" : 0x3E }, 
 	"ror" : { "IMP" : 0x6A, "ZP" : 0x66, "ZPX" : 0x76,               "ABS" : 0x6e, "ABSX" : 0x7E }, 
-	"cmp" : { "IMM" : 0xC9, "ZP" : 0xC5, "ZPX" : 0xd5,               "ABS" : 0xCD, "ABSX" : 0xDD, "ABSY" : 0xD9 }, 
+	"cmp" : { "IMM" : 0xC9, "ZP" : 0xC5, "ZPX" : 0xd5,               "ABS" : 0xCD, "ABSX" : 0xDD, "ABSY" : 0xD9,                "INDY" : 0xD1 }, 
 	"cpx" : { "IMM" : 0xE0, "ZP" : 0xE4,                             "ABS" : 0xEC }, 
 	"cpy" : { "IMM" : 0xC0, "ZP" : 0xC4,                             "ABS" : 0xCC }, 
 	"jsr" : {                                                        "ABS" : 0x20 }, 
@@ -533,7 +556,7 @@ def lex0(f):
 
 def lex(f):
 	result = lex0(f)
-#	print result
+#	print(result)
 	return result
 
 def parse_expr3(f):
@@ -576,6 +599,28 @@ def parse_expr2(f):
 		if tok != TOK_NUMBER:
 			raise Exception("type mismatch")
 		return (tok, (value >> 8) & 0xFF)
+	if (tok == TOK_DIRECTIVE) and (value == "cbm"):
+		tok1, value1 = lex(f)
+		if tok1 != TOK_OPEN_PAREN:
+			raise Exception("syntax error, opening parenthesis expected")
+		tok2, value2 = parse_expr(f)
+		if tok2 != TOK_STRING:
+			raise Exception("type mismatch, string expected")
+		tok3, value3 = lex(f)
+		if tok3 != TOK_CLOSE_PAREN:
+			raise Exception("syntax error, closing parenthesis expected")
+		return tok2, ascii_to_cbm(value2)		
+	if (tok == TOK_DIRECTIVE) and (value == "scn"):
+		tok1, value1 = lex(f)
+		if tok1 != TOK_OPEN_PAREN:
+			raise Exception("syntax error, opening parenthesis expected")
+		tok2, value2 = parse_expr(f)
+		if tok2 != TOK_STRING:
+			raise Exception("type mismatch, string expected")
+		tok3, value3 = lex(f)
+		if tok3 != TOK_CLOSE_PAREN:
+			raise Exception("syntax error, closing parenthesis expected")
+		return tok2, ascii_to_screen(value2)		
 	if tok == TOK_NOT:
 		tok, value = parse_expr2(f)
 		if tok != TOK_NUMBER:
@@ -687,16 +732,28 @@ def parse(f):
 		tok, value = lex(f)
 
 def dump_symbols():
-	symbol_list = symbols.keys()
+	f = open(symbol_filename, "w")
+	namespace_list = list(namespaces.keys())
+	namespace_list.sort()
+	for namespace in namespace_list:
+		dump_namespace_symbols(f, namespace)
+
+def dump_namespace_symbols(file, namespace):
+	symbols = namespaces[namespace]
+	symbol_list = list(symbols.keys())
 	symbol_list.sort()
 	for symbol in symbol_list:
 		tok, value, passnum = symbols[symbol]
-		if tok == TOK_NUMBER:
-			print("%-20s $%04x" % (symbol, value))
-		elif tok == TOK_STRING:
-			print("%-20s '%s'" % (symbol, value))
+		if namespace != "":
+			symbol_fullname = namespace + "." + symbol
 		else:
-			print("%-20s ? type=%d value=%s" % (symbol, tok, value))
+			symbol_fullname = symbol
+		if tok == TOK_NUMBER:
+			file.write("%-30s $%04x\n" % (symbol_fullname, value))
+		elif tok == TOK_STRING:
+			file.write("%-30s '%s'\n" % (symbol_fullname, value))
+		else:
+			file.write("%-30s ? type=%d value=%s\n" % (symbol_fullname, tok, value))
 
 if __name__ == "__main__":
 
@@ -722,7 +779,7 @@ if __name__ == "__main__":
 	if outfile is not None:
 		outfile.close()
 
-#	dump_symbols()
+	dump_symbols()
 
 	sys.exit(rc)
 	
