@@ -22,7 +22,7 @@ petcat -2 -nh "$1" \
 -e "s/stopgosub/bpl/g" -e "s/stopfor/word/g" -e "s/stopif/bmi/g" -e "s/stopdef/sbc/g" -e "s/stopcos/txs/g" -e "s/stoplog/tsx/g" \
 -e "s/stopfre/sed/g" -e "s/stop=/php/g" -e "s/stopsgn/plp/g" -e "s/stopstep/cld/g" -e "s/stopor/nop/g" \
 -e "s/stopspc(/bit/g" -e "s/stoppos/sei/g" -e "s/stopdim/send/g" -e "s/stop+/cli/g" -e "s/stopmid\\$/dup/g" \
--e "s/stopright\\$/scn/g" \
+-e "s/stopright\\$/scn/g" -e "s/stopint/rti/g" \
 > "$1.new"
 
 
