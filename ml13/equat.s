@@ -209,6 +209,8 @@ tmp7 = $d006
 trans = $d00e
 index = $d00f
 
+; cassette buffer
+
 datebuf = 828 ;$0b
 date1 = 839 ;$1c
 wrapbuf = 867 ;$50
