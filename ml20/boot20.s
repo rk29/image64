@@ -3,7 +3,7 @@ serialn=0001
 
 include "equat.s"
 
-org $02a7, "boot.prg"
+org $02a7, "boot20.prg"
 
 ; the boot program!
 
