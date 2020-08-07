@@ -188,7 +188,19 @@ def directive_include(f):
 	parse(includefile)
 	includefile.close() 
 	line_number = temp_linenum
-	
+
+def directive_prg(f):
+	tok, value = parse_expr(f)
+	if tok != TOK_STRING:
+		raise Exception("type mismatch")
+	with open(value, "rb") as binfile:
+		# skip CBM load address
+		load_addr = binfile.read(2)
+		byte = binfile.read(1)
+		while byte:
+			emit_byte(ord(byte))
+			byte = binfile.read(1)
+
 def directive_org(f):
 
 	tok, addr = parse_expr(f)
@@ -373,7 +385,8 @@ directives = {
 	"enc" : directive_enc,
 	"offset" : directive_offset,
 	"align" : directive_align,
-	"namespace" : directive_namespace
+	"namespace" : directive_namespace,
+	"prg" : directive_prg
 }
 
 current_namespace = ""
@@ -599,6 +612,17 @@ def parse_expr2(f):
 		if tok != TOK_NUMBER:
 			raise Exception("type mismatch")
 		return (tok, (value >> 8) & 0xFF)
+	if (tok == TOK_IDENT) and (value == "str"):
+		tok1, value1 = lex(f)
+		if tok1 != TOK_OPEN_PAREN:
+			raise Exception("syntax error, opening parenthesis expected")
+		tok2, value2 = parse_expr(f)
+		if tok2 != TOK_NUMBER:
+			raise Exception("type mismatch, number expected")
+		tok3, value3 = lex(f)
+		if tok3 != TOK_CLOSE_PAREN:
+			raise Exception("syntax error, closing parenthesis expected")
+		return TOK_STRING, str(value2)
 	if (tok == TOK_DIRECTIVE) and (value == "cbm"):
 		tok1, value1 = lex(f)
 		if tok1 != TOK_OPEN_PAREN:
@@ -647,7 +671,7 @@ def parse_expr1(f):
 				raise Exception("type mismatch")
 			if tok1 != TOK_NUMBER:
 				raise Exception("invalid math operation")
-			value1 = value1 / value2
+			value1 = int(value1 / value2)
 		else:
 			unlex(tok, value)
 			return (tok1, value1)
