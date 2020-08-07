@@ -263,6 +263,10 @@ struct lk_dir_entry *extract_dir_entry(int blocknum, unsigned char *block)
         entry->load_address = extract_word(block, LOADADDR_OFFSET);
 
         entry->bytes_in_last_block = ((block[LASTBLOCK_MSB_OFFSET] << 8) | block[LASTBLOCK_LSB_OFFSET]) & (BLOCKSIZE-1);
+        if (entry->bytes_in_last_block == 0)
+        {
+            entry->bytes_in_last_block = BLOCKSIZE;
+        }
 
         entry->user = (block[USER_LU_OFFSET] >> 4) & 0x0F;
 	entry->logical_unit = block[USER_LU_OFFSET] & 0x0F;
