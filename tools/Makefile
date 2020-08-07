@@ -3,7 +3,7 @@ CFLAGS = -std=c99 -Wall -Werror
 TARGETS = d6502 extractall
 
 d6502 : d6502.c
-	$(CC) $(CFLAGS) -o d6502 d6502.c
+	$(CC) -o d6502 d6502.c
 
 extractall : extractall.c
 	$(CC) $(CFLAGS) -o extractall extractall.c
