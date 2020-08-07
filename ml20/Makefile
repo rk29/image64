@@ -6,5 +6,9 @@ all : $(TARGETS)
 %.prg : %.s $(ASM) equat.s
 	$(ASM) $<
 
+ml20.prg: wedge.s editor.s gc.s ecs.s struct.s swap1.s swap2.s swap3.s jmptb.s strio.s
+ml20.prg: mcicm.s chrio.s dskio.s irqhn.s setup.s varbl.s miscl.s shdlr.s modem.s
+ml20.prg: calls.s intro.s
+
 clean :
 	rm -f *~ *.sym $(TARGETS)

@@ -52,8 +52,6 @@ cursor_lt_green = $99
 cursor_lt_blue =  $9a
 cursor_gray3 =    $9b
 
-
-
 ten = $dc08
 scs = $dc09
 min = $dc0a
@@ -107,13 +105,7 @@ error = $a437
 chkcom= $aefd
 
 jmptbl = $a000
-outastrp= $cd00
-usetbl1 = $cd03
-swapper = $cd06
-swapagn = $cd09
-trace = $cd0c
-chkspcl = $cd0f
-convchr = $cd12
+
 buffer = $ce77
 buf2 = $ce27
 
@@ -344,3 +336,12 @@ arraysav=wedgemem+9
 arrayres=wedgemem+12
 forcegc =wedgemem+15
 
+; interface page jump table
+
+outastrp= $cd00
+usetbl1 = $cd03
+swapper = $cd06
+swapagn = $cd09
+trace = $cd0c
+chkspcl = $cd0f
+convchr = $cd12
