@@ -171,7 +171,6 @@ readpost:
 
 ; proto 4 - relfile indexer
 
-
 ; search for an$ in file
 
 ; get handle to search for
