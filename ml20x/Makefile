@@ -1,6 +1,6 @@
 #ASM = ../tools/asm.py
 ASM = assemble
-TARGETS = ml20.prg boot20.prg image20.prg rs232_user.prg rs232_swift.prg post.prg punter.prg xmodem.prg path.prg net.prg copier.prg clock.prg
+TARGETS = ml20.prg boot20.prg image20.prg rs232_user.prg rs232_swift.prg post.prg punter.prg xmodem.prg path.prg net.prg copier.prg clock.prg menu2.prg sort.prg
 
 all : $(TARGETS)
 
