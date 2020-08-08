@@ -30,7 +30,7 @@ gc:
 		stx hi+1
 gc0:
 		lda #0
-		sta index
+		sta gcindex
 ; loop thru scalars
 		lda 45
 		ldx 46
@@ -91,10 +91,10 @@ gc5:
 		sta 4
 		jmp gc4
 gc6:
-		lda index
+		lda gcindex
 		beq gc7
-		jsr collect
-		lda index
+		jsr collectx
+		lda gcindex
 		cmp #size
 		beq gc0
 gc7:
@@ -189,7 +189,7 @@ dostr:
 		lda 6
 		sbc hi+1
 		bcs dostr0
-		ldx index
+		ldx gcindex
 		beq dostr4
 		ldx #0
 dostr1:
@@ -202,7 +202,7 @@ dostr1:
 		bcc dostr6
 		beq dostr5
 dostr2:
-		stx temp
+		stx gctemp
 		cpx #size-1
 		beq dostr4
 		ldx #size-1
@@ -216,7 +216,7 @@ dostr3:
 		lda tbldh-1,x
 		sta tbldh,x
 		dex
-		cpx temp
+		cpx gctemp
 		bne dostr3
 dostr4:
 		lda 3
@@ -227,15 +227,15 @@ dostr4:
 		sta tbldl,x
 		lda 6
 		sta tbldh,x
-		lda index
+		lda gcindex
 		cmp #size
 		beq dostr5
-		inc index
+		inc gcindex
 dostr5:
 		rts
 dostr6:
 		inx
-		cpx index
+		cpx gcindex
 		bcc dostr1
 		cpx #size
 		bcc dostr4
@@ -243,10 +243,10 @@ dostr6:
 
 collect0:
 		rts
-collect:
+collectx:
 		ldx #0
 collect1:
-		cpx index
+		cpx gcindex
 		beq collect0
 		lda tblpl,x
 		sta 3
@@ -256,7 +256,7 @@ collect1:
 		sta 5
 		lda tbldh,x
 		sta 6
-		stx temp
+		stx gctemp
 		ldy #0
 		lda [3],y
 		tax
@@ -282,13 +282,13 @@ collect2:
 		iny
 		lda hi+1
 		sta [3],y
-		ldx temp
+		ldx gctemp
 		inx
 		jmp collect1
 
-index:
+gcindex:
 		byte 0
-temp:
+gctemp:
 		byte 0
 lo:
 		word 0

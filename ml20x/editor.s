@@ -369,7 +369,7 @@ nothing:
 ;get param/default to zero
 getzero:
 		ldx #0
-		jmp getnum
+		jmp getnumx
 
 abort:
 		lda #0
@@ -1573,7 +1573,7 @@ getnumm:
 		stx numx
 		jsr gettxm
 		jmp getnum0
-getnum:
+getnumx:
 		stx numx
 		jsr gettx
 getnum0:

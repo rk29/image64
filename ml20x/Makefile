@@ -1,9 +1,10 @@
-ASM = ../tools/asm.py
-TARGETS = ml20.prg boot20.prg image20.prg rs232_user.prg rs232_swift.prg post.prg
+#ASM = ../tools/asm.py
+ASM = assemble
+TARGETS = ml20.prg boot20.prg image20.prg rs232_user.prg rs232_swift.prg post.prg punter.prg xmodem.prg path.prg net.prg copier.prg clock.prg
 
 all : $(TARGETS)
 
-%.prg : %.s $(ASM) equat.s
+%.prg : %.s equat.s
 	$(ASM) $<
 
 ml20.prg: wedge.s editor.s gc.s ecs.s struct.s swap1.s swap2.s swap3.s jmptb.s strio.s

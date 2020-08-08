@@ -29,7 +29,7 @@ wfunc0:
 		lda #$00
 		jmp $b391
 
-flen:
+filename_len:
 		byte 0
 fdev:
 		byte 0
@@ -51,7 +51,7 @@ openroo1:
 		cpy #20
 		bcc openroo1
 openroo2:
-		sty flen
+		sty filename_len
 		lda $ba
 		sta fdev
 		lda $b9
@@ -80,7 +80,7 @@ loadfile:
 		jsr setlfs
 		ldx #<fbuf
 		ldy #>fbuf
-		lda flen
+		lda filename_len
 		jsr setnam
 		jsr openf
 		ldx #127
@@ -103,7 +103,7 @@ loadfile:
 		jsr setlfs
 		ldx #<fbuf
 		ldy #>fbuf
-		lda flen
+		lda filename_len
 		jsr setnam
 		lda #0
 		ldx $ae
