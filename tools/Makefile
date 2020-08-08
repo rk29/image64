@@ -10,3 +10,6 @@ extractall : extractall.c
 
 clean:
 	rm -f $(TARGETS) *~
+
+install: d6502
+	cp d6502 ~/bin
