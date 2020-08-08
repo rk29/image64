@@ -44,10 +44,10 @@ reset = rsinabl
 relaxflg:
 		byte 0
 
-serialp:
-		byte "A"
-serialn:
-		word 3
+;serialp:
+;		byte "A"
+;serialn:
+;		word 3
 
 ;code accept
 t1:
@@ -61,7 +61,7 @@ entry:
 		tsx
 		stx stack
 		tax
-lda #0:
+		lda #0
 		sta tcount
 		lda #$37
 		sta 1
@@ -100,18 +100,18 @@ jmodemx:
 
 ; check carrier/abort
 exit:
-		txa
-		pha
+;		txa
+;		pha
 		lda $28d
 		cmp #2
 		beq ext1
-		ldx #4
-		lda bsnpre-4,x
-		cmp serialp-4,x
-		lda bsnval-4,x
-		cmp serialn-4,x
-		lda bsnval-3,x
-		cmp serialn-3,x
+;		ldx #4
+;		lda bsnpre-4,x
+;		cmp serialp-4,x
+;		lda bsnval-4,x
+;		cmp serialn-4,x
+;		lda bsnval-3,x
+;		cmp serialn-3,x
 		lda carrst
 		bmi ext2
 ext1:
@@ -122,10 +122,10 @@ ext1:
 ext0:
 		lda #1
 		sta 512
-		jmp nobytes
+		jsr nobytes
 ext2:
-		pla
-		tax
+;		pla
+;		tax
 		rts
 
 ; get # bytes and exit
@@ -226,11 +226,11 @@ chc4:
 
 ;codes.........012345
 char1:
-		byte "{CTRL-X}gbass"
+		cbm ascii_ctrl_x, "gbass"
 char2:
-		byte "{CTRL-X}oac/y"
+		cbm ascii_ctrl_x, "oac/y"
 char3:
-		byte "{CTRL-X}odkbn"
+		cbm ascii_ctrl_x, "odkbn"
 
 sendcode:
 		txa
@@ -282,7 +282,7 @@ tranrelx:
 trx1:
 		ldx #syn
 		jsr sendcode
-		lda #2^syn+2^goo
+		lda #(1<<syn) | (1<<goo)
 		jsr accept
 		beq trx3
 		dec repeat
@@ -362,7 +362,7 @@ rch5:
 		lda $96
 		rts
 rch6:
-		lda #2^syn
+		lda #1<<syn
 		jsr accept
 		bne rch1
 		lda #3
@@ -370,7 +370,7 @@ rch6:
 rch7:
 		ldx #syn
 		jsr sendcode
-		lda #2^snb
+		lda #1<<snb
 		jsr accept
 		beq rch8
 		dec repeat
@@ -438,7 +438,7 @@ trh6a:
 trh6b:
 		ldx #ack
 		jsr sendcode
-		lda #2^snb
+		lda #1<<snb
 		jsr accept
 		bne trh6a
 		jsr thisbuf
@@ -463,7 +463,7 @@ trh8:
 		jsr prtdash
 		ldx #ack
 		jsr sendcode
-		lda #2^snb
+		lda #1<<snb
 		jsr accept
 		bne trh8
 ; lda #10
@@ -471,14 +471,14 @@ trh8:
 trh9:
 		ldx #syn
 		jsr sendcode
-		lda #2^syn
+		lda #1<<syn
 		jsr accept
 ; bne trha
-; dec bufcount:
+; dec bufcount
 ; bne trh9
 ;trha:
-		lda #3
-		sta bufcount
+;		lda #3
+;		sta bufcount
 trhb:
 		ldx #snb
 		jsr sendcode
@@ -513,13 +513,13 @@ rcm2:
 		cpy #$02
 		bne rcm3
 		lda pbuf1
-		cmp #"a"
+		cmp #cbm("a")
 		bne rcm3
 		lda pbuf1+1
-		cmp #"c"
+		cmp #cbm("c")
 		bne rcm3
 		lda pbuf1+2
-		cmp #"k"
+		cmp #cbm("k")
 		beq rcm4
 rcm3:
 		iny

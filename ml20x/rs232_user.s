@@ -61,9 +61,9 @@ oldclr:
 oldchr:
 		byte $24
 		word nchrin
-oldout:
-		byte $26
-		word nchrout
+;oldout:
+;		byte $26
+;		word nchrout
 oldget:
 		byte $2a
 		word ngetin
@@ -439,10 +439,10 @@ setbaud1:
 		sta $dd0f
 		rts
 
-nchrout:
-		jsr disab
-		jsr oldout
- 		jmp inabl
+;nchrout:
+;		jsr disab
+;		jsr oldout
+;		jmp inabl
 
 nopen:
 		jsr disab

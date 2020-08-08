@@ -88,9 +88,9 @@ oldclr:
 oldchr:
 		byte $24
 		word nchrin
-oldout:
-		byte $26
-		word nchrout
+;oldout:
+;		byte $26
+;		word nchrout
 oldget:
 		byte $2a
 		word ngetin
@@ -371,10 +371,10 @@ setbaud3:
 		sta control
 		rts
 
-nchrout:
-		jsr disabl
-		jsr oldout
-		jmp inable
+;nchrout:
+;		jsr disabl
+;		jsr oldout
+;		jmp inable
 
 nopen:
 		jsr disabl

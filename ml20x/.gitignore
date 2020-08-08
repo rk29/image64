@@ -1,6 +1,6 @@
 *.prg
 *.lst
-*.sym
+*.sym*
 *~
 orig/
 unchecked/

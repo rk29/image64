@@ -1,6 +1,9 @@
 #ASM = ../tools/asm.py
 ASM = assemble
-TARGETS = ml20.prg boot20.prg image20.prg rs232_user.prg rs232_swift.prg post.prg punter.prg xmodem.prg path.prg net.prg copier.prg clock.prg menu2.prg sort.prg
+TARGETS = ml20.prg boot20.prg image20.prg \
+rs232.prg rs232_user.prg rs232_swift.prg \
+post.prg path.prg tagscan.prg net.prg net1.prg \
+punter.prg xmodem.prg copier.prg clock.prg menu2.prg sort.prg
 
 all : $(TARGETS)
 
@@ -12,6 +15,7 @@ ml20.prg: mcicm.s chrio.s dskio.s irqhn.s setup.s varbl.s miscl.s shdlr.s modem.
 ml20.prg: calls.s intro.s
 
 image20.prg: chr.imagelogo scn.imagelogo col.imagelogo
+rs232.prg: rs232_swift.prg rs232_user.prg
 
 clean :
-	rm -f *~ *.sym $(TARGETS)
+	rm -f *~ *.sym_by_* $(TARGETS)

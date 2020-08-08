@@ -404,7 +404,9 @@ tr1:
 		byte 0,$11,0,$13,20,$15,$16,$17,$18,$19,0,27,0,0,0,0
 		cbm " !",34,"#$%&'()*+,-./"
 		cbm "0123456789:;<=>?"
-		cbm "`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~", 127
+		cbm "@ABCDEFGHIJKLMNOPQRSTUVWXYZ["
+		byte $5c
+		cbm "]^_"
 		cbm 0,"abcdefghijklmnopqrstuvwxyz",0,0,0,0,20
 
 ; tblcta
@@ -415,7 +417,7 @@ tr2:
 		byte $18, $19, $1a, $1b, $1c, $1d, $1e, $1f
 		byte " !",34,"#$%&'()*+,-./"
 		byte "0123456789:;<=>?"
-		byte "@abcdefghijklmnopqrstuvwxyz[\]^", $5f
+		byte "@abcdefghijklmnopqrstuvwxyz[\]^_"
 		byte "-ABCDEFGHIJKLMNOPQRSTUVWXYZ*-!**"
 		byte 0,129,0,0,0,0,0,0,0,0,0,0,0,$d,0,0
 		byte 0,145,146,12,0,149,150,151,152,153,154,155,156,157,158,159

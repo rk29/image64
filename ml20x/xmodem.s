@@ -212,7 +212,7 @@ calcsum2:
 
 exit:
 		lda $028d
-cmp #2:
+		cmp #2
 		beq exit1
 		lda carrier
 		and #$10
@@ -350,7 +350,7 @@ xsendc0:
 		bcs xsendc0
 		cmp #chrnak
 		beq xsendc2
-		cmp #"c"
+		cmp #cbm("c")
 		beq xsendc1
 		cmp #chrcan
 		beq xsendc3
@@ -427,7 +427,7 @@ sendbuf:
 		sta $b0
 		lda #>xbuf
 		sta $b1
-lda #1:
+		lda #1
 		sta bufnum
 sendbuf1:
 		lda [$b0],y
@@ -569,7 +569,7 @@ xrecvcrc:
 		lda #3
 		sta bufnum
 xrecvc1:
-		lda #"c"
+		lda #cbm("c")
 		jsr sendbyte
 		jsr waitch10
 		bcc xrecvc3
@@ -868,7 +868,7 @@ xrecvn1:
 		beq xrecvn2
 		cmp #","
 		beq xrecvn2
-cmp #65:
+		cmp #65
 		bcc xrecvn3
 		cmp #91
 		bcs xrecvn4
@@ -885,7 +885,7 @@ xrecvn2:
 		lda #","
 		sta buffer,y
 		iny
-		lda #"s"
+		lda #cbm("s")
 		sta buffer,y
 		iny
 		sty var

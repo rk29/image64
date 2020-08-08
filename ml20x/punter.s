@@ -435,11 +435,13 @@ chc4:
 
 ;codes.........01234567..8..9
 char1:
-		byte "{CTRL-X}gbass{ensh}{CTRL-D}",13,"o"
+		cbm ascii_ctrl_x, "gbass", ensh, ascii_ctrl_d, 13, "o"
 char2:
-		byte "{CTRL-X}oac/y{ensh}{CTRL-D}",10,"k"
+		cbm ascii_ctrl_x, "oac/y", ensh, ascii_ctrl_d
+		byte 10
+		cbm "k"
 char3:
-		byte "{CTRL-X}odkbn{ensh}{CTRL-D}",00,13
+		cbm ascii_ctrl_x, "odkbn", ensh, ascii_ctrl_d, 0, 13
 
 sendcode:
 		txa
@@ -670,13 +672,13 @@ rcm2:
 		cpy #$02
 		bne rcm3
 		lda codebuf
-		cmp #"a"
+		cmp #cbm("a")
 		bne rcm3
 		lda codebuf+1
-		cmp #"c"
+		cmp #cbm("c")
 		bne rcm3
 		lda codebuf+2
-		cmp #"k"
+		cmp #cbm("k")
 		beq rcm4
 rcm3:
 		iny

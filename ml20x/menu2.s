@@ -731,19 +731,19 @@ cursm2:
 		sta key1
 		cmp #13
 		beq cursm3
-		cpx #"["
+		cpx #cbm("[")
 		bne cursm5
 		ldy #2
-		cmp #"A"
+		cmp #cbm("A")
 		beq cursm4
 		iny
-		cmp #"B"
+		cmp #cbm("B")
 		beq cursm4
 		iny
-		cmp #"C"
+		cmp #cbm("C")
 		beq cursm4
 		iny
-		cmp #"D"
+		cmp #cbm("D")
 		beq cursm4
 cursm5:
 		ldy #2
