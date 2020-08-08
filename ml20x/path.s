@@ -11,7 +11,7 @@ buf2 = $ce27
 		jmp pathfind
 
 		byte 255
-		byte version
+		cbm version
 
 src:
 		byte 0
