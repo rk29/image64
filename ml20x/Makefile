@@ -3,7 +3,9 @@ ASM = assemble
 TARGETS = ml20.prg boot20.prg image20.prg \
 rs232.prg rs232_user.prg rs232_swift.prg \
 post.prg path.prg tagscan.prg net.prg net1.prg \
-punter.prg xmodem.prg copier.prg clock.prg menu2.prg sort.prg
+punter.prg punter-9101290215.prg \
+xmodem.prg xmodem-9101290216.prg \
+copier.prg clock.prg menu2.prg sort.prg
 
 all : $(TARGETS)
 

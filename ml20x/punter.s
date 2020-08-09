@@ -66,9 +66,6 @@ setnam = $ffbd
 openf = $ffc0
 closef = $ffc3
 
-ascii_ctrl_d = 4
-ascii_ctrl_x = 24
-
 ; start - jump table
 ml:
 		lda defflag

@@ -18,6 +18,7 @@ ascii_backspace = 8
 ascii_bel = 7
 ascii_escape = 27
 ascii_formfeed = 12
+ascii_ctrl_d = 4
 ascii_ctrl_x = 24
 
 cursor_right = $1d

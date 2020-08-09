@@ -1,5 +1,5 @@
 prefix = cbm("A")
-serialn=0003	
+serialn=0001
 
 include "equat.s"
 
