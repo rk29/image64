@@ -4,7 +4,7 @@ serial = $1001
 
 include "equat.s"
 
-org $6c00, "ml20.prg"
+org $6c00, "ml.prg"
 
 ; $0c00 - wedge
 

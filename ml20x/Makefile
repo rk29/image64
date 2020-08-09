@@ -1,8 +1,8 @@
 #ASM = ../tools/asm.py
 ASM = assemble
-TARGETS = ml20.prg boot20.prg image20.prg \
+TARGETS = ml.prg boot.prg image.prg \
 rs232.prg rs232_user.prg rs232_swift.prg \
-post.prg path.prg tagscan.prg net.prg net1.prg \
+post.prg path.prg tagscan.prg net.prg \
 punter.prg punter-9101290215.prg \
 xmodem.prg xmodem-9101290216.prg \
 copier.prg clock.prg menu2.prg sort.prg
@@ -12,11 +12,11 @@ all : $(TARGETS)
 %.prg : %.s equat.s
 	$(ASM) $<
 
-ml20.prg: wedge.s editor.s gc.s ecs.s struct.s swap1.s swap2.s swap3.s jmptb.s strio.s
-ml20.prg: mcicm.s chrio.s dskio.s irqhn.s setup.s varbl.s miscl.s shdlr.s modem.s
-ml20.prg: calls.s intro.s
+ml.prg: wedge.s editor.s gc.s ecs.s struct.s swap1.s swap2.s swap3.s jmptb.s strio.s
+ml.prg: mcicm.s chrio.s dskio.s irqhn.s setup.s varbl.s miscl.s shdlr.s modem.s
+ml.prg: calls.s intro.s
 
-image20.prg: chr.imagelogo scn.imagelogo col.imagelogo
+image.prg: chr.imagelogo scn.imagelogo col.imagelogo
 rs232.prg: rs232_swift.prg rs232_user.prg
 
 clean :
@@ -32,9 +32,9 @@ ml-source.tar.gz: Makefile *.s
 
 ml.d81: *.prg
 	c1541 -format image,ml d81 ml.d81 \
-	-write boot20.prg "boot 2.0" \
-	-write image20.prg "image 2.0" \
-	-write ml20.prg "ml 2.0" \
+	-write boot.prg "boot 2.0" \
+	-write image.prg "image 2.0" \
+	-write ml.prg "ml 2.0" \
 	-write rs232.prg "ml.rs232" \
 	-write punter.prg "++ punter" \
 	-write xmodem.prg "++ xmodem" \

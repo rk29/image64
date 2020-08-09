@@ -1,6 +1,6 @@
 include "equat.s"
 
-org $0801, "image20.prg"
+org $0801, "image.prg"
 
 scnmem = $0400
 chrmem = $2000
