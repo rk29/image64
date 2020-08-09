@@ -1,6 +1,6 @@
 revision = 1
 version_string = "12/29/91  1:18p"
-serial = $1003
+serial = $1001
 
 include "equat.s"
 
