@@ -23,7 +23,7 @@ status=port+1
 command=port+2
 control=port+3
 
-comint0=%00001010 ;nmi off
+comint0=%00001011 ;nmi off
 comint1=%00001001 ;rxd on
 comint2=%00000101 ;txd/rxd
 comdtr0=%00001000 ;dtr off
