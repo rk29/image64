@@ -142,26 +142,9 @@ copyrite:
 		ldy #copylen-1
 loop:
 		lda copymsg,y
-		eor #$ff
 		sta buffer,y
 		dey
 		bpl loop
-
-		lda #1
-		sta var
-		lda #<bsnpre
-		sta var+1
-		lda #>bsnpre
-		sta var+2
-		ldx #1
-		jsr putvar ;a$
-
-		lda bsnval
-		sta var+1
-		lda bsnval+1
-		sta var
-		ldx #31
-		jsr putvar ;a%
 
 		lda #copylen
 		sta var
@@ -175,22 +158,10 @@ loop:
 		ldx #0
 		jmp prtvar0 ;an$
 
-enc 255
-
 copymsg:
 		byte function_key_6, british_pound, 95
-		cbm "07IMAGE BBS 64 V2.0 S# "
-		byte british_pound
-		cbm "$a"
-		byte british_pound
-		cbm "#4"
-		byte british_pound
-		cbm "%b"
+		cbm "07IMAGE BBS 64 V3.0"
 		byte function_key_6
-		byte british_pound, 95
-		cbm "06(C) 1991  NEW IMAGE SOFTWARE"
-		byte function_key_6
-enc 0
 copylen = *-copymsg
 
 mult3:

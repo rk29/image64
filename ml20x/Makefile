@@ -30,11 +30,11 @@ dist: ml-source.tar.gz ml.d81
 ml-source.tar.gz: Makefile *.s
 	tar czf ml-source.tar.gz Makefile *.s
 
-ml.d81: *.prg
+ml.d81: $(TARGETS)
 	c1541 -format image,ml d81 ml.d81 \
-	-write boot.prg "boot 2.0" \
-	-write image.prg "image 2.0" \
-	-write ml.prg "ml 2.0" \
+	-write boot.prg "boot 3.0" \
+	-write image.prg "image 3.0" \
+	-write ml.prg "ml 3.0" \
 	-write rs232.prg "ml.rs232" \
 	-write punter.prg "++ punter" \
 	-write xmodem.prg "++ xmodem" \

@@ -311,9 +311,9 @@ dispd3:
 		jsr dispdt
 		lda #" "
 		jsr dispdt
-		lda #"1"
+		lda #"2"
 		jsr dispdt
-		lda #"9"
+		lda #"0"
 		jsr dispdt
 		lda d1str+1
 		jsr dispdt

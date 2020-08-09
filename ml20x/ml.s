@@ -1,6 +1,5 @@
 revision = 1
-version_string = "12/29/91  1:18p"
-serial = $1001
+version_string = "2020-08-08 18:32"
 
 include "equat.s"
 

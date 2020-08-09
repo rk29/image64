@@ -1,6 +1,3 @@
-prefix = cbm("A")
-serialn=0001
-
 include "equat.s"
 
 org $02a7, "boot.prg"
@@ -49,29 +46,11 @@ boot:
 ; the filename for the ml file
 
 file:
-		cbm "image 2.0"
+		cbm "image 3.0"
 filename_length = * - file
 
-; serial number info
-
-		dup 0, $2fa-*
-enc 255
-		byte prefix
-		byte <serialn
-		byte >serialn
-enc 0
-
-; pad to line up with prefix
-		dup 0, bsnpre-*
-; bsnpre:
-		byte prefix
-
-; pad to line up with serial
-		dup 0, bsnval-*
-; bsnvar:
-		byte <serialn
-		byte >serialn
+		dup 0, $0300 - *
 
 ; the boot vector
 
-		word $e38b,boot
+		word $e38b, boot

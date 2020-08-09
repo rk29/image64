@@ -1,4 +1,4 @@
-;image 2.0 equates
+;image ml equates
 
 var = $61
 chrget = $73
@@ -108,9 +108,6 @@ jmptbl = $a000
 buffer = $ce77
 buf2 = $ce27
 fbuf = $ce13
-
-bsnpre = $02fd
-bsnval = $02fe
 
 death= $1800
 prgstart = $1801

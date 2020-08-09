@@ -18,47 +18,8 @@ getmod0:
 		sta $fe
 getmod1:
 		lda $fe
-		beq getmod3
-		ldx getmodn
-		cmp getmodt,x
-		bne getmod2
-		inx
-		stx getmodn
-		cpx #5
-		bcc getmod3
-		pha
-		lda bsnpre
-		jsr outm
-		lda bsnval+1
-		jsr outh
-		lda bsnval
-		pha
-		lsr
-		lsr
-		lsr
-		lsr
-		jsr outh
-		pla
-		jsr outh
-		pla
-getmod2:
-		ldx #0
-		stx getmodn
-getmod3:
 		cmp #0
 		rts
-getmodn:
-		byte 0
-getmodt:
-		byte 9,13,1,7,5 ;image
-outh:
-		and #$0f
-		ora #$30
-		cmp #$3a
-		bcc outh1
-		adc #6
-outh1:
-		jmp outm
 
 outmodh:
 		ldx interm

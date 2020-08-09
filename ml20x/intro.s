@@ -368,7 +368,7 @@ setp1:
 		rts
 
 date2:
-		cbm "Wed Feb 14, 1990 12:25 PM   "
+		cbm "Sat Aug 08, 2020 12:25 PM   "
 
 copytran:
 		ldy #0
@@ -460,7 +460,7 @@ daysofm0:
 		byte 31,31,30,31,30,31
 
 date1fmt:
-		cbm "Sat Dec  9, 1990"
+		cbm "Sat Dec  9, 2020"
 		cbm " 12:00 AM EST   "
 
 sndtbl0:
@@ -506,7 +506,7 @@ startmsg:
 
 bootvers:
 		byte clear_screen
-		cbm " Image BBS V2.0 Rev "
+		cbm " Image BBS V3.0 Rev "
 		byte british_pound
 		cbm "%a: "
 		byte british_pound

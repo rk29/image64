@@ -842,7 +842,7 @@ cvers:
 		jmp prmsg0
 versmsg:
 		byte function_key_6
-		cbm "Image BBS 2.0 Editor ("+editor_version+")"
+		cbm "Image BBS 3.0 Editor ("+editor_version+")"
 		byte function_key_6
 verslen = *-versmsg
 
