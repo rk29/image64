@@ -9,3 +9,5 @@ check.sh
 ml.d81
 names
 notes
+*.zip
+*.tar.gz
