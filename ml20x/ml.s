@@ -9,58 +9,72 @@ org $6c00, "ml.prg"
 
 include "wedge.s"
 
+room_in_wedge = $7000 - *
+
 ; pad to the start of the next module
-		dup 0,$7000-*
+		dup 0, room_in_wedge
 
 ; $d000 - editor
 
 include "editor.s"
 
+room_in_editor = $8000 - *
 
 ; pad to the start of the next module
-		dup 0,$8000-*
+		dup 0, room_in_editor
 
 ; $e000 - garbage collect
 
 include "gc.s"
 
+room_in_gc = $8400 - *
 
 ; pad to the start of the next module
-		dup 0,$8400-*
+		dup 0, room_in_gc
 
 ; $e400 - e.c.s. checker
 
 include "ecs.s"
 
+room_in_ecs = $8e00 - *
+
 ; pad to the start of the next module
-		dup 0, $8e00-*
+		dup 0, room_in_ecs
 
 ; $ee00 - struct
 
 include "struct.s"
 
+room_in_struct = $9400 - *
+
 ; pad to the start of the next module
-		dup 0, $9400-*
+		dup 0, room_in_struct
 
 ; $f400 - swap1
 
 include "swap1.s"
 
-		dup 0, $9800-*
+room_in_swap1 = $9800 - *
+
+		dup 0, room_in_swap1
 
 ; $f800 - swap2
 
 include "swap2.s"
 
+room_in_swap2 = $9c00 - *
+
 ; pad to the start of the next module
-		dup 0, $9c00-*
+		dup 0, room_in_swap2
 
 ; $fc00 - swap3
 
 include "swap3.s"
 
+room_in_swap3 = jmptbl - *
+
 ; pad to the start of the next module
-		dup 0, jmptbl-*
+		dup 0, room_in_swap3
 
 include "jmptb.s"
 
@@ -88,13 +102,16 @@ include "calls.s"
 
 ; put intro program in
 
-		dup 0, $c000-*
+room_under_basic_rom = protostart-*
+		dup 0, protostart-*
 
 include "intro.s"
 
+room_in_intro = $cb00 - *
+
 ;* skip rest of proto area *
 
-		dup 0,$cb00-*
+		dup 0, room_in_intro
 
 swapper0:
 		sta swappg1
@@ -406,7 +423,9 @@ convchr1:
 		and #127
 		rts
 
-		dup 0, $cd00-*
+room_in_swapper = $cd00 - *
+
+		dup 0, room_in_swapper
 
 ; interface page jmp table
 
@@ -563,7 +582,9 @@ farerr:
 		sta 1
 		jmp error
 
-		dup 0, $ce00-*
+room_in_interface_page = $ce00 - *
+
+		dup 0, room_in_interface_page
 
 ; buffer page
 
@@ -625,7 +646,9 @@ rvisnum:
 version:
 		cbm version_string
 
-; version 1.3
+; version in floating point
 
 versnum:
-		byte $81,$26,$66,$66,$66
+;		byte $81, $19, $99, $99, $9a ; 1.2
+;		byte $81, $26, $66, $66, $66 ; 1.3
+		byte $82, $00, $00, $00, $00 ; 2.0
