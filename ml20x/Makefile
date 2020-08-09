@@ -20,4 +20,29 @@ image20.prg: chr.imagelogo scn.imagelogo col.imagelogo
 rs232.prg: rs232_swift.prg rs232_user.prg
 
 clean :
-	rm -f *~ *.sym_by_* $(TARGETS)
+	rm -f *~ *.sym_by_* $(TARGETS) *.tar.gz *.zip
+
+release: dist
+	cp ml-source.tar.gz ml.d81 ~/Public/public-downloads/content/
+
+dist: ml-source.tar.gz ml.d81
+
+ml-source.tar.gz: Makefile *.s
+	tar czf ml-source.tar.gz Makefile *.s
+
+ml.d81: *.prg
+	c1541 -format image,ml d81 ml.d81 \
+	-write boot20.prg "boot 2.0" \
+	-write image20.prg "image 2.0" \
+	-write ml20.prg "ml 2.0" \
+	-write rs232.prg "ml.rs232" \
+	-write punter.prg "++ punter" \
+	-write xmodem.prg "++ xmodem" \
+	-write clock.prg "++ clock" \
+	-write copier.prg "++ copier" \
+	-write menu2.prg "++ menu2" \
+	-write net.prg "++ net" \
+	-write path.prg "++ path" \
+	-write post.prg "++ post" \
+	-write sort.prg "++ sort" \
+	-write tagscan.prg "++ tagscan"
