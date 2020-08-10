@@ -1,16 +1,59 @@
-During boot
+During boot (contents of the ML file)
 
-$7000 to $7FFF editor code location in "ml.prg"
+$6C00 to $6FFF Wedge code
+$7000 to $7FFF editor code
+$8000 to $83FF Garbage collector
+$8400 to $8DFF ECS code
+$8E00 to $93FF Struct code
+$9400 to $97FF Swap1 code
+$9800 to $9BFF Swap2 code
+$9C00 to $9FFF Swap3 code
+
+Everything after this point is the same as the next section.
+
 
 While running
 
 $0800 to $0AFF rs232 driver
 $0B00 to $0B7F rs232 input buffer
 $0B80 to $0BFF rs232 output buffer
-$0C00 to $1000 basic wedge
+$0C00 to $0FFF basic wedge
+$1000 to $12FF temporary screen data
+$1300 to $130F chktbl
+$1310 to $13CF bartbl
+$13D0 to $13DF array pointers
+$13E0 to $13EC days per month
+$13ED to $13EF unused
+$13F0 to $144F sounds
+$1450 to $147F net alarms
+$1480 to $14FF ASCII to CBM translation table
+$1500 to $15FF CBM to ASCII translation table
+$1600 to $161F tblcta1
+$1620 to $163F tblcta2
+$1640 to $165F tblcta3
+$1660 to $16E0 alarm table
+$16E0 to $16FF date buffer
+$1700 to $1718 lobytes
+$1719 to $1731 hibytes
+$1732 to $174A lobytec
+$174B to $1763 hibytec
+$1764 to $177F unused
+$1780 to $17FF pmodetbl
 $1800 to $27FF editor execution location (swapped in when needed)
-$D000 to $DFFF editor swap location (code is here before it runs)
+$1800 to $9FFF BASIC program area
+$A000 to $BFFF BASIC ROM / Image ML routines in RAM
+$C000 to $CAFF "Protocol" block for loadable ML code
 $CB00 to $CCFF swapper area
 $CD00 to $CDFF interface page
 $CE00 to $CDFF buffer page
 $CF00 to $CFFF ???
+$D000 to $DFFF I/O memory
+$D000 to $DFFF Character ROM
+$D000 to $DFFF editor swap location (code is here when waiting to run)
+$E000 to $FFFF KERNAL ROM / Image ML "swap" code in ROM 
+$E000 to $E3FF garbage collector swap module
+$E400 to $EDFF ECS swap module
+$EE00 to $F3FF Struct swap module
+$F400 to $F7FF Swap1 swap module
+$F800 to $FBFF Swap2 swap module
+$FC00 to $FFFF Swap3 swap module
