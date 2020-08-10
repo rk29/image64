@@ -393,7 +393,7 @@ editor_exec_address = $1800
 ; address of modules  when they are "swapped out", waiting to be used
 
 editor_swap_address = $d000
-gs_swap_address = $e000
+gc_swap_address = $e000
 ecs_swap_address = $e400
 struct_swap_address = $ee00
 swap1_swap_address = $f400
