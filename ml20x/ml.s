@@ -3,6 +3,10 @@ version_string = "2020-08-08 18:32"
 
 include "equat.s"
 
+;;;
+;;; wedge
+;;;
+
 org $6c00, "ml.prg"
 
 ; $0c00 - wedge
@@ -14,7 +18,9 @@ room_in_wedge = $7000 - *
 ; pad to the start of the next module
 		dup 0, room_in_wedge
 
-; $d000 - editor
+;;;
+;;; editor
+;;;
 
 include "editor.s"
 
@@ -23,7 +29,9 @@ room_in_editor = $8000 - *
 ; pad to the start of the next module
 		dup 0, room_in_editor
 
-; $e000 - garbage collect
+;;;
+;;; gc
+;;;
 
 include "gc.s"
 
@@ -31,6 +39,10 @@ room_in_gc = $8400 - *
 
 ; pad to the start of the next module
 		dup 0, room_in_gc
+
+;;;
+;;; ecs
+;;;
 
 ; $e400 - e.c.s. checker
 
@@ -41,7 +53,9 @@ room_in_ecs = $8e00 - *
 ; pad to the start of the next module
 		dup 0, room_in_ecs
 
-; $ee00 - struct
+;;;
+;;; struct
+;;;
 
 include "struct.s"
 
@@ -50,7 +64,9 @@ room_in_struct = $9400 - *
 ; pad to the start of the next module
 		dup 0, room_in_struct
 
-; $f400 - swap1
+;;;
+;;; swap1
+;;;
 
 include "swap1.s"
 
@@ -58,7 +74,9 @@ room_in_swap1 = $9800 - *
 
 		dup 0, room_in_swap1
 
-; $f800 - swap2
+;;;
+;;; swap2
+;;;
 
 include "swap2.s"
 
@@ -67,7 +85,9 @@ room_in_swap2 = $9c00 - *
 ; pad to the start of the next module
 		dup 0, room_in_swap2
 
-; $fc00 - swap3
+;;;
+;;; swap3
+;;;
 
 include "swap3.s"
 
@@ -475,12 +495,26 @@ usetbl0:
 		sta 780
 		stx 781
 		sty 782
+
+; get index into jump table in X
 		asl
 		tax
+
+; preserve ROM selection state
+
 		lda 1
 		pha
+
+; make sure we can access RAM under the BASIC ROM
+
 		lda #$36
 		sta 1
+
+; get the address from the jump table with interrupts disabled
+; to avoid race conditions where interrupt code changes addresses in the
+; jump table
+; puts the address in Y(lo)/X(hi)
+
 		php
 		sei
 		lda jmptbl,x
@@ -488,6 +522,9 @@ usetbl0:
 		lda jmptbl+1,x
 		tax
 		plp
+
+; if the target is under the kernel, call using "caller" swap code to visible memory
+
 		lda #<caller
 		sta jump+1
 		lda #>caller
@@ -498,6 +535,9 @@ usetbl0:
 		stx jump+2
 		ldx 781
 		ldy 782
+
+; jump to the target (self modifying code sets the address)
+
 jump:
 		jsr $ffff
 		sta 780

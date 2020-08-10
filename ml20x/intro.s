@@ -10,24 +10,33 @@ devnum = 186
 
 intro:
 
-;fake rs232 driver
+;fake rs232 driver filled with "RTS" instructions
+
 		lda #$60
 		ldy #0
 intro_loop1:
 		sta rs232,y
 		dey
 		bne intro_loop1
-;move editor
+
+; move editor code to it's "swapped out" location
+; also moves other modules after the editor
+; TODO split this out to swap each module individually
+
 		lda #$70
 		ldy #$d0
 		ldx #48
 		jsr swapper
-;move wedge
+
+;move wedge to it's execution location
+
 		lda #$6c
 		ldy #$0c
 		ldx #4
 		jsr swapper
-;load "im"
+
+;load "im" basic program
+
 		ldx #<prgstart
 		ldy #>prgstart
 		stx $2b
