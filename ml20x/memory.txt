@@ -1,4 +1,16 @@
-$1800 to $27FF editor execution location
-$D000 to $DFFF editor swap location (code is here before it runs)
+During boot
+
 $7000 to $7FFF editor code location in "ml.prg"
-$CB00 to $CCFF interface area (swapper, etc)
+
+While running
+
+$0800 to $0AFF rs232 driver
+$0B00 to $0B7F rs232 input buffer
+$0B80 to $0BFF rs232 output buffer
+$0C00 to $1000 basic wedge
+$1800 to $27FF editor execution location (swapped in when needed)
+$D000 to $DFFF editor swap location (code is here before it runs)
+$CB00 to $CCFF swapper area
+$CD00 to $CDFF interface page
+$CE00 to $CDFF buffer page
+$CF00 to $CFFF ???
