@@ -203,13 +203,6 @@ loop:
 		bpl loop
 		ldx #15
 		jsr putvar ;lp
-		jsr zero
-		lda rvisnum
-		sta var+1
-		lda rvisnum+1
-		sta var
-		ldx #30
-		jmp putvar ;a%
 
 scrnset:
 		sta blnkflag
@@ -682,11 +675,6 @@ ha560:
 decchr:
 		byte $30,$30,$30,$30,$30
 		byte $31,$30,$31
-
-; the revision number of this ml
-
-rvisnum:
-		word revision
 
 ; the date this ml was made
 
