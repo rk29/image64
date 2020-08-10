@@ -46,3 +46,21 @@ ml.d81: $(TARGETS)
 	-write post.prg "++ post" \
 	-write sort.prg "++ sort" \
 	-write tagscan.prg "++ tagscan"
+
+emu: $(TARGETS)
+	cp emulated/8.d81 emulated/8-updated.d81
+	c1541 -attach emulated/8-updated.d81 \
+	-delete "boot 3.0"   -write boot.prg "boot 3.0" \
+	-delete "image 3.0"  -write image.prg "image 3.0" \
+	-delete "ml 3.0"     -write ml.prg "ml 3.0" \
+	-delete "ml.rs232"   -write rs232.prg "ml.rs232" \
+	-delete "++ punter"  -write punter.prg "++ punter" \
+	-delete "++ xmodem"  -write xmodem.prg "++ xmodem" \
+	-delete "++ clock"   -write clock.prg "++ clock" \
+	-delete "++ copier"  -write copier.prg "++ copier" \
+	-delete "++ menu2"   -write menu2.prg "++ menu2" \
+	-delete "++ net"     -write net.prg "++ net" \
+	-delete "++ path"    -write path.prg "++ path" \
+	-delete "++ post"    -write post.prg "++ post" \
+	-delete "++ sort"    -write sort.prg "++ sort" \
+	-delete "++ tagscan" -write tagscan.prg "++ tagscan"
