@@ -502,13 +502,13 @@ usetbl0:
 
 ; preserve ROM selection state
 
-		lda 1
+		lda r6510
 		pha
 
 ; make sure we can access RAM under the BASIC ROM
 
-		lda #$36
-		sta 1
+		lda #r6510_basic_ram
+		sta r6510
 
 ; get the address from the jump table with interrupts disabled
 ; to avoid race conditions where interrupt code changes addresses in the
@@ -542,7 +542,7 @@ jump:
 		jsr $ffff
 		sta 780
 		pla
-		sta 1
+		sta r6510
 		lda 780
 nothing:
 		rts
@@ -551,15 +551,15 @@ nothing:
 
 newout:
 		sta $9e
-		lda 1
+		lda r6510
 		pha
-		lda #$36
-		sta 1
+		lda #r6510_basic_ram
+		sta r6510
 		lda $9e
 		jsr out
 		sta $9e
 		pla
-		sta 1
+		sta r6510
 		lda $9e
 		rts
 oldout:

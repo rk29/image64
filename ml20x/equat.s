@@ -8,7 +8,7 @@ ridbs = $29c
 
 ; control-codes
 
-dish = $08     ; disable case-shift 
+dish = $08     ; disable case-shift
 ensh = $09     ; enable case-shift
 swlc = $0e     ; switch to lower case
 swuc = $8e     ; switch to upper case
@@ -372,4 +372,31 @@ nbinfl=hdrblk+$10
 loadad=hdrblk+$1a
 blmilo=hdrblk+$20
 nrpblk=hdrblk+$12
+
+; 6510 data direction register
+
+d6501 = 0
+
+; 6510 data register
+
+r6510 = 1
+
+r6510_loram =           %00000001 ; (out) 1=basic, 0=RAM
+r6510_hiram =           %00000010 ; (out) 1=kernal, 0=RAM
+r6510_charen =          %00000100 ; (out) 1=I/O, 0=Character ROM
+r6510_cassette_data =   %00001000 ; (out) cassette port data output line
+r6510_cassette_switch = %00010000 ; (in) senses the cassette switch
+r6510_cassette_motor =  %00100000 ; (out) 1=motor on, 0=motor off
+r6510_nc1            =  %01000000 ; not connected
+r6510_nc2            =  %10000000 ; not connected
+
+
+; allow access to all ram ($34)
+r6510_all_ram = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen)
+
+; "normal" for this register is $37
+r6510_normal = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen | r6510_hiram | r6510_loram)
+
+; $allow access to the RAM "underneath" the BASIC ROM ($36)
+r6510_basic_ram = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen | r6510_hiram)
 
