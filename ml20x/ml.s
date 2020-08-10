@@ -147,6 +147,10 @@ swapper0:
 swapagn0:
 		lda #$d3 ; reverse capital "S"
 		sta tdisp+31
+		lda swappg1
+		sta tdisp+32
+		lda swappg2
+		sta tdisp+33
 		jsr rsdisab
 		sei
 		lda r6510
@@ -182,8 +186,10 @@ swapr1:
 		sta r6510
 		cli
 		jsr rsinabl
-		lda #$a0
+		lda #$a0 ; reverse space
 		sta tdisp+31
+		sta tdisp+32
+		sta tdisp+33
 		rts
 
 getversn:
