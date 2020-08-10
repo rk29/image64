@@ -1,4 +1,4 @@
-offset $c000-*
+offset protostart - *
 namespace "swap3"
 
 hc000:

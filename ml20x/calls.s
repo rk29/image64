@@ -81,7 +81,7 @@ caller2:
 ; self modifying code sets the low byte of the jump
 
 calljmp:
-		jsr $c000
+		jsr protostart
 		sta 780
 		stx 781
 		sty 782
@@ -122,7 +122,7 @@ callswap:
 ; swap the module to the execution address
 
 callswp1:
-		ldy #>$c000
+		ldy #>protostart
 		jsr swapper
 
 ; restore all registers

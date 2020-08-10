@@ -1,4 +1,4 @@
-offset $c000-*
+offset protostart - *
 namespace "struct"
 
 ;putstruc - put string into struct
