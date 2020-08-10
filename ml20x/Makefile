@@ -27,8 +27,8 @@ release: dist
 
 dist: ml-source.tar.gz ml.d81
 
-ml-source.tar.gz: Makefile *.s
-	tar czf ml-source.tar.gz Makefile *.s
+ml-source.tar.gz: Makefile *.s memory.txt
+	tar czf ml-source.tar.gz Makefile *.s memory.txt
 
 ml.d81: $(TARGETS)
 	c1541 -format image,ml d81 ml.d81 \
