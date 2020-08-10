@@ -7,16 +7,15 @@ include "equat.s"
 ;;; wedge
 ;;;
 
-org $6c00, "ml.prg"
-
-; $0c00 - wedge
+org wedge_load_address, "ml.prg"
 
 include "wedge.s"
 
-room_in_wedge = $7000 - *
+room_in_wedge = editor_load_address - *
 
 ; pad to the start of the next module
 		dup 0, room_in_wedge
+wedge_module_size = * - wedge_load_address
 
 ;;;
 ;;; editor
@@ -24,10 +23,11 @@ room_in_wedge = $7000 - *
 
 include "editor.s"
 
-room_in_editor = $8000 - *
+room_in_editor = gc_load_address - *
 
 ; pad to the start of the next module
 		dup 0, room_in_editor
+editor_module_size = * - editor_load_address
 
 ;;;
 ;;; gc
@@ -35,10 +35,11 @@ room_in_editor = $8000 - *
 
 include "gc.s"
 
-room_in_gc = $8400 - *
+room_in_gc = ecs_load_address - *
 
 ; pad to the start of the next module
 		dup 0, room_in_gc
+gc_module_size = * - gc_load_address
 
 ;;;
 ;;; ecs
@@ -48,10 +49,11 @@ room_in_gc = $8400 - *
 
 include "ecs.s"
 
-room_in_ecs = $8e00 - *
+room_in_ecs = struct_load_address - *
 
 ; pad to the start of the next module
 		dup 0, room_in_ecs
+ecs_module_size = * - ecs_load_address
 
 ;;;
 ;;; struct
@@ -59,10 +61,11 @@ room_in_ecs = $8e00 - *
 
 include "struct.s"
 
-room_in_struct = $9400 - *
+room_in_struct = swap1_load_address - *
 
 ; pad to the start of the next module
 		dup 0, room_in_struct
+struct_module_size = * - struct_load_address
 
 ;;;
 ;;; swap1
@@ -70,9 +73,11 @@ room_in_struct = $9400 - *
 
 include "swap1.s"
 
-room_in_swap1 = $9800 - *
+room_in_swap1 = swap2_load_address - *
 
+; pad to the start of the next module
 		dup 0, room_in_swap1
+swap1_module_size = * - swap1_load_address
 
 ;;;
 ;;; swap2
@@ -80,10 +85,11 @@ room_in_swap1 = $9800 - *
 
 include "swap2.s"
 
-room_in_swap2 = $9c00 - *
+room_in_swap2 = swap3_load_address - *
 
 ; pad to the start of the next module
 		dup 0, room_in_swap2
+swap2_module_size = * - swap2_load_address
 
 ;;;
 ;;; swap3
@@ -95,6 +101,7 @@ room_in_swap3 = jmptbl - *
 
 ; pad to the start of the next module
 		dup 0, room_in_swap3
+swap3_module_size = * - swap3_load_address
 
 include "jmptb.s"
 
@@ -529,7 +536,7 @@ usetbl0:
 		sta jump+1
 		lda #>caller
 		sta jump+2
-		cpx #$e0
+		cpx #>kernal_rom_start
 		bcs jump
 		sty jump+1
 		stx jump+2

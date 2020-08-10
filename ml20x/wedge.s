@@ -1,4 +1,4 @@
-offset $0c00-*
+offset wedge_exec_address - *
 namespace "wedge"
 
 ; jump table

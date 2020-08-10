@@ -23,16 +23,16 @@ intro_loop1:
 ; also moves other modules after the editor
 ; TODO split this out to swap each module individually
 
-		lda #$70
-		ldy #$d0
+		lda #>editor_load_address
+		ldy #>editor_swap_address
 		ldx #48
 		jsr swapper
 
 ;move wedge to it's execution location
 
-		lda #$6c
-		ldy #$0c
-		ldx #4
+		lda #>wedge_load_address
+		ldy #>wedge_exec_address
+		ldx #>wedge_module_size
 		jsr swapper
 
 ;load "im" basic program

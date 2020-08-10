@@ -1,4 +1,4 @@
-offset $1800-*
+offset editor_exec_address - *
 namespace "editor"
 
 editor_version = "01/22/91 06:51p"

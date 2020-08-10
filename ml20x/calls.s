@@ -105,19 +105,19 @@ callswap:
 
  ; swap1, swap2, swap3 must be the same size
 
-		ldx #4 ;swap1/2
-		cmp #>$f400
+		ldx #>swap1_module_size
+		cmp #>swap1_swap_address
 		bcs callswp1
 
-		ldx #6 ;struct
-		cmp #>$ee00
+		ldx #>struct_module_size
+		cmp #>struct_swap_address
 		bcs callswp1
 
-		ldx #10 ;ecs
-		cmp #>$e400
+		ldx #>ecs_module_size
+		cmp #>ecs_swap_address
 		bcs callswp1
 
-		ldx #4 ;gc
+		ldx #gc_module_size
 
 ; swap the module to the execution address
 

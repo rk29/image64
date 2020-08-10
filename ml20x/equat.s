@@ -373,6 +373,37 @@ loadad=hdrblk+$1a
 blmilo=hdrblk+$20
 nrpblk=hdrblk+$12
 
+; address of modules in the ml file (where they initially load)
+
+wedge_load_address = $6c00
+editor_load_address = $7000
+gc_load_address = $8000
+ecs_load_address = $8400
+struct_load_address = $8e00
+swap1_load_address = $9400
+swap2_load_address = $9800
+swap3_load_address = $9c00
+
+; address of modules when they are executing
+; swap modules use protostart if not listed here
+
+wedge_exec_address = $0c00
+editor_exec_address = $1800
+
+; address of modules  when they are "swapped out", waiting to be used
+
+editor_swap_address = $d000
+gs_swap_address = $e000
+ecs_swap_address = $e400
+struct_swap_address = $ee00
+swap1_swap_address = $f400
+swap2_swap_address = $f800
+swap3_swap_address = $fc00
+
+; start of the kernal ROM
+
+kernal_rom_start = $e000
+
 ; 6510 data direction register
 
 d6501 = 0
