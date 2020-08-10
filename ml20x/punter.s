@@ -340,15 +340,15 @@ xfer1:
 		lda $62
 		eor #$ff
 		rol
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		lda #0
 		sta $65
 		jsr $bc4f
 		pla
-		sta 1
+		sta r6510
 		lda $66
 		ora #$7f
 		and $62

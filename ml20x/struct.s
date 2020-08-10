@@ -77,10 +77,10 @@ entry1:
 entry2:
 		sty count
 		stx func
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		txa
 		sec
 		sbc #4
@@ -93,7 +93,7 @@ entry2:
 strucjmp:
 		jsr strucrts
 		pla
-		sta 1
+		sta r6510
 strucrts:
 		rts
 

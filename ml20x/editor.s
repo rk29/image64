@@ -1857,11 +1857,11 @@ quad:
 		sta quad1+2
 		jsr rsdisab
 		php
-		lda 1
+		lda r6510
 		pha
 		sei
-		lda #51
-		sta 1
+		lda #r6510_char_rom
+		sta r6510
 		ldy #7
 quad1:
 		lda $ffff,y
@@ -1869,7 +1869,7 @@ quad1:
 		dey
 		bpl quad1
 		pla
-		sta 1
+		sta r6510
 		plp
 		jsr rsinabl
 		ldy #3

@@ -5,8 +5,8 @@ org protostart, "menu2.prg"
 ml:
 		stx ml1+1
 		sty stsize
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr fnvarx1
 		stx menubase
 		sty menubase+1

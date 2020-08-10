@@ -29,8 +29,8 @@ odpc3off = 8
 ; makelist: &,16,3,0,list(),obj(),objsize,def(),usernumber
 
 entry1:
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		stx func
 		jsr fnvarx
 		stx lstptr

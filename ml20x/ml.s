@@ -149,10 +149,10 @@ swapagn0:
 		sta tdisp+31
 		jsr rsdisab
 		sei
-		lda 1
+		lda r6510
 		pha
-		lda #$34
-		sta 1
+		lda #r6510_all_ram
+		sta r6510
 swappg1 = *+1
 		lda #$00
 		sta $6a
@@ -179,7 +179,7 @@ swapr1:
 		dec $6d
 		bne swapr1
 		pla
-		sta 1
+		sta r6510
 		cli
 		jsr rsinabl
 		lda #$a0
@@ -220,28 +220,28 @@ scrnset:
 ; find a basic variable
 
 findvar1:
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr ptrget1
 		jmp exitint
 
 ; relink basic program lines
 
 relink:
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr linkprg
 		jmp exitint
 
 fpout:
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr $bddd
 		jmp exitint
 
@@ -249,15 +249,15 @@ fpout:
 
 makeroom:
 		tax
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		txa
 		jsr makerm1
 exitint:
 		pla
-		sta 1
+		sta r6510
 		rts
 
 mlgosub:
@@ -272,22 +272,22 @@ mlgosub:
 		lda #$8d
 		pha
 mlresume:
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 mljump:
 		jsr mlgoto
 		jmp $a7ae
 
 mlgoto:
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		stx $14
 		sty $15
 		jsr $a8a3
 		pla
-		sta 1
+		sta r6510
 		rts
 
 ;* output a$
@@ -338,10 +338,10 @@ outastr:
 		jmp prtvar
 
 getstr:
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr $ad9e
 		bit $0d
 		bpl getval
@@ -362,23 +362,23 @@ getval1:
 		bne getval1
 getstr1:
 		pla
-		sta 1
+		sta r6510
 		txa
 		ldx $22
 		ldy $23
 		rts
 
 fnvar0:
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr chkcom
 		jsr $b08b
 		ldx $47
 		ldy $48
 		pla
-		sta 1
+		sta r6510
 		rts
 fnvar2:
 		jsr fnvar
@@ -387,56 +387,56 @@ fnvar2:
 		rts
 
 evalstr0:
-		lda 1
+		lda r6510
 		sta rom0
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr chkcom
 		jsr $ad9e
 		jsr $b6a3
 		pha
 		lda rom0
-		sta 1
+		sta r6510
 		pla
 		ldx $22
 		ldy $23
 		rts
 
 evalbyt0:
-		lda 1
+		lda r6510
 		sta rom0
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr chkcom
 		jsr $0079
 		jsr $b79e
 		lda rom0
-		sta 1
+		sta r6510
 		rts
 
 evalint0:
-		lda 1
+		lda r6510
 		sta rom0
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr chkcom
 		jsr frmnum
 		jsr getadr
 		ldx $14
 		ldy $15
 		lda rom0
-		sta 1
+		sta r6510
 		rts
 
 evalfil0:
-		lda 1
+		lda r6510
 		sta rom0
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr chkcom
 		jsr getfile
 		lda rom0
-		sta 1
+		sta r6510
 		rts
 
 convchr0:
@@ -604,10 +604,10 @@ rast1:
 		inc jiffy
 
 newirq:
-		lda 1
+		lda r6510
 		pha
 		lda #$36
-		sta 1
+		sta r6510
 irqt:
 		lda #$00
 		beq newirq0
@@ -619,14 +619,14 @@ newirq0:
 		sta irqt+1
 newirq1:
 		pla
-		sta 1
+		sta r6510
 		jmp $ea81
 
 ; far call to the error handler
 
 farerr:
 		lda #$37
-		sta 1
+		sta r6510
 		jmp error
 
 room_in_interface_page = $ce00 - *

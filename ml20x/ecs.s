@@ -66,13 +66,13 @@ ecsgoto:
 		sta $14
 		lda var
 		sta $15
-		lda 1
+		lda r6510
 		pha
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr $a8a3
 		pla
-		sta 1
+		sta r6510
 		rts
 
 ecschk:

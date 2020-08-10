@@ -386,11 +386,11 @@ wgone:
 		ldx #16
 		jmp error ;outofm
 wgone1:
-		lda #$36
-		sta 1
+		lda #r6510_basic_ram
+		sta r6510
 		jsr trace
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr chrget
 		cmp #cbm("&")
 		beq ampr0

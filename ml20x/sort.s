@@ -1,3 +1,5 @@
+include "equat.s"
+
 org $c000, "sort.prg"
 
 ilen = $61 ;1
@@ -61,8 +63,8 @@ calcstr:
 		rts
 
 sort:
-		lda #55
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		jsr $aefd
 		jsr $b08b
 		ldx $47

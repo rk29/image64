@@ -63,8 +63,8 @@ entry:
 		tax
 		lda #0
 		sta tcount
-		lda #$37
-		sta 1
+		lda #r6510_normal
+		sta r6510
 		tya
 		inx
 		dex

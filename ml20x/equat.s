@@ -422,6 +422,9 @@ r6510_nc1            =  %01000000 ; not connected
 r6510_nc2            =  %10000000 ; not connected
 
 
+; allow access to character ROM ($33)
+r6510_char_rom = (r6510_cassette_motor | r6510_cassette_switch | r6510_hiram | r6510_loram)
+
 ; allow access to all ram ($34)
 r6510_all_ram = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen)
 
