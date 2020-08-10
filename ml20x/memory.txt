@@ -1,0 +1,3 @@
+$1800 to $27FF editor execution location
+$D000 to $DFFF editor swap location (code is here before it runs)
+$7000 to $7FFF editor code location in "ml.prg"
