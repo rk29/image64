@@ -187,7 +187,7 @@ swapr1:
 		rts
 
 getversn:
-		lda #15
+		lda #version_length
 		sta var
 		lda #<version
 		sta var+1
@@ -195,6 +195,7 @@ getversn:
 		sta var+2
 		ldx #1
 		jsr putvar ;a$
+
 		ldy #4
 loop:
 		lda versnum,y
@@ -202,7 +203,7 @@ loop:
 		dey
 		bpl loop
 		ldx #15
-		jsr putvar ;lp
+		jmp putvar ;lp
 
 scrnset:
 		sta blnkflag
@@ -680,6 +681,7 @@ decchr:
 
 version:
 		cbm version_string
+version_length = * - version
 
 ; version in floating point
 
