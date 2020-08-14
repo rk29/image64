@@ -166,7 +166,11 @@ comk:
 comc:
 		lda mnum
 		bne comc1
-		comqc=*+1
+comqc = *+1
+
+; self-modifying
+; TODO is this a bug? should it be lda?
+
 		ldx #3
 		beq comc2
 comc1:
@@ -203,7 +207,7 @@ comj2:
 
 ;* \f - send form feed
 comf:
-		lda #$93
+		lda #clear_screen
 		sta $fe
 		jmp output
 
@@ -275,7 +279,7 @@ comm2:
 
 ;* \n - send carriage returns
 comn:
-		lda #13
+		lda #carriage_return
 		jmp repchr
 
 ;* \o - output 19 characters
@@ -291,6 +295,9 @@ comp:
 ;* \q - reset mci settings
 comq:
 		beq comq1
+
+; set default color
+
 		stx comqc
 comq1:
 		jsr comc
@@ -314,7 +321,7 @@ comr:
 		and #1
 		lsr
 		ror
-		eor #$92
+		eor #reverse_off
 		sta $fe
 		jmp outchr
 

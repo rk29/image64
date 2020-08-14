@@ -62,6 +62,10 @@ bauds:
 		byte %00011110 ;19200
 		byte %00011111 ;38400
 
+; shadow command byte
+; this is the last value set on the port
+; which should be restored after disabling then enabling interrupts
+
 shcomm:
 		byte comint1
 
@@ -97,8 +101,12 @@ oldget:
 		byte 0
 
 setup:
+
+; drop DTR initially
+
 		lda #comint0
 		sta command
+
 		ldx #0
 		lda #3
 		sta 21
@@ -106,11 +114,18 @@ setup1:
 		lda vectbl,x
 		beq setup3
 		sta 20
+
+; replace index with a "JMP" instruction
+
 		lda #$4c
 		sta vectbl,x
 		inx
+
 		ldy #0
 setup2:
+
+; swap original vector with new value
+
 		lda vectbl,x
 		pha
 		lda [20],y
@@ -122,15 +137,34 @@ setup2:
 		cpy #2
 		bcc setup2
 		jmp setup1
+
 setup3:
+
+; do a "soft" reset of the chip
+
 		lda #0
 		sta status
+
+; set initial command register settings to "rx int enabled, tx int disabled"
+
 		lda #comint1
 		sta shcomm
+
+; write the command register
+
 		jsr inable
+
+; set the image carrier detected bit based on DCD (should clear it)
+
 		jsr setcarr
+
+; set default bit rate to 1200
+
 		lda #2
 		jmp setbaud
+
+; set the carrier flag based on DCD
+; expected to only use A and Y
 
 setcarr:
 		ldy #imagecd1
@@ -142,7 +176,7 @@ setcarr1:
 		sty carrier
 		rts
 
-; ** nmi routine
+; interrupt routine
 
 nmi64:
 		pha
@@ -151,14 +185,27 @@ nmi64:
 		tya
 		pha
 		cld
+
 		lda status
 		and #statint
 		beq notacia
+
+; disable further interrupts
+; if we clear an interrupt source then another happens,
+; then the new interrupt can interrupt this handler
+
 		lda #comint0
 		sta command
+
+; handle interrupt sources
+
 		jsr rsint
+
+; enable interrupts
+
 		lda shcomm
 		sta command
+
 		pla
 		tay
 		pla
@@ -166,17 +213,23 @@ nmi64:
 		pla
 		rti
 
+; the interrupt wasn't from the ACIA, so it must have come from the "restore" key
 notacia:
 		ldy #0
 		jmp rstkey
 
-; ** check for character
+; check for character
+; expected to only use A and Y
 
 rsint:
 		jsr setcarr
+
 		lda status
 		and #statrxd
 		beq rsint2
+
+; a byte is available
+
 		lda port
 		ldy ridbe
 		sta ribuf,y
@@ -185,21 +238,34 @@ rsint:
 		ldy #0
 rsint1:
 		sty ridbe
+
+; check remaining space in buffer
+
 		tya
 		sec
 		sbc ridbs
 		and #127
 		cmp #120
 		bcc rsint2
+
+; unassert RTS to prevent more bytes from being received
+
 		lda #comrts0
 		sta command
 
 ; ** check transmit
 
 rsint2:
+
+; if the transmit register is not empty, then we're done
+
 		lda status
 		and #stattxd
 		beq rsint4
+
+; if RTS is asserted, then transmit interrupts will be disabled too
+; so we just skip output for that case
+
 		lda shcomm
 		cmp #comint1
 		beq rsint4
@@ -218,7 +284,7 @@ rsint3:
 rsint4:
 		rts
 
-; ** disable nmi
+; disable interrupts
 
 disabl:
 		php
@@ -229,7 +295,7 @@ disabl:
 		plp
 		rts
 
-; ** enable nmi
+; enable interrupts (restore to shadow value)
 
 inable:
 		php
@@ -243,14 +309,31 @@ inable:
 ; ** rs232 bsout
 
 rsout0:
+
+; try to send/receive on the port
+
 		jsr rsint
+
+; then try to put the byte in the buffer again
+
 		jmp rsout1
+
 rsout_entry:
+
+; stash for later
+
 		sta $9e
 		sty $97
+
+; disable interrupts
+
 		lda #comint0
 		sta command
+
 rsout1:
+
+; write the byte to the buffer
+
 		lda $9e
 		ldy rodbe
 		sta robuf,y
@@ -258,14 +341,28 @@ rsout1:
 		bpl rsout2
 		ldy #0
 rsout2:
+
+		; if the buffer is full, try to push bytes to the port
+
 		cpy rodbs
 		beq rsout0
+
 		sty rodbe
+
+; enable rx and tx interrupts
+
 		lda #comint2
 		sta shcomm
+
 rsout4:
+
+; restore command register, enabling interrupts
+
 		lda shcomm
 		sta command
+
+; exit and restore registers
+
 		jmp ret1
 
 xtmp:
@@ -320,11 +417,18 @@ ngetin:
 ; ** rs232 getin
 
 rsget_entry:
+
+; stash for later
+
 		sta $9e
 		sty $97
+
+; if buffer is empty, then we're done
+
 		ldy ridbs
 		cpy ridbe
 		beq ret2
+
 		lda ribuf,y
 		sta $9e
 		iny

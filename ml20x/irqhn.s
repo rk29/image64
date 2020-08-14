@@ -536,6 +536,9 @@ irq6e:
 
 ;* display lightbar checkmarks
 irq7:
+
+; self modifying code changes this
+
 		ldy #1
 		lda bar
 		and #63
@@ -560,7 +563,11 @@ irq7:
 		sta irq7a+1
 		asl
 		clc
+
 irq7a:
+
+; self modifying code changes this
+
 		adc #0
 		tay
 		lda bar
@@ -587,12 +594,14 @@ irq7c:
 irq7z:
 		rts
 
+; display either a space or a checkmark for a lightbar flag
+
 irq7d:
 		lsr
 		pha
 		lda #" "
 		bcc irq7e
-		lda #$7a
+		lda #$7a ; "checkmark"
 irq7e:
 		jsr irq7f
 		pla
@@ -601,10 +610,16 @@ irq7e:
 irq7j:
 		lda bartbl,y
 		iny
+
+; write a single character to the on-screen lightbar
+
 irq7f:
 		ora #$80
 		sta ldisp,x
 irq7g:
+
+; self-modifying code changes this
+
 		lda #15
 		sta lcolr,x
 		inx
@@ -612,12 +627,16 @@ irq7g:
 
 irq7h:
 		pha
+
+; set the highlight color for this lightbar position
+
 		lda #15
 		cpx tmpbar
 		bne irq7i
 		lda #1
 irq7i:
 		sta irq7g+1
+
 		pla
 		jsr irq7d
 		pha
@@ -669,16 +688,27 @@ chkflag8:
 		txa
 		rts
 
+; clear a flag
+
 chkflag0:
 		eor #$ff
 		and chktbl,x
 		jmp chkflag6
+
+; set a flag
+
 chkflag1:
 		ora chktbl,x
 		jmp chkflag6
+
+; toggle a flag
+
 chkflag2:
 		eor chktbl,x
 		jmp chkflag6
+
+; read a flag (basic, result in a%)
+
 chkflag3:
 		ldy #0
 		sty var
@@ -690,10 +720,16 @@ chkflg3a:
 		ldx #30
 		jsr putvar ;a%
 		jmp chkflag8
+
+; set selected position
+
 chkflag4:
 		lda $ff
 		sta bar
 		jmp chkflag7
+
+; read a flag (ml), result in accumulator
+
 chkflag5:
 		and chktbl,x
 		jmp chkflag8
