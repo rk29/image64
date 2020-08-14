@@ -354,6 +354,19 @@ rsout2:
 		lda #comint2
 		sta shcomm
 
+; update on-screen buffers
+
+		ldy scnmode
+		bne rsout4
+		ldy #0
+outdisp:
+		lda sdisp+30,y
+		sta sdisp+29,y
+		iny
+		cpy #9
+		bcc outdisp
+		lda $9e
+		sta sdisp+38
 rsout4:
 
 ; restore command register, enabling interrupts
@@ -436,6 +449,21 @@ rsget_entry:
 		ldy #0
 rsget1:
 		sty ridbs
+
+; update on screen buffers
+
+		ldy scnmode    ; 4      1 * 4
+		bne ret1       ; 2/3    1 * 2  +  0 * 3
+		ldy #0         ; 3      1 * 3
+inpdisp:
+		lda sdisp+2,y  ; 4/5    10 * 4
+		sta sdisp+1,y  ; 5      10 * 5
+		iny            ; 2      10 * 2
+		cpy #9         ; 2      10 * 2
+		bcc inpdisp    ; 2/3    3 * 10  +  2 * 1
+		lda $9e        ; 3      1 * 3
+		sta sdisp+10   ; 4      1 * 4
+
 		lda ridbe
 		sec
 		sbc ridbs
