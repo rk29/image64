@@ -375,34 +375,42 @@ rsout_entry:
 		sta $9e
 		sty $97
 
+rsout_block:
+		lda status
+		and #m6551_stat_tdr_empty
+		beq rsout_block
+
+		lda $9e
+		sta port
+
 ; disable interrupts
 
-		lda #comint_none
-		sta command
+;		lda #comint_none
+;		sta command
 
 rsout1:
 
 ; write the byte to the buffer
 
-		lda $9e
-		ldy rodbe
-		sta robuf,y
-		iny
-		bpl rsout2
-		ldy #0
-rsout2:
+;		lda $9e
+;		ldy rodbe
+;		sta robuf,y
+;		iny
+;		bpl rsout2
+;		ldy #0
+;rsout2:
 
-		; if the buffer is full, try to push bytes to the port
+; if the buffer is full, try to push bytes to the port
 
-		cpy rodbs
-		beq rsout0
+;		cpy rodbs
+;		beq rsout0
 
-		sty rodbe
+;		sty rodbe
 
 ; enable rx and tx interrupts
 
-		lda #comint_rxtx
-		sta shcomm
+;		lda #comint_rxtx
+;		sta shcomm
 
 ; update on-screen buffers
 
@@ -421,8 +429,8 @@ rsout4:
 
 ; restore command register, enabling interrupts
 
-		lda shcomm
-		sta command
+;		lda shcomm
+;		sta command
 
 ; exit and restore registers
 
