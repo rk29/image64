@@ -62,11 +62,11 @@ comrts0 = m6551_cmd_dtr_low |  m6551_cmd_rxint_disabled | m6551_cmd_tx_0 | m6551
 statint = %10000000 ; interrupt has occurred
 statdsr = %01000000 ; Data Set Ready: 0=DSR low (ready), 1=DSR high (not ready)
 statdcd = %00100000 ; Carrier detect: 0=DCD low (detected), 1=DCD high (not detected)
-stattxd = %00010000 ; transmit data register empty: 0=not empty, 1=empty
-statrxd = %00001000 ; receive data register full: 0=not full, 1=full
-m6551_stat_overrun = %00000100 ; overrun: 0=no overrun, 1=overrun detected
-m6551_stat_framing = %00000010 ; framing error: 0=no error, 1=error detected
-m6551_stat_parity =  %00000001 ; parity error: 0=no error, 1=error detected
+m6551_stat_tdr_empty = %00010000 ; transmit data register empty: 0=not empty, 1=empty
+m6551_stat_rdr_full =  %00001000 ; receive data register full: 0=not full, 1=full
+m6551_stat_overrun =   %00000100 ; overrun: 0=no overrun, 1=overrun detected
+m6551_stat_framing =   %00000010 ; framing error: 0=no error, 1=error detected
+m6551_stat_parity =    %00000001 ; parity error: 0=no error, 1=error detected
 
 imagecd0=%00000000 ;none
 imagecd1=%00010000 ;carrier
@@ -265,7 +265,7 @@ rsint:
 		jsr setcarr
 
 		lda status
-		and #statrxd
+		and #m6551_stat_rdr_full
 		beq rsint2
 
 ; a byte is available
@@ -300,15 +300,15 @@ rsint2:
 ; if the transmit register is not empty, then we're done
 
 		lda status
-		and #stattxd
+		and #m6551_stat_tdr_empty
 		beq rsint_done
 
 ; if RTS is asserted, then transmit interrupts will be disabled too
 ; so we just skip output for that case
 
 		lda shcomm
-		cmp #comrts0
-		beq rsint_done
+		cmp #comint_rxtx
+		bne rsint_done
 
 		ldy rodbs
 		lda robuf,y
