@@ -23,19 +23,59 @@ status=port+1
 command=port+2
 control=port+3
 
-comint0=%00001011 ;nmi off
-comint1=%00001001 ;rxd on
-comint2=%00000101 ;txd/rxd
-comdtr0=%00001000 ;dtr off
-comrts0=%00000001 ;rts off
+; command port values
 
-statdcd=%01000000 ;carrier
-statrxd=%00001000 ;receive
-stattxd=%00010000 ;transmit
-statint=%10000000 ;nmi
+m6551_cmd_dtr_high =       %00000000 ; high is not asserted.
+m6551_cmd_dtr_low =        %00000001 ; low is asserted
+m6551_cmd_rxint_enabled =  %00000000
+m6551_cmd_rxint_disabled = %00000010
+m6551_cmd_tx_0 =           %00000000 ; interrupt disabled, RTS high (not asserted)
+m6551_cmd_tx_1 =           %00000100 ; interrupt enabled, RTS low (asserted)
+m6551_cmd_tx_2 =           %00001000 ; interrupt disabled, RTS low (asserted)
+m6551_cmd_tx_3 =           %00001100 ; interrupt disabled, RTS low (asserted), transmit break
+m6551_cmd_echo_off =       %00000000
+m6551_cmd_echo_on =        %00010000
+m6551_cmd_parity_none =    %00000000
+m6551_cmd_parity_odd =     %00100000
+m6551_cmd_parity_even =    %01100000
+m6551_cmd_parity_mark =    %10100000
+m6551_cmd_parity_space =   %11100000
+
+; interrupts disabled
+comint_none = m6551_cmd_dtr_low | m6551_cmd_rxint_disabled | m6551_cmd_tx_2 | m6551_cmd_echo_off | m6551_cmd_parity_none
+
+; receive interrupt enabled, transmit interrupt disabled
+comint_rx =  m6551_cmd_dtr_low | m6551_cmd_rxint_enabled | m6551_cmd_tx_2 | m6551_cmd_echo_off | m6551_cmd_parity_none
+
+; all interrupts enabled
+comint_rxtx = m6551_cmd_dtr_low |  m6551_cmd_rxint_enabled | m6551_cmd_tx_1 | m6551_cmd_echo_off | m6551_cmd_parity_none
+
+; unassert DTR - tells the device we are not online
+; also disables interrupts, since they should not happen anyway
+comdtr0 = m6551_cmd_dtr_high | m6551_cmd_rxint_disabled | m6551_cmd_tx_2 | m6551_cmd_echo_off | m6551_cmd_parity_none
+
+; unassert RTS - tells the device to stop sending
+; The 6551 disables tx interrupts when you unassert RTS
+; This setting also disables rx interrupts, since they should not happen anyway
+comrts0 = m6551_cmd_dtr_low |  m6551_cmd_rxint_disabled | m6551_cmd_tx_0 | m6551_cmd_echo_off | m6551_cmd_parity_none
+
+statint = %10000000 ; interrupt has occurred
+statdsr = %01000000 ; Data Set Ready: 0=DSR low (ready), 1=DSR high (not ready)
+statdcd = %00100000 ; Carrier detect: 0=DCD low (detected), 1=DCD high (not detected)
+stattxd = %00010000 ; transmit data register empty: 0=not empty, 1=empty
+statrxd = %00001000 ; receive data register full: 0=not full, 1=full
+m6551_stat_overrun = %00000100 ; overrun: 0=no overrun, 1=overrun detected
+m6551_stat_framing = %00000010 ; framing error: 0=no error, 1=error detected
+m6551_stat_parity =  %00000001 ; parity error: 0=no error, 1=error detected
 
 imagecd0=%00000000 ;none
 imagecd1=%00010000 ;carrier
+
+; when there are this many or more bytes in the input buffer, disable rx
+upper_flow_control_threshold = 120
+
+; when there are less than this many bytes in the input buffer, enable rx
+lower_flow_control_threshold = 100
 
 first:
 
@@ -67,7 +107,7 @@ bauds:
 ; which should be restored after disabling then enabling interrupts
 
 shcomm:
-		byte comint1
+		byte comint_rx
 
 vectbl:
 
@@ -104,7 +144,7 @@ setup:
 
 ; drop DTR initially
 
-		lda #comint0
+		lda #comint_none
 		sta command
 
 		ldx #0
@@ -147,7 +187,7 @@ setup3:
 
 ; set initial command register settings to "rx int enabled, tx int disabled"
 
-		lda #comint1
+		lda #comint_rx
 		sta shcomm
 
 ; write the command register
@@ -194,7 +234,7 @@ nmi64:
 ; if we clear an interrupt source then another happens,
 ; then the new interrupt can interrupt this handler
 
-		lda #comint0
+		lda #comint_none
 		sta command
 
 ; handle interrupt sources
@@ -261,27 +301,37 @@ rsint2:
 
 		lda status
 		and #stattxd
-		beq rsint4
+		beq rsint_done
 
 ; if RTS is asserted, then transmit interrupts will be disabled too
 ; so we just skip output for that case
 
 		lda shcomm
-		cmp #comint1
-		beq rsint4
+		cmp #comrts0
+		beq rsint_done
+
 		ldy rodbs
 		lda robuf,y
 		sta port
 		iny
 		bpl rsint3
+
+; wrap at $7F
+
 		ldy #0
 rsint3:
 		sty rodbs
 		cpy rodbe
-		bne rsint4
-		lda #comint1
+		bne rsint_done
+
+rsint_disable_tx:
+
+; no bytes remaining in output buffer, so we disable tx interrupts
+
+		lda #comint_rx
 		sta shcomm
-rsint4:
+
+rsint_done:
 		rts
 
 ; disable interrupts
@@ -289,7 +339,7 @@ rsint4:
 disabl:
 		php
 		pha
-		lda #comint0
+		lda #comint_none
 		sta command
 		pla
 		plp
@@ -327,7 +377,7 @@ rsout_entry:
 
 ; disable interrupts
 
-		lda #comint0
+		lda #comint_none
 		sta command
 
 rsout1:
@@ -351,7 +401,7 @@ rsout2:
 
 ; enable rx and tx interrupts
 
-		lda #comint2
+		lda #comint_rxtx
 		sta shcomm
 
 ; update on-screen buffers
