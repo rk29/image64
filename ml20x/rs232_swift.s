@@ -375,6 +375,8 @@ rsout_entry:
 		sta $9e
 		sty $97
 
+		jsr setcarr
+
 rsout_block:
 		lda status
 		and #m6551_stat_tdr_empty
