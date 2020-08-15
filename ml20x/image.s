@@ -112,7 +112,7 @@ loop:
 		rts
 
 file1:
-		cbm "ml 3.0"
+		cbm "ml " + version_number
 file1_len = * - file1
 
 boot:

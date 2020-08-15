@@ -46,7 +46,7 @@ boot:
 ; the filename for the ml file
 
 file:
-		cbm "image 3.0"
+		cbm "image " + version_number
 filename_length = * - file
 
 		dup 0, $0300 - *

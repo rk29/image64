@@ -160,7 +160,7 @@ loop:
 
 copymsg:
 		byte function_key_6, british_pound, 95
-		cbm "07IMAGE BBS 64 V3.0"
+		cbm "07IMAGE BBS 64 V" + version_number
 		byte function_key_6
 copylen = *-copymsg
 

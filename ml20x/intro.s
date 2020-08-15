@@ -515,7 +515,7 @@ startmsg:
 
 bootvers:
 		byte clear_screen
-		cbm " Image BBS V3.0 "
+		cbm " Image BBS V" + version_number + " "
 		byte british_pound
 		cbm "$a"
 		byte function_key_6

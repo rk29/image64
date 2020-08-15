@@ -1,3 +1,5 @@
+version_number = "3.0"
+
 ;image ml equates
 
 var = $61
