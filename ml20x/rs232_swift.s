@@ -496,6 +496,9 @@ rsget_entry:
 		sta $9e
 		sty $97
 
+
+		jsr setcarr
+
 ; if buffer is empty, then we're done
 
 		ldy ridbs
