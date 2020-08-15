@@ -1,0 +1,9 @@
+DCD 1-4 DTR
+RXD 2-3 TXD
+TXD 3-2 RXD
+DTR 4-1 DCD
+GND 5-5 GND
+DSR 6 not used
+RTS 7-8 CTS
+CTS 8-7 RTS
+RI  9 not used
