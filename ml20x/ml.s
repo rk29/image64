@@ -1,181 +1,176 @@
-revision = 1
-version_string = "2020-08-08 18:32"
+.label revision = 1
+.var version_string = "2020-08-08 18:32"
 
-include "equat.s"
+.encoding "petscii_mixed"
 
-;;;
-;;; wedge
-;;;
+#import "equat.s"
 
-org wedge_load_address, "ml.prg"
+//////
+////// wedge
+//////
 
-include "wedge.s"
+* = wedge_load_address "ml.prg"
 
-room_in_wedge = editor_load_address - *
+#import "wedge.s"
 
-; pad to the start of the next module
-		dup 0, room_in_wedge
-wedge_module_size = * - wedge_load_address
+.label room_in_wedge = editor_load_address - *
+* = editor_load_address "editor"
 
-;;;
-;;; editor
-;;;
+.label wedge_module_size = * - wedge_load_address
 
-include "editor.s"
+//////
+////// editor
+//////
 
-room_in_editor = gc_load_address - *
+#import "editor.s"
 
-; pad to the start of the next module
-		dup 0, room_in_editor
-editor_module_size = * - editor_load_address
+.label room_in_editor = gc_load_address - *
+* = gc_load_address "gc"
 
-;;;
-;;; gc
-;;;
+.label editor_module_size = * - editor_load_address
 
-include "gc.s"
+//////
+////// gc
+//////
 
-room_in_gc = ecs_load_address - *
+#import "gc.s"
 
-; pad to the start of the next module
-		dup 0, room_in_gc
-gc_module_size = * - gc_load_address
+.label room_in_gc = ecs_load_address - *
+* = ecs_load_address "ecs"
 
-;;;
-;;; ecs
-;;;
+.label gc_module_size = * - gc_load_address
 
-; $e400 - e.c.s. checker
+//////
+////// ecs
+//////
 
-include "ecs.s"
+// $e400 - e.c.s. checker
 
-room_in_ecs = struct_load_address - *
+#import "ecs.s"
 
-; pad to the start of the next module
-		dup 0, room_in_ecs
-ecs_module_size = * - ecs_load_address
+.label room_in_ecs = struct_load_address - *
+* = struct_load_address "struct"
 
-;;;
-;;; struct
-;;;
+.label ecs_module_size = * - ecs_load_address
 
-include "struct.s"
+//////
+////// struct
+//////
 
-room_in_struct = swap1_load_address - *
+#import "struct.s"
 
-; pad to the start of the next module
-		dup 0, room_in_struct
-struct_module_size = * - struct_load_address
+.label room_in_struct = swap1_load_address - *
+* = swap1_load_address "swap1"
 
-;;;
-;;; swap1
-;;;
+.label struct_module_size = * - struct_load_address
 
-include "swap1.s"
+//////
+////// swap1
+//////
 
-room_in_swap1 = swap2_load_address - *
+#import "swap1.s"
 
-; pad to the start of the next module
-		dup 0, room_in_swap1
-swap1_module_size = * - swap1_load_address
+.label room_in_swap1 = swap2_load_address - *
+* = swap2_load_address "swap2"
 
-;;;
-;;; swap2
-;;;
+.label swap1_module_size = * - swap1_load_address
 
-include "swap2.s"
+//////
+////// swap2
+//////
 
-room_in_swap2 = swap3_load_address - *
+#import "swap2.s"
 
-; pad to the start of the next module
-		dup 0, room_in_swap2
-swap2_module_size = * - swap2_load_address
+.label room_in_swap2 = swap3_load_address - *
+* = swap3_load_address "swap3"
+.label swap2_module_size = * - swap2_load_address
 
-;;;
-;;; swap3
-;;;
+//////
+////// swap3
+//////
 
-include "swap3.s"
+#import "swap3.s"
 
-room_in_swap3 = jmptbl - *
+.label room_in_swap3 = jmptbl - *
+* = jmptbl "jmptbl"
 
-; pad to the start of the next module
-		dup 0, room_in_swap3
-swap3_module_size = * - swap3_load_address
+.label swap3_module_size = * - swap3_load_address
 
-include "jmptb.s"
+#import "jmptb.s"
 
-include "strio.s"
+#import "strio.s"
 
-include "mcicm.s"
+#import "mcicm.s"
 
-include "chrio.s"
+#import "chrio.s"
 
-include "dskio.s"
+#import "dskio.s"
 
-include "irqhn.s"
+#import "irqhn.s"
 
-include "setup.s"
+#import "setup.s"
 
-include "varbl.s"
+#import "varbl.s"
 
-include "miscl.s"
+#import "miscl.s"
 
-include "shdlr.s"
+#import "shdlr.s"
 
-include "modem.s"
+#import "modem.s"
 
-include "calls.s"
+#import "calls.s"
 
-; put intro program in
+// put intro program in
 
-room_under_basic_rom = protostart-*
-		dup 0, protostart-*
+.label room_under_basic_rom = protostart-*
+* = protostart "intro"
 
-include "intro.s"
+#import "intro.s"
 
-room_in_intro = $cb00 - *
-
-;* skip rest of proto area *
-
-		dup 0, room_in_intro
+.label room_in_intro = $cb00 - *
+* = $cb00 "swapper"
 
 swapper0:
-		sta swappg1
-		sty swappg2
-		stx swapsiz
+		sta swappg1_load+1
+		sty swappg2_load+1
+		stx swapsiz_load+1
 swapagn0:
-		lda #$d3 ; reverse capital "S"
+		lda #$d3 // reverse capital "S"
 		sta tdisp+31
-		lda swappg1
+
+// "temporary" debugging display
+// TODO move to after the loads below to avoid extra code
+
+		lda swappg1_load+1
 		sta tdisp+32
-		lda swappg2
+		lda swappg2_load+1
 		sta tdisp+33
+
 		jsr rsdisab
 		sei
 		lda r6510
 		pha
 		lda #r6510_all_ram
 		sta r6510
-swappg1 = *+1
+swappg1_load:
 		lda #$00
 		sta $6a
-swappg2 = *+1
+swappg2_load:
 		lda #$00
 		sta $6c
-swapsiz = *+1
+swapsiz_load:
 		lda #$00
 		sta $6d
 		ldy #0
 		sty $69
 		sty $6b
 swapr1:
-		lda [$69],y
+		lda ($69),y
 		tax
-		lda [$6b],y
-		sta [$69],y
+		lda ($6b),y
+		sta ($69),y
 		txa
-		sta [$6b],y
+		sta ($6b),y
 		iny
 		bne swapr1
 		inc $6a
@@ -186,30 +181,30 @@ swapr1:
 		sta r6510
 		cli
 		jsr rsinabl
-		lda #$a0 ; reverse space
+		lda #$a0 // reverse space
 		sta tdisp+31
 		sta tdisp+32
 		sta tdisp+33
 		rts
 
 getversn:
-		lda #version_length
-		sta var
+		lda #version_end - version
+		sta varbuf
 		lda #<version
-		sta var+1
+		sta varbuf+1
 		lda #>version
-		sta var+2
+		sta varbuf+2
 		ldx #1
-		jsr putvar ;a$
+		jsr putvar //a$
 
 		ldy #4
 loop:
 		lda versnum,y
-		sta var,y
+		sta varbuf,y
 		dey
 		bpl loop
 		ldx #15
-		jmp putvar ;lp
+		jmp putvar //lp
 
 scrnset:
 		sta blnkflag
@@ -217,7 +212,7 @@ scrnset:
 		stx $d011
 		rts
 
-; find a basic variable
+// find a basic variable
 
 findvar1:
 		lda r6510
@@ -227,7 +222,7 @@ findvar1:
 		jsr ptrget1
 		jmp exitint
 
-; relink basic program lines
+// relink basic program lines
 
 relink:
 		lda r6510
@@ -245,7 +240,7 @@ fpout:
 		jsr $bddd
 		jmp exitint
 
-; make a dynamic string
+// make a dynamic string
 
 makeroom:
 		tax
@@ -290,12 +285,12 @@ mlgoto:
 		sta r6510
 		rts
 
-;* output a$
+//* output a$
 outspace:
 		txa
 		beq outspac2
 outspac1:
-		lda #" "
+		lda #' '
 		jsr xchrout
 		dex
 		bne outspac1
@@ -318,14 +313,14 @@ outastr0:
 		jsr chrget
 		beq outastr2
 outastr1:
-		cmp #";"
+		cmp #';'
 		beq outastr0
-		cmp #","
+		cmp #','
 		beq outcomma
 		jsr getstr
-		stx var+1
-		sty var+2
-		sta var
+		stx varbuf+1
+		sty varbuf+2
+		sta varbuf
 		jsr outstr
 		jsr chrgot
 		bne outastr1
@@ -450,11 +445,10 @@ convchr1:
 		and #127
 		rts
 
-room_in_swapper = $cd00 - *
+.label room_in_swapper = $cd00 - *
+* = $cd00 "interface"
 
-		dup 0, room_in_swapper
-
-; interface page jmp table
+// interface page jmp table
 
 hcd00:
 		jmp outastr
@@ -503,24 +497,24 @@ usetbl0:
 		stx 781
 		sty 782
 
-; get index into jump table in X
+// get index into jump table in X
 		asl
 		tax
 
-; preserve ROM selection state
+// preserve ROM selection state
 
 		lda r6510
 		pha
 
-; make sure we can access RAM under the BASIC ROM
+// make sure we can access RAM under the BASIC ROM
 
 		lda #r6510_basic_ram
 		sta r6510
 
-; get the address from the jump table with interrupts disabled
-; to avoid race conditions where interrupt code changes addresses in the
-; jump table
-; puts the address in Y(lo)/X(hi)
+// get the address from the jump table with interrupts disabled
+// to avoid race conditions where interrupt code changes addresses in the
+// jump table
+// puts the address in Y(lo)/X(hi)
 
 		php
 		sei
@@ -530,7 +524,7 @@ usetbl0:
 		tax
 		plp
 
-; if the target is under the kernel, call using "caller" swap code to visible memory
+// if the target is under the kernel, call using "caller" swap code to visible memory
 
 		lda #<caller
 		sta jump+1
@@ -543,7 +537,7 @@ usetbl0:
 		ldx 781
 		ldy 782
 
-; jump to the target (self modifying code sets the address)
+// jump to the target (self modifying code sets the address)
 
 jump:
 		jsr $ffff
@@ -554,7 +548,7 @@ jump:
 nothing:
 		rts
 
-; new system chrout routine
+// new system chrout routine
 
 newout:
 		sta $9e
@@ -572,7 +566,7 @@ newout:
 oldout:
 		jmp $ffff
 
-; raster interrupt routine
+// raster interrupt routine
 
 raster:
 		lda #$00
@@ -622,76 +616,76 @@ newirq1:
 		sta r6510
 		jmp $ea81
 
-; far call to the error handler
+// far call to the error handler
 
 farerr:
 		lda #$37
 		sta r6510
 		jmp error
 
-room_in_interface_page = $ce00 - *
+.label room_in_interface_page = $ce00 - *
+* = $ce00 "buffers"
 
-		dup 0, room_in_interface_page
-
-; buffer page
+// buffer page
 
 d1str:
-		cbm "           "
+		.text "           "
 spchars:
-		byte ",:",34,"*?=",13,"^"
+		.text ",:"
+		.byte 34
+		.text "*?="
+		.byte 13
+		.text "^"
 
-; pad up to fbuf start
-		dup 0, fbuf-*
-; fbuf:
-		dup $20, 20
+* = fbuf
+// fbuf:
+		.fill 20, $20
 
-; pad up to buf2 start
-		dup 0, buf2-*
-; buf2:
-		dup $20, 80
+* = buf2
+// buf2:
+		.fill 80, $20
 
-; pad up to buffer start
-		dup 0, buffer-*
-; buffer:
-		dup $20, 80
+* = buffer
+// buffer:
+		.fill 80, $20
 
-; date in 6 byte bcd format
+// date in 6 byte bcd format
 
 bootdate:
 
 dateday:
-		byte $01
+		.byte $01
 datemon:
-		byte $12
+		.byte $12
 datedate:
-		byte $09
+		.byte $09
 dateyear:
-		byte $90
-		byte $20,$00
+		.byte $90
+		.byte $20,$00
 
-; storage for conversion routines
+// storage for conversion routines
 
 binary:
-		byte 0,0,0,0
+		.byte 0,0,0,0
 
-; days in each month
+// days in each month
 
 ha560:
-		byte $31,$28,$31,$30,$31
-		byte $30,$31,$31,$30,$00
+		.byte $31,$28,$31,$30,$31
+		.byte $30,$31,$31,$30,$00
 decchr:
-		byte $30,$30,$30,$30,$30
-		byte $31,$30,$31
+		.byte $30,$30,$30,$30,$30
+		.byte $31,$30,$31
 
-; the date this ml was made
+// the date this ml was made
 
 version:
-		cbm version_string
-version_length = * - version
+		.text version_string
+version_end:
 
-; version in floating point
+// version in floating point
 
 versnum:
-;		byte $81, $19, $99, $99, $9a ; 1.2
-;		byte $81, $26, $66, $66, $66 ; 1.3
-		byte $82, $00, $00, $00, $00 ; 2.0
+//		.byte $81, $19, $99, $99, $9a // 1.2
+//		.byte $81, $26, $66, $66, $66 // 1.3
+		.byte $82, $00, $00, $00, $00 // 2.0

@@ -1,19 +1,13 @@
-include "equat.s"
+#import "equat.s"
 
-org $0800, "rs232_user.prg"
+* = $0800 "rs232_user.prg"
 
-baudof = $299
-ridbe = $29b
-ridbs = $29c
-rodbe = $29e
-rodbs = $29d
-enabl = $2a1
-rstkey = $fe56
-norest = $fe72
-nmiexit = $febc
-findfn = $f30f
-devnum = $f31f
-nofile = $f701
+.label rstkey = $fe56
+.label norest = $fe72
+.label nmiexit = $febc
+.label findfn = $f30f
+.label devnum = $f31f
+.label nofile = $f701
 
 first:
 
@@ -30,44 +24,41 @@ xx0c:
 xx0f:
 		jmp setbaud
 
-; word 0300,0600,1200,2400
+		//     300   600  1200 2400 4800
 strt:
-		word 4915,2550,1090,0459
-		word 0220
+		.word 4915, 2550, 1090, 459, 220
 full:
-		word 3410,1705,0845,0421
-		word 0200
+		.word 3410, 1705,  845, 421, 200
 baudofs:
-		word 3410,1706,0852,0426
-		word 0213
+		.word 3410, 1706,  852, 426, 213
 
 vectbl:
 
 oldnmi:
-		byte $18
-		word nmi64
+		.byte $18
+		.word nmi64
 oldopn:
-		byte $1a
-		word nopen
+		.byte $1a
+		.word nopen
 oldcls:
-		byte $1c
-		word nclose
+		.byte $1c
+		.word nclose
 oldchk:
-		byte $1e
-		word nchkin
+		.byte $1e
+		.word nchkin
 oldclr:
-		byte $22
-		word nclrch
+		.byte $22
+		.word nclrch
 oldchr:
-		byte $24
-		word nchrin
-;oldout:
-;		byte $26
-;		word nchrout
+		.byte $24
+		.word nchrin
+//oldout:
+//		.byte $26
+//		.word nchrout
 oldget:
-		byte $2a
-		word ngetin
-		byte 0
+		.byte $2a
+		.word ngetin
+		.byte 0
 
 setup:
 		ldx #0
@@ -84,10 +75,10 @@ setup1:
 setup2:
 		lda vectbl,x
 		pha
-		lda [20],y
+		lda (20),y
 		sta vectbl,x
 		pla
-		sta [20],y
+		sta (20),y
 		iny
 		inx
 		cpy #2
@@ -333,7 +324,7 @@ back:
 		jsr oldchk
 		jmp inabl
 xtmp:
-		byte 0
+		.byte 0
 
 ngetin:
 		pha
@@ -404,7 +395,7 @@ getenabl:
 		rts
 
 dtrtable:
-		byte 0,38
+		.byte 0, 38
 
 setdtr:
 		and #1
@@ -439,10 +430,10 @@ setbaud1:
 		sta $dd0f
 		rts
 
-;nchrout:
-;		jsr disab
-;		jsr oldout
-;		jmp inabl
+//nchrout:
+//		jsr disab
+//		jsr oldout
+//		jmp inabl
 
 nopen:
 		jsr disab

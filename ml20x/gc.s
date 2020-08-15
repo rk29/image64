@@ -1,12 +1,12 @@
-offset $c000-*
-namespace "gc"
+.pseudopc protostart {
+.namespace gcml {
 
-hi = 51
-size = 128
+.label hi = 51
+.label size = 128
 
-; setup gc parameters
+// setup gc parameters
 gc:
-		lda #$c7 ; reverse uppercase G
+		lda #$c7 // reverse uppercase G
 		sta tdisp+31
 		lda 3
 		pha
@@ -31,7 +31,7 @@ gc:
 gc0:
 		lda #0
 		sta gcindex
-; loop thru scalars
+// loop thru scalars
 		lda 45
 		ldx 46
 		sta 3
@@ -45,10 +45,10 @@ gc1:
 		beq gc4
 gc1a:
 		ldy #0
-		lda [3],y
+		lda (3),y
 		bmi gc2
 		iny
-		lda [3],y
+		lda (3),y
 		bpl gc2
 		lda #2
 		jsr add3
@@ -61,7 +61,7 @@ gc2:
 		lda #7
 		jsr add3
 		jmp gc1
-; loop thru arrays
+// loop thru arrays
 gc4:
 		lda 3
 		cmp 49
@@ -71,10 +71,10 @@ gc4:
 		beq gc6
 gc4a:
 		ldy #0
-		lda [3],y
+		lda (3),y
 		bmi gc5
 		iny
-		lda [3],y
+		lda (3),y
 		bpl gc5
 		iny
 		jsr doarray
@@ -82,11 +82,11 @@ gc5:
 		ldy #2
 		clc
 		lda 3
-		adc [3],y
+		adc (3),y
 		tax
 		iny
 		lda 4
-		adc [3],y
+		adc (3),y
 		stx 3
 		sta 4
 		jmp gc4
@@ -125,11 +125,11 @@ add3a:
 
 doarray:
 		clc
-		lda [3],y
+		lda (3),y
 		adc 3
 		sta 7
 		iny
-		lda [3],y
+		lda (3),y
 		adc 4
 		sta 8
 		lda 3
@@ -137,7 +137,7 @@ doarray:
 		lda 4
 		pha
 		iny
-		lda [3],y
+		lda (3),y
 		asl
 		clc
 		adc #5
@@ -169,13 +169,13 @@ doarray3:
 dostr0:
 		rts
 dostr:
-		lda [3],y
+		lda (3),y
 		tax
 		iny
-		lda [3],y
+		lda (3),y
 		sta 5
 		iny
-		lda [3],y
+		lda (3),y
 		sta 6
 		cpx #0
 		beq dostr0
@@ -258,11 +258,11 @@ collect1:
 		sta 6
 		stx gctemp
 		ldy #0
-		lda [3],y
+		lda (3),y
 		tax
 		sec
 		lda hi
-		sbc [3],y
+		sbc (3),y
 		sta hi
 		lda hi+1
 		sbc #0
@@ -271,35 +271,35 @@ collect1:
 		tay
 		dey
 collect2:
-		lda [5],y
-		sta [hi],y
+		lda (5),y
+		sta (hi),y
 		dey
 		dex
 		bne collect2
 		ldy #1
 		lda hi
-		sta [3],y
+		sta (3),y
 		iny
 		lda hi+1
-		sta [3],y
+		sta (3),y
 		ldx gctemp
 		inx
 		jmp collect1
 
 gcindex:
-		byte 0
+		.byte 0
 gctemp:
-		byte 0
+		.byte 0
 lo:
-		word 0
+		.word 0
 tblpl:
-		dup 0,size
+		.fill size, 0
 tblph:
-		dup 0,size
+		.fill size, 0
 tbldl:
-		dup 0,size
+		.fill size, 0
 tbldh:
-		dup 0,size
+		.fill size, 0
 
-offset 0
-namespace ""
+}
+}

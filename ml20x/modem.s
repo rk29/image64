@@ -2,7 +2,7 @@ getmod:
 		jsr getmdm
 		sta $fe
 		ldx #9
-		ldy #5 ;cht-r
+		ldy #5 //cht-r
 		jsr chkflags
 		beq getmod0
 		lda #0
@@ -10,7 +10,7 @@ getmod:
 		rts
 getmod0:
 		ldx #16
-		ldy #5 ;asc-l
+		ldy #5 //asc-l
 		jsr chkflags
 		beq getmod1
 		ldx $fe
@@ -25,7 +25,7 @@ outmodh:
 		ldx interm
 		bne outmodh1
 		jsr outm
-		lda #" "
+		lda #' '
 		jsr outm
 outmodh1:
 		lda #dish
@@ -33,14 +33,14 @@ outmodh1:
 
 outmod:
 		ldx #16
-		ldy #5 ;asc-l
+		ldy #5 //asc-l
 		jsr chkflags
 		bne outmod0
 		lda $fe
 		jmp outm
 outmod0:
 		ldx #19
-		ldy #5 ;ans-r
+		ldy #5 //ans-r
 		jsr chkflags
 		tax
 		lda $fe
@@ -83,7 +83,7 @@ outmod1:
 		jmp outm
 outmod1a:
 		ldx #18
-		ldy #5 ;ans-l
+		ldy #5 //ans-l
 		pha
 		jsr chkflags
 		tax
@@ -124,7 +124,7 @@ outmodm:
 		jsr outmodr0
 outmodm1:
 		ldx #17
-		ldy #5 ;asc-r
+		ldy #5 //asc-r
 		jsr chkflags
 		php
 		lda #13
@@ -150,18 +150,18 @@ ansicom:
 		pha
 		lda #27
 		jsr outm
-		lda #"["
+		lda #'['
 		jsr outm
 		pla
 		jmp outm
 
 outmodr0:
-		lda #"3"
-		ldx #"4"
+		lda #'3'
+		ldx #'4'
 		bne outmodr
 outmodr1:
-		lda #"4"
-		ldx #"3"
+		lda #'4'
+		ldx #'3'
 outmodr:
 		sta ansir1
 		stx ansir2
@@ -172,19 +172,23 @@ outmodl:
 		bne outmodl1
 		jmp outm
 outmodl1:
-		lda #"2"
+		lda #'2'
 		jsr ansicom
-		lda #$4a
+		.encoding "ascii"
+		lda #'J'
+		.encoding "petscii_mixed"
 		jmp outm
 
 outmodhm:
-		lda #"1"
+		lda #'1'
 		jsr ansicom
-		lda #";"
+		lda #';'
 		jsr outm
-		lda #"1"
+		lda #'1'
 		jsr outm
-		lda #$48
+		.encoding "ascii"
+		lda #'H'
+		.encoding "petscii_mixed"
 		jmp outm
 
 outmodc:
@@ -216,19 +220,20 @@ ansi2:
 		rts
 
 ansiclrs:
-		byte "7716524333107247"
+		.text "7716524333107247"
 ansiints:
-		byte "0100000100110110"
+		.text "0100000100110110"
 ansibuf:
-		byte 27, "[0;"
+		.byte 27
+		.text "[0;"
 ansiint:
-		byte "0;"
+		.text "0;"
 ansir1:
-		byte "3"
+		.text "3"
 ansicol:
-		byte "1;"
+		.text "1;"
 ansir2:
-		byte "4"
+		.text "4"
 ansibak:
-		byte "0", $6d, 0
-
+		.text "0"
+		.byte $6d, 0

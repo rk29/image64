@@ -1,36 +1,37 @@
-offset $c000-*
-namespace "ecs"
+.pseudopc protostart {
+.namespace ecsml {
 
-a=0
+.label a=0
+.label ecsdefs_size = $a00
 
-;common parts
-; 0-1..flag
-; ..... bit 32768
-; ..... bit 16384
-; ..... bit .8192
-; ..... bit .4096
-; ..... bit .2048
-; ..... bit .1024
-; ..... bit ..512
-; ..... bit ..256
-; ..... bit ..128
-; ..... bit ...64
-; ..... bit ...32
-; ..... bit ...16
-; ..... bit ....8
-; ..... bit ....4
-; ..... bit ....2
-; ..... bit ....1
-; 1-2..access
-; 3-4..credits
+//common parts
+// 0-1..flag
+// ..... bit 32768
+// ..... bit 16384
+// ..... bit .8192
+// ..... bit .4096
+// ..... bit .2048
+// ..... bit .1024
+// ..... bit ..512
+// ..... bit ..256
+// ..... bit ..128
+// ..... bit ...64
+// ..... bit ...32
+// ..... bit ...16
+// ..... bit ....8
+// ..... bit ....4
+// ..... bit ....2
+// ..... bit ....1
+// 1-2..access
+// 3-4..credits
 
-;long format
-; 0......flag (same as short)
-; 1-2....access
-; 3-9....command (7 chars)
-; 10-23..file (14 chars)
-; 24-31..password (7 chars)
-; 32.....credits
+//long format
+// 0......flag (same as short)
+// 1-2....access
+// 3-9....command (7 chars)
+// 10-23..file (14 chars)
+// 24-31..password (7 chars)
+// 32.....credits
 
 ecs:
 		cpx #0
@@ -61,10 +62,10 @@ ecs6:
 
 ecsgoto:
 		ldx #30
-		jsr usevar ;a%
-		lda var+1
+		jsr usevar //a%
+		lda varbuf+1
 		sta $14
-		lda var
+		lda varbuf
 		sta $15
 		lda r6510
 		pha
@@ -77,17 +78,17 @@ ecsgoto:
 
 ecschk:
 		ldx #0
-		jsr usevar ;an$
-		ldy var
+		jsr usevar //an$
+		ldy varbuf
 		sty index
 ecsc2:
-		lda [var+1],y
+		lda (varbuf+1),y
 		sta buffer,y
 		dey
 		bpl ecsc2
 		ldx #24
-		jsr usevar ;ac%
-		ldx var+1
+		jsr usevar //ac%
+		ldx varbuf+1
 		sec
 		lda #0
 		sta acc
@@ -98,18 +99,18 @@ ecsc3:
 		dex
 		bpl ecsc3
 		ldx #30
-		jsr usevar ;a%
-		lda var+1
+		jsr usevar //a%
+		lda varbuf+1
 		sta zzf
 		lda index
 		beq ecsquit
 		ldy #0
 		lda #<ecsdefs
-		sta var+3
+		sta varbuf+3
 		lda #>ecsdefs
-		sta var+4
+		sta varbuf+4
 ecsscan:
-		lda [var+3],y
+		lda (varbuf+3),y
 		tax
 		and #64
 		beq ecsnext
@@ -120,16 +121,16 @@ ecsscan:
 		beq ecsnext
 ecsscan1:
 		ldy #1
-		lda [var+3],y
+		lda (varbuf+3),y
 		and acc
 		bne ecsscan2
 		ldy #2
-		lda [var+3],y
+		lda (varbuf+3),y
 		and acc+1
 		beq ecsnext
 ecsscan2:
 		ldy #0
-		lda [var+3],y
+		lda (varbuf+3),y
 		pha
 		and #8
 		bne ecsscan3
@@ -140,7 +141,7 @@ ecsscan3:
 ecsscan4:
 		pla
 		bcc ecsnext
-; got it!
+// got it!
 		bmi ecsscan5
 		lda #5
 		bne ecsquit
@@ -153,22 +154,22 @@ ecsscan5:
 		clc
 		adc #1
 ecsquit:
-		sta var+1
+		sta varbuf+1
 		lda #0
-		sta var
-		sta var+2
-		sta var+3
-		sta var+4
+		sta varbuf
+		sta varbuf+2
+		sta varbuf+3
+		sta varbuf+4
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 ecsnext:
 		ldy #0
-		lda [var+3],y
+		lda (varbuf+3),y
 		and #$c0
 		beq ecsquit
 		ldy #0
-		lda [var+3],y
+		lda (varbuf+3),y
 		ldx #8
 		and #8
 		bne ecsnext1
@@ -176,27 +177,27 @@ ecsnext:
 ecsnext1:
 		clc
 		txa
-		adc var+3
-		sta var+3
+		adc varbuf+3
+		sta varbuf+3
 		tya
-		adc var+4
-		sta var+4
-		cmp #>ecsdefnd
+		adc varbuf+4
+		sta varbuf+4
+		cmp #>(ecs+ecsdefs_size)
 		bne ecsscan
 		lda #0
 		beq ecsquit
 
 acc:
-		word 0
+		.word 0
 zzf:
-		byte 0
+		.byte 0
 
-; check long command, cc=not equal
+// check long command, cc=not equal
 ecslong:
 		ldx #0
 		ldy #3
 ecslong1:
-		lda [var+3],y
+		lda (varbuf+3),y
 		beq ecslong2
 		cmp buffer,x
 		bne ecslong3
@@ -207,21 +208,21 @@ ecslong1:
 ecslong2:
 		cpx index
 		beq ecslong4
-;nope
+//nope
 ecslong3:
 		clc
 		rts
-;yup
+//yup
 ecslong4:
 		ldy #24
-		lda [var+3],y
+		lda (varbuf+3),y
 		beq ecslong5
-;do password later
+//do password later
 ecslong5:
 		ldy #10
 		ldx #0
 ecslong6:
-		lda [var+3],y
+		lda (varbuf+3),y
 		beq ecslong7
 		sta buffer,x
 		iny
@@ -230,17 +231,17 @@ ecslong6:
 		bcc ecslong6
 ecslong7:
 		stx index
-		stx var
+		stx varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #2
-		jsr putvar ;b$
+		jsr putvar //b$
 		ldy #24
 		ldx #0
 ecslong8:
-		lda [var+3],y
+		lda (varbuf+3),y
 		beq ecslong9
 		sta buf2,x
 		iny
@@ -249,27 +250,27 @@ ecslong8:
 		bcc ecslong8
 ecslong9:
 		stx index
-		stx var
+		stx varbuf
 		lda #<buf2
-		sta var+1
+		sta varbuf+1
 		lda #>buf2
-		sta var+2
+		sta varbuf+2
 		ldx #1
-		jsr putvar ;a$
+		jsr putvar //a$
 		ldy #31
-		lda [var+3],y
-		sta var+1
+		lda (varbuf+3),y
+		sta varbuf+1
 		lda #0
-		sta var
+		sta varbuf
 		ldx #31
-		jsr putvar ;b%
+		jsr putvar //b%
 		sec
 		rts
 
-; check short command,cc=not equal
+// check short command,cc=not equal
 ecsshort:
 		ldy #0
-		lda [var+3],y
+		lda (varbuf+3),y
 		and #4
 		beq ecsshrt1
 		lda index
@@ -281,51 +282,51 @@ ecsshrt1:
 		bne ecsshrt3
 ecsshrt2:
 		ldy #3
-		lda [var+3],y
+		lda (varbuf+3),y
 		cmp buffer
 		bne ecsshrt3
 		ldy #4
-		lda [var+3],y
+		lda (varbuf+3),y
 		cmp buffer+1
 		beq ecsshrt4
-;nope
+//nope
 ecsshrt3:
 		clc
 		rts
-;yup
+//yup
 ecsshrt4:
 		ldy #5
-		lda [var+3],y
+		lda (varbuf+3),y
 		sta buffer
 		ldy #6
-		lda [var+3],y
+		lda (varbuf+3),y
 		sta buffer+1
 		ldx #2
 		stx index
-		stx var
+		stx varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #2
-		jsr putvar ;b$
+		jsr putvar //b$
 		ldy #7
-		lda [var+3],y
-		sta var+1
+		lda (varbuf+3),y
+		sta varbuf+1
 		lda #0
-		sta var
+		sta varbuf
 		ldx #31
-		jsr putvar ;b%
+		jsr putvar //b%
 		ldx #1
-		jsr usevar ;a$
+		jsr usevar //a$
 		lda #0
-		sta var
+		sta varbuf
 		lda #<buf2
-		sta var+1
+		sta varbuf+1
 		lda #>buf2
-		sta var+2
+		sta varbuf+2
 		ldx #1
-		jsr putvar ;a$
+		jsr putvar //a$
 		sec
 		rts
 
@@ -340,21 +341,21 @@ ecsg1:
 		inc $6b
 		jsr ecsgetln
 		lda $6a
-		cmp #>ecsdefnd
+		cmp #>(ecs+ecsdefs_size)
 		bcs ecsg2
 		ldy #0
-		lda [$69],y
+		lda ($69),y
 		bne ecsg1
 ecsg2:
 		lda $6b
-		sta var+1
+		sta varbuf+1
 		lda #0
-		sta var
-		sta var+2
-		sta var+3
-		sta var+4
+		sta varbuf
+		sta varbuf+2
+		sta varbuf+3
+		sta varbuf+4
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 ecsput:
 		sty $6c
@@ -368,7 +369,7 @@ ecsp1:
 		inc $6b
 		jsr ecsputln
 		lda $6a
-		cmp #>ecsdefnd
+		cmp #>(ecs+ecsdefs_size)
 		bcs ecsp2
 		lda $6b
 		cmp $6c
@@ -379,7 +380,7 @@ ecsp2:
 ecsgetln:
 		ldy #31
 ecsgl1:
-		lda [$69],y
+		lda ($69),y
 		sta buffer,y
 		dey
 		bpl ecsgl1
@@ -412,7 +413,7 @@ ecspl1:
 		sty index
 ecspl2:
 		lda buffer,y
-		sta [$69],y
+		sta ($69),y
 		dey
 		bpl ecspl2
 		sec
@@ -439,15 +440,15 @@ putvar:
 
 ecsload:
 		ldx #1
-		jsr usevar ;a$
-		lda var
-		ldx var+1
-		ldy var+2
+		jsr usevar //a$
+		lda varbuf
+		ldx varbuf+1
+		ldy varbuf+2
 		jsr setnam
 		ldx #32
-		jsr usevar ;dv%
+		jsr usevar //dv%
 		lda #8
-		ldx var+1
+		ldx varbuf+1
 		ldy #0
 		jsr setlfs
 		lda #0
@@ -457,31 +458,29 @@ ecsload:
 
 ecssave:
 		ldx #1
-		jsr usevar ;a$
-		lda var
-		ldx var+1
-		ldy var+2
+		jsr usevar //a$
+		lda varbuf
+		ldx varbuf+1
+		ldy varbuf+2
 		jsr setnam
 		ldx #32
-		jsr usevar ;dv%
+		jsr usevar //dv%
 		lda #8
-		ldx var+1
+		ldx varbuf+1
 		ldy #0
 		jsr setlfs
 		lda #<ecsdefs
 		ldx #>ecsdefs
-		sta var
-		stx var+1
-		ldx #<ecsdefnd
-		ldy #>ecsdefnd
-		lda #var
+		sta varbuf
+		stx varbuf+1
+		ldx #<(ecs+ecsdefs_size)
+		ldy #>(ecs+ecsdefs_size)
+		lda #varbuf
 		jmp savef
 
-align 32
+.align 32
 
 ecsdefs:
-		byte 0
-ecsdefnd = ecs+$a00
 
-offset 0
-namespace ""
+}
+}

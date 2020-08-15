@@ -1,5 +1,5 @@
-offset protostart - *
-namespace "swap1"
+.pseudopc protostart {
+.namespace swap1 {
 
 hc000:
 		jmp inline
@@ -10,7 +10,7 @@ hc006:
 hc009:
 		jmp useeditr
 
-; jump table routines
+// jump table routines
 
 xgetin:
 		lda #23
@@ -63,67 +63,67 @@ chatmode:
 		lda #56
 		jmp usetbl1
 
-;********************************
-;* string input routines
-;********************************
+//********************************
+//* string input routines
+//********************************
 
-;********************************
-;* input line to an$ *
-;********************************
-;* on entry:*
-;* pl=0 for upper/lower case *
-;* pl=1 for upper case only *
-;* w$ = text that was wrapped *
-;* or text to edit in *
-;* edit mode. *
-;* p$ = text for prompt *
-;* .x register holds mode *
-;* .y register holds password mode
-;* flags *
-;********************************
-;* on exit:
-;* an$ = text that was typed *
-;* w$ = text that was wrapped *
-;* location (chat) holds:
-;* 0 = normal *
-;* 1 = delete on column one *
-;* or dot on column one *
-;* 2 = chat check hit *
-;* 3 = carrier/time loss *
-;********************************
+//********************************
+//* input line to an$ *
+//********************************
+//* on entry:*
+//* pl=0 for upper/lower case *
+//* pl=1 for upper case only *
+//* w$ = text that was wrapped *
+//* or text to edit in *
+//* edit mode. *
+//* p$ = text for prompt *
+//* .x register holds mode *
+//* .y register holds password mode
+//* flags *
+//********************************
+//* on exit:
+//* an$ = text that was typed *
+//* w$ = text that was wrapped *
+//* location (chat) holds:
+//* 0 = normal *
+//* 1 = delete on column one *
+//* or dot on column one *
+//* 2 = chat check hit *
+//* 3 = carrier/time loss *
+//********************************
 
 inline:
-		stx editor ;flags
+		stx editor //flags
 		sty passmode
 		ldx #16
-		jsr usevar ;pl
-		lda var ;case lock
+		jsr usevar //pl
+		lda varbuf //case lock
 		and #1
 		sta case
 inline0:
 		ldy #$00
 		sty index
-		sty tmp1 ;chars typed
+		sty tmp1 //chars typed
 		sty mjump
-		sty chat ;result code
+		sty chat //result code
 		sty buffer
 		jsr prprompt
 		lda editor
-		and #$30 ;word wrap
-		beq in0c ;and edit mode
+		and #$30 //word wrap
+		beq in0c //and edit mode
 		ldx #27
-		jsr usevar ;w$
-		ldy var
+		jsr usevar //w$
+		ldy varbuf
 		beq in1
 		sty tmp1
 in0:
 		dey
-		lda [var+1],y
+		lda (varbuf+1),y
 		sta buffer,y
 		cpy #0
 		bne in0
 in0c:
-		ldy #0 ;print buffer
+		ldy #0 //print buffer
 		cpy tmp1
 		beq in0d
 in0a:
@@ -135,7 +135,7 @@ in0a:
 		lda tmp1
 		sta index
 in0d:
-		lda editor ;edit mode
+		lda editor //edit mode
 		and #$20
 		beq in0b
 		jsr prcr
@@ -145,9 +145,9 @@ in0d:
 in0b:
 		jsr zero
 		ldx #27
-		jsr putvar ;w$
+		jsr putvar //w$
 in1:
-		jsr xgetin ;main loop
+		jsr xgetin //main loop
 		sta $fe
 		jsr carchk
 		beq in1a
@@ -187,15 +187,16 @@ put0:
 put1:
 		jmp in1
 ctrlchrs:
-		byte $04, ensh, 13, 20, $15,$16, $17, $18, $19, swlc, $02, "./"
+		.byte $04, ensh, 13, 20, $15,$16, $17, $18, $19, swlc, $02
+		.text "./"
 ctrlend:
 
 ctrl:
-		word ctrld,ctrli,ctrlm
-		word ctrlt,ctrlu,ctrlv
-		word ctrlw,ctrlx,ctrly
-		word ctrln,ctrlb,dot
-		word dot
+		.word ctrld,ctrli,ctrlm
+		.word ctrlt,ctrlu,ctrlv
+		.word ctrlw,ctrlx,ctrly
+		.word ctrln,ctrlb,dot
+		.word dot
 in3:
 		txa
 		asl
@@ -238,7 +239,7 @@ ctrli1:
 		jmp ctrli1
 ctrli2:
 		inc tmp1
-		lda #" "
+		lda #' '
 		sta buffer,y
 ctrli3:
 		jmp in1
@@ -247,13 +248,13 @@ ctrlm:
 		lda #13
 		jsr xchrout0
 		lda index
-		sta var
+		sta varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #0
-		jsr putvar ;an$
+		jsr putvar //an$
 		jmp memory
 
 ctrlt:
@@ -326,7 +327,7 @@ ctrlw:
 		lda buffer,y
 		jsr ctrlt4
 		lda buffer,y
-		cmp #" "
+		cmp #' '
 		bne ctrlw
 ctrlw1:
 		sty index
@@ -343,7 +344,7 @@ ctrly:
 		cpy tmp1
 		bcs ctrly1
 		lda buffer,y
-		cmp #" "
+		cmp #' '
 		php
 		jsr xchrout0
 		inc index
@@ -402,7 +403,7 @@ wrap0a:
 		jmp in1
 wrap0:
 		lda tmp2
-		cmp #" "
+		cmp #' '
 		bne wrap1
 		sty tmp3
 		jmp wrap6
@@ -411,20 +412,20 @@ wrap1:
 		dey
 wrap2:
 		lda buffer,y
-		cmp #" "
+		cmp #' '
 		beq wrap3
 		dey
 		bne wrap2
 		lda tmp2
 		sta buf2
 		lda #1
-		sta var
+		sta varbuf
 		lda #<buf2
-		sta var+1
+		sta varbuf+1
 		lda #>buf2
-		sta var+2
+		sta varbuf+2
 		ldx #27
-		jsr putvar ;w$
+		jsr putvar //w$
 		jmp ctrlm
 wrap3:
 		ldx #0
@@ -445,13 +446,13 @@ wrap5:
 		lda tmp2
 		sta buf2,x
 		inx
-		stx var
+		stx varbuf
 		lda #<buf2
-		sta var+1
+		sta varbuf+1
 		lda #>buf2
-		sta var+2
+		sta varbuf+2
 		ldx #$1b
-		jsr putvar ;w$
+		jsr putvar //w$
 wrap6:
 		ldy tmp3
 		iny
@@ -469,17 +470,17 @@ prprompt:
 		lda #0
 		sta passmode
 		ldx #28
-		jsr prtvar0 ;p$
-		lda #":"
+		jsr prtvar0 //p$
+		lda #':'
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jsr xchrout
 		pla
 		sta passmode
 prpr1:
 		rts
 
-; carry clear if cotrol
+// carry clear if cotrol
 ctrlchk:
 		pha
 		lda editor
@@ -521,7 +522,7 @@ ctrlch1:
 		clc
 		rts
 
-; carry clear if color chr
+// carry clear if color chr
 colorchk:
 		sty cytmp
 		ldy #15
@@ -542,7 +543,7 @@ prcr:
 		lda #$0d
 		jmp xchrout
 
-;* password input routine *
+//* password input routine *
 
 password:
 		lda #1
@@ -583,7 +584,7 @@ editswap:
 		rts
 
 edittbl:
-		byte 0,3,6
+		.byte 0,3,6
 
-offset 0
-namespace ""
+}
+}

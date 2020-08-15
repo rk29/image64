@@ -1,45 +1,48 @@
-include "equat.s"
+.encoding "petscii_mixed"
 
-org $0801, "image.prg"
+#import "equat.s"
 
-scnmem = $0400
-chrmem = $2000
-colmem = $d800
+* = $0801 "image.prg"
 
-chrpok = chrmem/1024 + 16*scnmem/1024
+.label scnmem = $0400
+.label chrmem = $2000
+.label colmem = $d800
 
-devnum = 186
+.label chrpok = chrmem/1024 + 16*scnmem/1024
 
-src = $fb
-dst = $fd
+.label devnum = 186
 
-		; link to next line (bogus, gets fixed by basic loader)
-		byte $1b, $1b
-		; line number
-		word 1990
-		; "sys" token
-		byte $9e
-		byte str(ml)
-		cbm " "
-		; "new" token
-		byte $a2
-		cbm" image software"
-		; end of basic line
-		byte 0
-		; end of basic program
-		byte 0, 0
+.label src = $fb
+.label dst = $fd
+
+		// link to next line (bogus, gets fixed by basic loader)
+		.byte $1b, $1b
+		// line number
+    	.word 1990
+		// "sys" token
+	    .byte $9e
+        .text toIntString(start)
+		.text " "
+		// "new" token
+		.byte $a2
+		.text " image software"
+		// end of basic line
+        .byte 0
+		// end of basic program
+		.word 0 
+
+* = $081e
 
 chrset:
-		prg "chr.imagelogo"
+		.import c64 "chr.imagelogo"
 
 scndat:
-		prg "scn.imagelogo"
+		.import c64 "scn.imagelogo"
 
 coldat:
-		prg "col.imagelogo"
+		.import c64 "col.imagelogo"
 
-ml:
-
+start:
 		lda #0
 		sta $d020
 		lda #1
@@ -101,8 +104,8 @@ ml:
 move:
 		ldy #0
 loop:
-		lda [src],y
-		sta [dst],y
+		lda (src),y
+		sta (dst),y
 		iny
 		bne loop
 		inc src+1
@@ -112,8 +115,8 @@ loop:
 		rts
 
 file1:
-		cbm "ml " + version_number
-file1_len = * - file1
+		.text "ml " + version_number
+file1_end:
 
 boot:
 		ldy #17
@@ -122,8 +125,8 @@ fill_loop:
 		sta rs232,y
 		dey
 		bpl fill_loop
-;load "ml 1.3"
-		lda #file1_len
+// load "ml"
+		lda #file1_end - file1
 		ldx #<file1
 		ldy #>file1
 		jsr $ffbd

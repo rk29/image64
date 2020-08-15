@@ -28,7 +28,7 @@ sc1b:
 		cmp #32
 		bcs sc4
 		lda $fe
-		ldy #nchrs-1
+		ldy #chrs_end - chrs - 1
 sc2:
 		cmp chrs,y
 		beq sc6
@@ -86,13 +86,13 @@ scret:
 		stx mprint
 		stx mspeed
 		stx mdigits
-		ldx #"0"
+		ldx #'0'
 		stx cnumc
 		jsr scdn
 		ldx mleft
 		beq scret0
 scret1:
-		lda #" "
+		lda #' '
 		jsr $e716
 		dex
 		bne scret1
@@ -183,10 +183,10 @@ scroll0:
 		sta $af
 		ldy #39
 scroll1:
-		lda [$ac],y
-		sta [$d1],y
-		lda [$ae],y
-		sta [$f3],y
+		lda ($ac),y
+		sta ($d1),y
+		lda ($ae),y
+		sta ($f3),y
 		dey
 		bpl scroll1
 		ldy $ac
@@ -220,30 +220,30 @@ scline0:
 		ldy #39
 scline1:
 		lda 646
-		sta [$f3],y
+		sta ($f3),y
 		lda #32
-		sta [$d1],y
+		sta ($d1),y
 		dey
 		bpl scline1
 		rts
 
 chrtbl:
-		word scupc,scupc
-		word scrvs,scrvs
-		word schome,scclear
-		word scrt,sclf
-		word scdn,scup
-		word scret,scdel
-		word scbell
+		.word scupc,scupc
+		.word scrvs,scrvs
+		.word schome,scclear
+		.word scrt,sclf
+		.word scdn,scup
+		.word scret,scdel
+		.word scbell
 chrs:
-		byte swlc, swuc
-		byte reverse_on, reverse_off
-		byte cursor_home, clear_screen
-		byte cursor_right, cursor_left
-		byte cursor_down, cursor_up
-		byte carriage_return, cbm_backspace
-		byte ascii_bel
-nchrs = *-chrs
+		.byte swlc, swuc
+		.byte reverse_on, reverse_off
+		.byte cursor_home, clear_screen
+		.byte cursor_right, cursor_left
+		.byte cursor_down, cursor_up
+		.byte carriage_return, cbm_backspace
+		.byte ascii_bel
+chrs_end:
 
 cleanup:
 		lda #39
@@ -262,7 +262,7 @@ fixlinks:
 		rts
 
 botline:
-		byte 22
+		.byte 22
 
 poscrsr:
 		txa
@@ -276,8 +276,8 @@ poscrsr:
 		clc
 		jmp $fff0
 
-;* output routine to fix 1200 and
-;* do the transmit window
+//* output routine to fix 1200 and
+//* do the transmit window
 
 out0:
 		sta $9e
@@ -477,7 +477,7 @@ hea24:
 		tay
 		rts
 
-; toggle full screen
+// toggle full screen
 setmode:
 		cpx scnmode
 		beq setmode1
@@ -526,18 +526,18 @@ swapscn1:
 		sta $af
 		ldy #39
 swapscn2:
-		lda [$d1],y
+		lda ($d1),y
 		pha
-		lda [$ac],y
-		sta [$d1],y
+		lda ($ac),y
+		sta ($d1),y
 		pla
-		sta [$ac],y
-		lda [$f3],y
+		sta ($ac),y
+		lda ($f3),y
 		pha
-		lda [$ae],y
-		sta [$f3],y
+		lda ($ae),y
+		sta ($f3),y
 		pla
-		sta [$ae],y
+		sta ($ae),y
 		dey
 		bpl swapscn2
 swapscn3:
@@ -563,15 +563,15 @@ swapscn3:
 		pla
 		sta $d1
 		rts
-;*
-;* decimal to ascii routine *
-;*
+//*
+//* decimal to ascii routine *
+//*
 decimal:
 		sta binary
 		stx binary+1
 		ldy #0
 dec1:
-		ldx #"0"
+		ldx #'0'
 dec2:
 		lda binary
 		cmp dectbl1,y
@@ -593,12 +593,12 @@ dec3:
 		rts
 
 dectbl1:
-		byte <10000, <1000, <100, <10, <1
+		.byte <10000, <1000, <100, <10, <1
 dectbl2:
-		byte >10000, >1000, >100, >10, >1
-;*
-;* memory and trace update
-;*
+		.byte >10000, >1000, >100, >10, >1
+//*
+//* memory and trace update
+//*
 trace0:
 		inc scnlock
 		lda scnmode
@@ -668,9 +668,9 @@ trace7:
 		rts
 
 oldline:
-		word 0
+		.word 0
 oldmem:
-		word 0
+		.word 0
 
 dspidle:
 		sta idlesec

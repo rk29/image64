@@ -1,26 +1,28 @@
-include "equat.s"
+.encoding "petscii_mixed"
 
-org protostart, "copier.prg"
+#import "equat.s"
 
-status = $90
+* = protostart "copier.prg"
 
-gcount = 11
-bcount = 23
-ncount = 38
+.label status = $90
 
-pbuf0= $658
-pbuf1= $400
-		pbuf2= $500
+.label gcount = 11
+.label bcount = 23
+.label ncount = 38
+
+.label pbuf0= $658
+.label pbuf1= $400
+.label pbuf2= $500
 
 proto:
 		inx
 		beq protonum
 		dex
-		beq copyall ;&,16,0
+		beq copyall //&,16,0
 		dex
-		beq jcount ;&,16,1
+		beq jcount //&,16,1
 		dex
-		beq copysome;&,16,2
+		beq copysome//&,16,2
 		rts
 
 jcount:
@@ -28,10 +30,10 @@ jcount:
 
 protonum:
 		lda #0
-		sta var
+		sta varbuf
 		lda #2
-		sta var+1
-		ldx #30 ;a%
+		sta varbuf+1
+		ldx #30 //a%
 putvar:
 		lda #30
 		jmp usetbl1
@@ -133,14 +135,14 @@ nxtcount:
 		jsr chrout
 		jsr clrchn
 		lda #3
-		jmp $ffc3 ; close
+		jmp $ffc3 // close
 
 buflen:
-		byte 0
+		.byte 0
 flen:
-		byte 0,0,0
+		.byte 0,0,0
 done:
-		byte 0
+		.byte 0
 
 goodbyte:
 		ldx #ncount
@@ -152,9 +154,9 @@ goodblok:
 counter:
 		inc pbuf0,x
 		lda pbuf0,x
-		cmp #":"
+		cmp #':'
 		bne counter1
-		lda #"0"
+		lda #'0'
 		sta pbuf0,x
 		dex
 		dey

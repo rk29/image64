@@ -1,5 +1,5 @@
-offset protostart - *
-namespace "swap2"
+.pseudopc protostart {
+.namespace swap2 {
 
 hc000:
 		jmp term
@@ -12,7 +12,7 @@ hc009:
 hc00c:
 		jmp sound
 
-; jump table routines
+// jump table routines
 
 xchrout:
 		sta $fe
@@ -51,14 +51,14 @@ output:
 		lda #55
 		jmp usetbl1
 
-;* chat mode *
+//* chat mode *
 chatmode:
 		lda #$00
 		sta $fe
 		sta chatpage
 		sta sndrept
 		ldx #34
-		jsr prtvar0 ;c1$
+		jsr prtvar0 //c1$
 		lda #1
 		sta inchat
 		lda case
@@ -89,17 +89,17 @@ chat3:
 		sta inchat
 		sta usrlin
 		ldx #35
-		jsr prtvar0 ;c2$
+		jsr prtvar0 //c2$
 		lda editor
 		and #130
 		beq chat5
 		ldx #39
-		jsr prtvar0 ;c3$
+		jsr prtvar0 //c3$
 chat5:
 		ldx #36
-		jmp btmvar ;co$
+		jmp btmvar //co$
 
-; terminal mode
+// terminal mode
 
 term0:
 		lda #0
@@ -123,7 +123,7 @@ term1:
 		jsr outansi
 		jmp term
 
-;output to screen, interpret ansi
+//output to screen, interpret ansi
 outansi:
 		ldx #18
 		ldy #5
@@ -144,37 +144,37 @@ outansi2:
 		cpx #1
 		bcc outansi1
 		lda ansibuf+1
-		cmp #"["
+		cmp #'['
 		bne outansi0
 		cpx #2
 		bcc outansi1
 		cpx #14
 		bcs outansi0
 		lda ansibuf,x
-		cmp #";"
+		cmp #';'
 		beq outansi1
-		cmp #"0"
+		cmp #'0'
 		bcc outansi3
-		cmp #":"
+		cmp #':'
 		bcc outansi1
 outansi3:
 		ldx #2
 		stx ansiptr
-		cmp #cbm("m")
+		cmp #'m'
 		beq ansim
-		cmp #cbm("A")
+		cmp #'A'
 		beq ansia
-		cmp #cbm("B")
+		cmp #'B'
 		beq ansib
-		cmp #cbm("C")
+		cmp #'C'
 		beq ansic
-		cmp #cbm("D")
+		cmp #'D'
 		beq ansid
-		cmp #cbm("F")
+		cmp #'F'
 		beq ansih
-		cmp #cbm("H")
+		cmp #'H'
 		beq ansih
-		cmp #cbm("J")
+		cmp #'J'
 		beq ansij
 outansi0:
 		ldx #0
@@ -212,13 +212,13 @@ ansim3:
 
 ansib:
 		lda #cursor_down
-		byte $2c
+		.byte $2c
 ansic:
 		lda #cursor_right
-		byte $2c
+		.byte $2c
 ansid:
 		lda #cursor_left
-		byte $2c
+		.byte $2c
 ansia:
 		lda #cursor_up
 ansia1:
@@ -273,22 +273,22 @@ ansirpt1:
 		rts
 
 reptcnt:
-		byte 0
+		.byte 0
 reptchr:
-		byte 0
+		.byte 0
 ansibuf:
-		byte "                  "
+		.text "                  "
 ansiptr:
-		byte 0
+		.byte 0
 ansiposh:
-		byte 0
+		.byte 0
 ansiposv:
-		byte 0
+		.byte 0
 ansiprm:
-		byte 0
+		.byte 0
 ansiclrs:
-		byte cursor_black, cursor_red, cursor_green, cursor_yellow
-		byte cursor_blue, cursor_purple, cursor_cyan, cursor_white
+		.byte cursor_black, cursor_red, cursor_green, cursor_yellow
+		.byte cursor_blue, cursor_purple, cursor_cyan, cursor_white
 
 ansiparm:
 		lda #0
@@ -296,16 +296,16 @@ ansiparm:
 		ldx ansiptr
 		lda ansibuf,x
 		inc ansiptr
-		cmp #";"
+		cmp #';'
 		bne ansiprm2
 ansiprm1:
 		ldx ansiptr
 		lda ansibuf,x
 		inc ansiptr
 ansiprm2:
-		cmp #"0"
+		cmp #'0'
 		bcc ansiprm3
-		cmp #":"
+		cmp #':'
 		bcc ansiprm4
 		clc
 		lda ansiprm
@@ -325,13 +325,13 @@ ansiprm4:
 		sta ansiprm
 		pla
 		sec
-		sbc #"0"
+		sbc #'0'
 		clc
 		adc ansiprm
 		sta ansiprm
 		jmp ansiprm1
 
-;print string variable to bottom
+//print string variable to bottom
 btmvar:
 		inc scnlock
 		lda scnmode
@@ -345,17 +345,17 @@ btm0:
 		jsr usevar
 		ldy #0
 		ldx #0
-		lda var
+		lda varbuf
 		beq btm2
 		cmp #16
 		bcs btm1
 		lda #16
 		sec
-		sbc var
+		sbc varbuf
 		lsr
 		tax
 btm1:
-		lda [var+1],y
+		lda (varbuf+1),y
 		jsr chkspcl
 		cmp #0
 		bmi btm1a
@@ -369,7 +369,7 @@ btm1a:
 		cpx #16
 		bcs btm2
 		iny
-		cpy var
+		cpy varbuf
 		bcc btm1
 btm2:
 		dec scnlock
@@ -392,11 +392,11 @@ isalpha1:
 		rts
 
 lotbl:
-		byte <convnam,<convdsk
-		byte <convimg,<chkspcl
+		.byte <convnam,<convdsk
+		.byte <convimg,<chkspcl
 hitbl:
-		byte >convnam,>convdsk
-		byte >convimg,>chkspcl
+		.byte >convnam,>convdsk
+		.byte >convimg,>chkspcl
 
 convert0:
 		rts
@@ -409,23 +409,26 @@ convert:
 		lda hitbl,x
 		sta convs2+2
 		ldx #0
-		jsr usevar ;an$
+		jsr usevar //an$
 		ldy #0
 		ldx #0
 convs1:
-		cpy var
+		cpy varbuf
 		beq convs3
-		lda [var+1],y
+		lda (varbuf+1),y
 convs2:
 		jsr convdsk
-		sta [var+1],y
+		sta (varbuf+1),y
 		iny
 		bne convs1
 convs3:
 		rts
 
 convd0:
-		byte ",:", function_key_5, "*?=", function_key_6, function_key_8
+		.text ",:"
+		.byte function_key_5
+		.text "*?="
+		.byte function_key_6, function_key_8
 convdsk:
 		cmp #133
 		bcc convd1
@@ -438,7 +441,7 @@ convd1:
 		rts
 
 convnam:
-		cmp #"'"
+		cmp #'''
 		beq convn3
 		jsr isalpha
 		bcs convn1
@@ -457,7 +460,7 @@ convn3:
 		rts
 
 convi0:
-		byte "$,*?:=;"
+		.text "$,*?:=;"
 convimg:
 		ldx #6
 convi1:
@@ -467,7 +470,7 @@ convi1:
 		bpl convi1
 		rts
 convi2:
-		lda #"-"
+		lda #'-'
 		rts
 
 sound:
@@ -486,7 +489,7 @@ sound1:
 		cpx #0
 		bne sound3
 		ldx #27
-		ldy #5 ;bel-r
+		ldy #5 //bel-r
 		jsr chkflags
 		bne sound0
 		ldx #0
@@ -545,13 +548,13 @@ sound4:
 		rts
 
 sndvec:
-		byte 0,1,5,6,4,7,8,12,13,11,14,15,19,20,18
+		.byte 0,1,5,6,4,7,8,12,13,11,14,15,19,20,18
 
 timetbl:
-		byte 010,020,030,040
-		byte 050,060,070,080
-		byte 090,100,110,120
-		byte 150,180,240,001
+		.byte 010,020,030,040
+		.byte 050,060,070,080
+		.byte 090,100,110,120
+		.byte 150,180,240,001
 
-offset 0
-namespace ""
+}
+}

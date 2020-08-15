@@ -1,7 +1,7 @@
 
-;* message command interpreter
+//* message command interpreter
 
-;* mci routines follow *
+//* mci routines follow *
 domci0:
 		jmp notc1
 domci:
@@ -11,19 +11,19 @@ domci:
 		bne domci0
 		inc $96
 		ldy $96
-		lda [$71],y
+		lda ($71),y
 		cmp #british_pound
 		beq domci0
 		and #63
 		sta mcom
 		inc $96
 		iny
-		lda [$71],y
+		lda ($71),y
 		sta mchr
 		and #$0f
 		sta mnum
 		iny
-		lda [$71],y
+		lda ($71),y
 		sta mchr2
 		and #$0f
 		sta mnum2
@@ -37,9 +37,9 @@ domci:
 		adc mnum2
 		sta mval
 		iny
-		lda [$71],y
+		lda ($71),y
 		sta mchr3
-;* actual mci routines *
+//* actual mci routines *
 		lda mcom
 		cmp #40
 		bcs combad
@@ -56,36 +56,36 @@ comjmp:
 combad:
 		jmp notc
 mcom:
-		byte 0
+		.byte 0
 mnum:
-		byte 3
+		.byte 3
 mchr:
-		byte 0
+		.byte 0
 mnum2:
-		byte 0
+		.byte 0
 mchr2:
-		byte 0
+		.byte 0
 mval:
-		byte 0
+		.byte 0
 mchr3:
-		byte 0
+		.byte 0
 
 comtbl:
-		word notc,coma,comb,comc
-		word comd,come,comf,comg
-		word comh,comi,comj,comk
-		word coml,mcicomm,comn,como
-		word comp,comq,comr,coms
-		word comt,comu,comv,comw
-		word comx,comy,notc,notc
-		word notc,notc,notc,ctab
-		word notc,cvar,notc,clen
-		word cstr,cnum,notc,notc
+		.word notc,coma,comb,comc
+		.word comd,come,comf,comg
+		.word comh,comi,comj,comk
+		.word coml,mcicomm,comn,como
+		.word comp,comq,comr,coms
+		.word comt,comu,comv,comw
+		.word comx,comy,notc,notc
+		.word notc,notc,notc,ctab
+		.word notc,cvar,notc,clen
+		.word cstr,cnum,notc,notc
 
 mcivars:
-		cbm "d1ldnarnphbnb"
-		byte $80
-		cbm "and2d3akltd4agccdd"
+		.text "d1ldnarnphbnb"
+		.byte $80
+		.text "and2d3akltd4agccdd"
 
 mcivar:
 		txa
@@ -98,35 +98,35 @@ mcivar:
 		jmp usevar0
 
 colors:
-		byte cursor_cyan ; (default color)
-		byte cursor_white
-		byte cursor_red
-		byte cursor_cyan
-		byte cursor_purple
-		byte cursor_green
-		byte cursor_blue
-		byte cursor_yellow
-		byte cursor_orange
-		byte cursor_brown
-		byte cursor_lt_red
-		byte cursor_gray1
-		byte cursor_gray2
-		byte cursor_lt_green
-		byte cursor_lt_blue
-		byte cursor_gray3
+		.byte cursor_cyan // (default color)
+		.byte cursor_white
+		.byte cursor_red
+		.byte cursor_cyan
+		.byte cursor_purple
+		.byte cursor_green
+		.byte cursor_blue
+		.byte cursor_yellow
+		.byte cursor_orange
+		.byte cursor_brown
+		.byte cursor_lt_red
+		.byte cursor_gray1
+		.byte cursor_gray2
+		.byte cursor_lt_green
+		.byte cursor_lt_blue
+		.byte cursor_gray3
 
-;* \a - compare to variable
+//* \a - compare to variable
 coma:
 		jsr mcivar
-		lda var+1
+		lda varbuf+1
 		sta coma2+1
-		lda var+2
+		lda varbuf+2
 		sta coma2+2
 		ldx #0
 coma1:
 		inc $96
 		ldy $96
-		lda [$71],y
+		lda ($71),y
 		cmp #british_pound
 		beq coma3
 coma2:
@@ -146,30 +146,30 @@ coma5:
 		ldy $96
 		cpy #80
 		beq coma6
-		lda [$71],y
+		lda ($71),y
 		cmp #british_pound
 		bne coma5
 coma6:
 		rts
 
-;* \b - send bells
+//* \b - send bells
 comb:
 		lda #7
 		jmp repchr
 
-;* \k - kolorific
+//* \k - kolorific
 comk:
 		stx mkolor
 		beq comc2
 
-;* \c - set color
+//* \c - set color
 comc:
 		lda mnum
 		bne comc1
-comqc = *+1
+.label comqc = *+1
 
-; self-modifying
-; TODO is this a bug? should it be lda?
+// self-modifying
+// TODO is this a bug? should it be lda?
 
 		ldx #3
 		beq comc2
@@ -181,19 +181,19 @@ comc1:
 comc2:
 		rts
 
-;* \d - branch on not equal
+//* \d - branch on not equal
 comd:
 		lda mresult
 		beq comj
 		rts
 
-;* \e - branch on equal
+//* \e - branch on equal
 come:
 		lda mresult
 		bne comj
 		rts
 
-;* \j - skip lines
+//* \j - skip lines
 comj:
 		lda mnum
 comj1:
@@ -205,25 +205,25 @@ comj1:
 comj2:
 		rts
 
-;* \f - send form feed
+//* \f - send form feed
 comf:
 		lda #clear_screen
 		sta $fe
 		jmp output
 
-;* \g - get character
+//* \g - get character
 comg:
 		txa
 		and #1
 		sta case
 		jmp inchr
 
-;* \h - send backspaces
+//* \h - send backspaces
 comh:
 		lda #20
 		jmp repchr
 
-;* \i - input to buffer
+//* \i - input to buffer
 comi:
 		txa
 		and #1
@@ -236,7 +236,7 @@ comi:
 		sta passmode
 		jsr zero
 		ldx #0
-		jsr putvar ;an$
+		jsr putvar //an$
 		lda $96
 		pha
 		lda $71
@@ -256,47 +256,47 @@ comi:
 		sta $96
 		rts
 
-;* \l - send output to printer
+//* \l - send output to printer
 coml:
 		txa
 		and #1
-		sta mprtr
+		sta outptr+1
 		rts
 
-;* \m - margin set
+//* \m - margin set
 mcicomm:
 		ldx mnum2
-		cmp #"<"
+		cmp #'<'
 		bne comm1
 		stx mleft
 comm1:
-		cmp #">"
+		cmp #'>'
 		bne comm2
 		stx mright
 comm2:
 		inc $96
 		rts
 
-;* \n - send carriage returns
+//* \n - send carriage returns
 comn:
 		lda #carriage_return
 		jmp repchr
 
-;* \o - output 19 characters
+//* \o - output 19 characters
 como:
 		ldx #19
 		jmp repchr
 
-;* \p - set print mode
+//* \p - set print mode
 comp:
 		stx mprint
 		rts
 
-;* \q - reset mci settings
+//* \q - reset mci settings
 comq:
 		beq comq1
 
-; set default color
+// set default color
 
 		stx comqc
 comq1:
@@ -305,7 +305,7 @@ comq1:
 		sta mjump
 		sta mnum
 		sta mreverse
-		sta mprtr
+		sta outptr+1
 		sta mprint
 		sta mspeed
 		sta mkolor
@@ -315,7 +315,7 @@ comq1:
 		sta mright
 		jmp comu1
 
-;* \r - reverse mode
+//* \r - reverse mode
 comr:
 		txa
 		and #1
@@ -325,20 +325,20 @@ comr:
 		sta $fe
 		jmp outchr
 
-;* \s - set print speed
+//* \s - set print speed
 coms:
 		stx mspeed
 		rts
 
-;* \t - compare to buffer
+//* \t - compare to buffer
 comt:
 		cpx #2
 		bne comt1
 		ldx #24
-		jsr usevar ;ac%
-		lda var+1
+		jsr usevar //ac%
+		lda varbuf+1
 		and #$0f
-		ora #"0"
+		ora #'0'
 		sta buffer
 comt1:
 		lda #<buffer
@@ -348,7 +348,7 @@ comt1:
 		ldx #0
 		jmp coma1
 
-;* \u - uppercase mode
+//* \u - uppercase mode
 comu:
 		txa
 comu1:
@@ -360,16 +360,16 @@ comu1:
 		sta $fe
 		jmp outchr
 
-;* \v - print variable
+//* \v - print variable
 comv:
 		stx mcom
 		jsr mcivar
 comv0:
-		lda var
+		lda varbuf
 		sta comv1+1
-		lda var+1
+		lda varbuf+1
 		sta comv3+1
-		lda var+2
+		lda varbuf+2
 		sta comv3+2
 		lda #0
 		sta comv2+1
@@ -411,13 +411,13 @@ comv7:
 comv8:
 		rts
 
-;* \w - wait
+//* \w - wait
 comw:
 		beq comw2
 		inx
 comw1:
 		lda scs
-; wait for scs to change
+// wait for scs to change
 comw1a:
 		cmp scs
 		beq comw1a
@@ -426,13 +426,13 @@ comw1a:
 comw2:
 		rts
 
-;* \x - abort file read
+//* \x - abort file read
 comx:
 		lda #32
 		sta chat
 		rts
 
-;* \y - yes/no
+//* \y - yes/no
 comy:
 		txa
 		and #1
@@ -447,11 +447,11 @@ comy0:
 		jsr xgetchr
 		tax
 		pla
-		cpx #cbm("N")
+		cpx #'N'
 		bne comy1
 		lda #0
 comy1:
-		cpx #cbm("Y")
+		cpx #'Y'
 		bne comy2
 		lda #1
 comy2:
@@ -477,7 +477,7 @@ cvar:
 		lda #0
 		sta cvar1+1
 		lda $0100
-		cmp #" "
+		cmp #' '
 		beq cvar2
 cvar1:
 		lda $0100
@@ -496,7 +496,7 @@ cvar3:
 		sta $96
 		rts
 
-;* \# - length of field / fill chr
+//* \# - length of field / fill chr
 clen:
 		lda mchr
 		cmp #$30
@@ -509,12 +509,12 @@ clen:
 		lda #5
 clen0a:
 		sta mdigits
-		lda #"0"
+		lda #'0'
 clen1:
 		sta cnumc
 		rts
 
-;* \$ - print string variable
+//* \$ - print string variable
 cstr:
 		lda #2
 		sta mcom
@@ -523,14 +523,14 @@ cstr:
 		jsr usevar0
 		jmp comv0
 
-;* \% - print integer variable
+//* \% - print integer variable
 cnum:
 		lda mchr
 		ora #$80
 		ldx #$80
 		jsr usevar0
-		ldx var
-		lda var+1
+		ldx varbuf
+		lda varbuf+1
 prax:
 		jsr decimal
 		ldy #0
@@ -548,7 +548,7 @@ cnum1:
 		bcs cnum2
 		ldx cnumf
 		bne cnum2
-		cmp #"0"
+		cmp #'0'
 		bne cnum2
 		ldx mdigits
 		beq cnum3
@@ -567,13 +567,13 @@ cnum3:
 		bne cnum1
 		rts
 cnumf:
-		byte 0
+		.byte 0
 cnumd:
-		byte 0
+		.byte 0
 cnumc:
-		byte "0"
+		.text "0"
 
-;\_ - mci tab
+//\_ - mci tab
 ctab:
 		inc $96
 		lda mval
@@ -583,7 +583,7 @@ ctab:
 		cmp #40
 		bcs ctab0
 ctab1:
-		lda #" "
+		lda #' '
 		sta $fe
 		jsr output
 		lda mval
@@ -592,7 +592,7 @@ ctab1:
 ctab0:
 		rts
 
-;* repeat a character(\b,\h,\n,\o)
+//* repeat a character(\b,\h,\n,\o)
 repchr:
 		sta tmp5
 		cpx #0
@@ -607,7 +607,7 @@ repchr1:
 repchr2:
 		rts
 
-;* not an mci command
+//* not an mci command
 notc:
 		dec $96
 		dec $96
@@ -616,12 +616,12 @@ notc1:
 		cmp #$04
 		bne domode
 
-;* handle ctrl-d in string
+//* handle ctrl-d in string
 		ldx #0
 dodate:
 		inc $96
 		ldy $96
-		lda [$71],y
+		lda ($71),y
 		sta datebuf,x
 		inx
 		cpx #11
@@ -640,7 +640,7 @@ dodate1:
 dodate2:
 		rts
 
-;* do print modes
+//* do print modes
 domode:
 		sta $fe
 		ldx mprint
@@ -679,12 +679,12 @@ domode6:
 		lda tmp4
 		jmp domode3
 
-;* do print speed
+//* do print speed
 dospeed:
 		ldx mspeed
 		beq dokolor
 		jsr tenwait
-;* do kolorific
+//* do kolorific
 dokolor:
 		lda mkolor
 		beq donone
@@ -703,7 +703,7 @@ dokolor1:
 donone:
 		rts
 
-; wait for .x tenths of a second
+// wait for .x tenths of a second
 tenwait:
 		cpx #0
 		beq tnw3

@@ -1,13 +1,13 @@
-offset wedge_exec_address - *
-namespace "wedge"
+.pseudopc wedge_exec_address {
+.namespace wedge {
 
-; jump table
+// jump table
 
-; xx00: install w/o error trap
-; xx03: install w/error trap
-; xx06: load after filename is set
-; xx09: save array pointers
-; xx0c: restore array pointers
+// xx00: install w/o error trap
+// xx03: install w/error trap
+// xx06: load after filename is set
+// xx09: save array pointers
+// xx0c: restore array pointers
 
 start:
 		jmp install
@@ -30,9 +30,9 @@ wfunc0:
 		jmp $b391
 
 filename_len:
-		byte 0
+		.byte 0
 fdev:
-		byte 0
+		.byte 0
 
 tload:
 		jsr chrget
@@ -45,7 +45,7 @@ openroom:
 openroo1:
 		cpy $b7
 		beq openroo2
-		lda [$bb],y
+		lda ($bb),y
 		sta fbuf,y
 		iny
 		cpy #20
@@ -90,9 +90,9 @@ loadfile:
 		jsr chrin
 		jsr chrin
 		jsr chrin
-		sta l1
+		sta l1x+1
 		jsr chrin
-		sta l2
+		sta l2x+1
 		jsr clrchn
 		lda #127
 		jsr closef
@@ -117,9 +117,9 @@ loaderr:
 loadfil1:
 		jsr linkprg
 
-		lda l1
+		lda l1x+1
 		cmp 57
-		lda l2
+		lda l2x+1
 		sbc 58
 		bcs chopfile
 		lda #<(prgstart-1)
@@ -131,14 +131,14 @@ chopfile:
 		ldx #<65535
 		ldy #>65535
 chopfil1:
-		stx l1
-		sty l2
+		stx l1x+1
+		sty l2x+1
 		jsr scan0
 		ldy #0
 		tya
-		sta [$ae],y
+		sta ($ae),y
 		iny
-		sta [$ae],y
+		sta ($ae),y
 		clc
 		lda #2
 		adc $ae
@@ -168,8 +168,8 @@ clrm:
 		lda 1,x
 		sta $b1
 clrm1:
-		lda [$ac],y
-		sta [$ae],y
+		lda ($ac),y
+		sta ($ae),y
 		lda $ac
 		cmp 0,x
 		bne clrm0
@@ -203,12 +203,12 @@ scan1:
 		stx $ae
 		sty $af
 		ldy #2
-		lda [$ae],y
-l1 = *+1
+		lda ($ae),y
+l1x:
 		cmp #0
 		iny
-		lda [$ae],y
-l2 = *+1
+		lda ($ae),y
+l2x:
 		sbc #0
 		bcs scan3
 scan2:
@@ -217,10 +217,10 @@ scan2:
 		sta $ac
 		stx $ad
 		ldy #0
-		lda [$ae],y
+		lda ($ae),y
 		tax
 		iny
-		lda [$ae],y
+		lda ($ae),y
 		tay
 		bne scan1
 scan3:
@@ -251,8 +251,8 @@ oprm2:
 		dec $af
 oprm3:
 		dec $ae
-		lda [$ac],y
-		sta [$ae],y
+		lda ($ac),y
+		sta ($ae),y
 		jmp oprm1
 oprm4:
 		lda $ae
@@ -287,7 +287,7 @@ tpoke:
 		jsr pokefix
 		ldy #0
 		txa
-		sta [$14],y
+		sta ($14),y
 		jmp gone2
 
 tsys:
@@ -319,9 +319,9 @@ thex:
 thex1:
 		jsr chrget
 		bcc thex2
-		cmp #cbm("g")
+		cmp #'g'
 		bcs thex5
-		cmp #cbm("a")
+		cmp #'a'
 		bcc thex5
 		sbc #7
 thex2:
@@ -353,7 +353,7 @@ tpeek:
 		jsr getadr
 		jsr pokefix
 		ldy #0
-		lda [$14],y
+		lda ($14),y
 		tay
 		pla
 		sta $15
@@ -379,12 +379,12 @@ wgone:
 		lda 52
 		sbc 50
 		bne wgone1
-; less than 256 bytes free, force
-; out of memory error for safety
+// less than 256 bytes free, force
+// out of memory error for safety
 		ldx #1
 		jsr arrayrs0
 		ldx #16
-		jmp error ;outofm
+		jmp error //outofm
 wgone1:
 		lda #r6510_basic_ram
 		sta r6510
@@ -392,7 +392,7 @@ wgone1:
 		lda #r6510_normal
 		sta r6510
 		jsr chrget
-		cmp #cbm("&")
+		cmp #'&'
 		beq ampr0
 		cmp #poketok
 		beq poke0
@@ -409,7 +409,7 @@ weval:
 		jsr chrget
 		ldx #0
 		stx $d
-		cmp #cbm("$")
+		cmp #'$'
 		beq hex0
 		cmp #peektok
 		beq peek0
@@ -446,7 +446,7 @@ getaxy:
 getparm:
 		jsr chrgot
 		ldx #0
-		cmp #cbm(",")
+		cmp #','
 		bne getparm1
 		jsr getbytc
 getparm1:
@@ -506,7 +506,7 @@ arrayoff:
 		ldy #2
 		rts
 
-;* copy pointers for arrays *
+//* copy pointers for arrays *
 arraysv0:
 		jsr arrayoff
 arsv1:
@@ -524,7 +524,7 @@ arsv1:
 		bpl arsv1
 		rts
 
-;* restore pointers for arrays *
+//* restore pointers for arrays *
 arrayrs0:
 		lda $2f
 		sta $ac
@@ -559,8 +559,8 @@ arrs3a:
 		bne arrs2
 		inc $af
 arrs2:
-		lda [$ac],y
-		sta [$ae],y
+		lda ($ac),y
+		sta ($ae),y
 		lda $ae
 		cmp $31
 		bne arrs3
@@ -577,5 +577,5 @@ collect:
 		jsr gc
 		jmp swapagn
 
-offset 0
-namespace ""
+}
+}

@@ -1,7 +1,7 @@
 stcount:
-		byte 0
+		.byte 0
 stsize:
-		byte 0
+		.byte 0
 
 lodstruc:
 		jsr fnvar
@@ -61,8 +61,8 @@ putstruc:
 		tax
 		beq puts2
 puts1:
-		lda [$22],y
-		sta [$14],y
+		lda ($22),y
+		sta ($14),y
 		iny
 		cpy stcount
 		bcs puts3
@@ -70,7 +70,7 @@ puts1:
 		bne puts1
 puts2:
 		lda #0
-		sta [$14],y
+		sta ($14),y
 		iny
 		cpy stcount
 		bcc puts2
@@ -82,7 +82,7 @@ getstruc:
 		jsr fnvar
 		ldy #0
 gets1:
-		lda [$14],y
+		lda ($14),y
 		beq gets2
 		iny
 		cpy stcount
@@ -95,15 +95,15 @@ gets2:
 gets3:
 		cpy stcount
 		beq gets4
-		lda [$14],y
-		sta [$62],y
+		lda ($14),y
+		sta ($62),y
 		iny
 		bne gets3
 gets4:
 		ldy #4
 gets5:
 		lda $61,y
-		sta [$47],y
+		sta ($47),y
 		dey
 		bpl gets5
 		rts
@@ -113,8 +113,8 @@ putfloat:
 		jsr fnvar
 		ldy #4
 putf1:
-		lda [$47],y
-		sta [$14],y
+		lda ($47),y
+		sta ($14),y
 		dey
 		bpl putf1
 		rts
@@ -124,8 +124,8 @@ getfloat:
 		jsr fnvar
 		ldy #4
 getf1:
-		lda [$14],y
-		sta [$47],y
+		lda ($14),y
+		sta ($47),y
 		dey
 		bpl getf1
 		rts
@@ -158,13 +158,13 @@ cursp4:
 
 cursmode:
 		ldx #16
-		jsr chkflag ;asc
+		jsr chkflag //asc
 		bne cursmod1
 		lda #1
 		rts
 cursmod1:
 		ldx #18
-		jsr chkflag ;ans
+		jsr chkflag //ans
 		beq cursmod2
 		lda #2
 		rts
@@ -176,9 +176,9 @@ calcgoto:
 		txa
 		pha
 		ldx #30
-		jsr usevar ;a%
-		ldx var+1
-		ldy var
+		jsr usevar //a%
+		ldx varbuf+1
+		ldy varbuf
 		pla
 		bne calcgot1
 		jmp mlgoto
@@ -201,7 +201,7 @@ ecsc1:
 		lda #0
 		cpy index
 		bcs ecsc2
-		lda [$22],y
+		lda ($22),y
 ecsc2:
 		sta buf2,y
 		iny
@@ -212,22 +212,22 @@ ecsc2:
 		ldy #0
 ecsc3:
 		lda #0
-		sta var+3
+		sta varbuf+3
 ecsc4:
 		lda #0
-		sta var+4
+		sta varbuf+4
 		lda #0
-		sta var+0
+		sta varbuf+0
 		lda #1
-		sta var+1
+		sta varbuf+1
 ecsscan:
 		ldy #2
-		lda [var+3],y
+		lda (varbuf+3),y
 ecsc5:
 		and #0
 		bne ecsscan1
 		ldy #3
-		lda [var+3],y
+		lda (varbuf+3),y
 ecsc6:
 		and #0
 		beq ecsnext
@@ -235,7 +235,7 @@ ecsscan1:
 		ldy #6
 		ldx #0
 ecsscan2:
-		lda [var+3],y
+		lda (varbuf+3),y
 		iny
 		cmp buf2,x
 		bne ecsnext
@@ -247,26 +247,26 @@ ecsscan2:
 		jmp ecsdone
 
 ecsnext:
-		lda var+3
+		lda varbuf+3
 		clc
 		adc stsize
-		sta var+3
-		lda var+4
+		sta varbuf+3
+		lda varbuf+4
 		adc #0
-		sta var+4
-		inc var+1
+		sta varbuf+4
+		inc varbuf+1
 		dec stcount
 		bne ecsscan
 ecsquit:
 		lda #0
-		sta var
-		sta var+1
+		sta varbuf
+		sta varbuf+1
 ecsdone:
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 arbit:
-		sty lu
+		sty lu_load+1
 		lda $ffd2
 		cmp #$20
 		bne arbit1
@@ -281,15 +281,15 @@ lock:
 		clc
 		jsr block
 		bpl idle
-		cmp port
+		cmp port_load+1
 		beq lock1
-		ldy #$cc ; reverse uppercase L
+		ldy #$cc // reverse uppercase L
 		sty tdisp+31
 		jsr tdelay
 		bne lock
 idle:
 		ldx #0
-		lda port
+		lda port_load+1
 lock1:
 		inx
 		sec
@@ -297,7 +297,7 @@ lock1:
 		jsr tdelay
 		clc
 		jsr block
-port=*+1
+port_load:
 		cmp #0
 		bne lock
 		ldy #$a0
@@ -308,7 +308,7 @@ unlock:
 		clc
 		jsr block
 		bpl unlock0
-		cmp port
+		cmp port_load+1
 		bne unlock0
 		dex
 		bne unlock1
@@ -324,21 +324,24 @@ block:
 		php
 		sta ltk_redbuf
 		stx ltk_redbuf+1
-lu=*+1
+lu_load:
+// changed by self-modifying code
 		lda #0
 		sec
-blkl=*+1
+blkl_load:
+// changed by self-modifying code
 		adc #0
 		tax
 		lda #0
-blkh=*+1
+blkh_load:
+// changed by self-modifying code
 		adc #0
 		tay
 		lda #10
 		plp
 		jsr ltk_driver
-		word ltk_redbuf
-		byte 1
+		.word ltk_redbuf
+		.byte 1
 		ldx ltk_redbuf+1
 		lda ltk_redbuf
 		jsr ltk_bankin

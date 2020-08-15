@@ -1,76 +1,76 @@
-offset protostart - *
-namespace "struct"
+.pseudopc protostart {
+.namespace structml {
 
-;putstruc - put string into struct
-; &,nn,0,num,arry(a,b),string$
-; arry(a,b) = starting element
-; num = # of bytes
-; string$ = the string
+//putstruc - put string into struct
+// &,nn,0,num,arry(a,b),string$
+// arry(a,b) = starting element
+// num = # of bytes
+// string$ = the string
 
-;getstruc - get string from struct
-; &,nn,1,num,arry(a,b),string$
-; arry(a,b) = starting element
-; num = # of bytes
-; string$ = the string
+//getstruc - get string from struct
+// &,nn,1,num,arry(a,b),string$
+// arry(a,b) = starting element
+// num = # of bytes
+// string$ = the string
 
-;lodstruc - load structure
-; &,nn,2,0,arry(a,b),"file",dev
-; arry(a,b) = starting element
-; "file" = filename
-; dev = device #
+//lodstruc - load structure
+// &,nn,2,0,arry(a,b),"file",dev
+// arry(a,b) = starting element
+// "file" = filename
+// dev = device #
 
-;savstruc - save structure
-; &,nn,3,0,arry(a,b),bytes,"file",dev
-; arry(a,b) = starting element
-; bytes = # of bytes
-; "file" = filename
-; dev = device #
+//savstruc - save structure
+// &,nn,3,0,arry(a,b),bytes,"file",dev
+// arry(a,b) = starting element
+// bytes = # of bytes
+// "file" = filename
+// dev = device #
 
-;putdate - put date into struct
-; &,nn,4,0,arry(a,b),string$
-; arry(a,b) = starting element
-; string$ = the date string
+//putdate - put date into struct
+// &,nn,4,0,arry(a,b),string$
+// arry(a,b) = starting element
+// string$ = the date string
 
-;getdate - get date from struct
-; &,nn,5,0,arry(a,b),string$
-; arry(a,b) = starting element
-; string$ = the string
+//getdate - get date from struct
+// &,nn,5,0,arry(a,b),string$
+// arry(a,b) = starting element
+// string$ = the string
 
-;doscan - scan structures
-; &,nn,6,num,com,a(a,b),b(a,b),l,bits,test
-; com = command number
-; com = 0: 2 byte and, <>0
-; com = 1: 2 byte and, ==0
-; com = 2: 2 byte cmp, <
-; com = 3: 2 byte cmp, >=
-; com = 4: date cmp, <
-; com = 5: date cmp, >=
-; num = # of structures to scan
-; a(a,b) = starting flags element
-; b(a,b) = starting object element
-; bits = the bits to set if true
-; test = the object to test for
+//doscan - scan structures
+// &,nn,6,num,com,a(a,b),b(a,b),l,bits,test
+// com = command number
+// com = 0: 2 byte and, <>0
+// com = 1: 2 byte and, ==0
+// com = 2: 2 byte cmp, <
+// com = 3: 2 byte cmp, >=
+// com = 4: date cmp, <
+// com = 5: date cmp, >=
+// num = # of structures to scan
+// a(a,b) = starting flags element
+// b(a,b) = starting object element
+// bits = the bits to set if true
+// test = the object to test for
 
-ilen = $61 ;1
-istr = $62 ;2
-iptr = $64 ;2
-jlen = $69 ;1
-jstr = $6a ;2
-jptr = $6c ;2
-temp = $14 ;2
+.label ilen = $61 //1
+.label istr = $62 //2
+.label iptr = $64 //2
+.label jlen = $69 //1
+.label jstr = $6a //2
+.label jptr = $6c //2
+.label temp = $14 //2
 
-opandy=57
-opcmpy=217
-opbne =208
-opbcc =144
-opbeq =240
-opbcs =176
+.label opandy=57
+.label opcmpy=217
+.label opbne =208
+.label opbcc =144
+.label opbeq =240
+.label opbcs =176
 
-makerm = $b475
-chkcom = $aefd
-getnxt = $e206
+.label makerm = $b475
+.label chkcom = $aefd
+.label getnxt = $e206
 
-defbase= $c600
+.label defbase= $c600
 
 entry1:
 		jmp clrarr
@@ -98,16 +98,16 @@ strucrts:
 		rts
 
 functbl:
-		word putdate ;4
-		word getdate ;5
-		word doscan ;6
-		word sort ;7
-		word scannums ;8
-		word scansum ;9
-		word cpystruc ;10
-		word scanstr ;11
-		word gamescan ;12
-		word textread ;13
+		.word putdate //4
+		.word getdate //5
+		.word doscan //6
+		.word sort //7
+		.word scannums //8
+		.word scansum //9
+		.word cpystruc //10
+		.word scanstr //11
+		.word gamescan //12
+		.word textread //13
 
 putvar:
 		lda #30
@@ -119,19 +119,19 @@ xchrout1:
 		jmp usetbl1
 
 count:
-		byte 0
+		.byte 0
 func:
-		byte 0
+		.byte 0
 size:
-		byte 0
+		.byte 0
 scanfor:
-		byte 0,0,0,0,0,0
+		.byte 0,0,0,0,0,0
 bitmask:
-		word 0
+		.word 0
 invert:
-		byte 0
+		.byte 0
 oper:
-		byte 0
+		.byte 0
 
 getsize:
 		jsr evalbyt
@@ -150,7 +150,7 @@ evaldate:
 		ldy #1
 		ldx #0
 evald1:
-		lda [$62],y
+		lda ($62),y
 		iny
 		and #15
 		asl
@@ -158,7 +158,7 @@ evald1:
 		asl
 		asl
 		sta scanfor,x
-		lda [$62],y
+		lda ($62),y
 		iny
 		and #15
 		ora scanfor,x
@@ -168,7 +168,7 @@ evald1:
 		bcc evald1
 evald2:
 		ldy #0
-		lda [$62],y
+		lda ($62),y
 		sta scanfor+5
 		ldx scanfor+3
 		txa
@@ -189,7 +189,7 @@ putdate:
 		ldy #0
 putd1:
 		lda scanfor,y
-		sta [$14],y
+		sta ($14),y
 		iny
 		cpy #6
 		bcc putd1
@@ -199,7 +199,7 @@ getdate:
 		jsr fnvar1
 		ldy #5
 getd1:
-		lda [$14],y
+		lda ($14),y
 		sta scanfor,y
 		dey
 		bpl getd1
@@ -219,7 +219,7 @@ getd0:
 		lda scanfor+5
 		ldx #0
 		ldy #0
-		sta [$62],y
+		sta ($62),y
 		iny
 getd2:
 		lda scanfor,x
@@ -230,12 +230,12 @@ getd2:
 		lsr
 		lsr
 		ora #$30
-		sta [$62],y
+		sta ($62),y
 		iny
 		pla
 		and #15
 		ora #$30
-		sta [$62],y
+		sta ($62),y
 		iny
 		cpx #5
 		bcc getd2
@@ -243,17 +243,17 @@ getd3:
 		ldy #4
 getd4:
 		lda $61,y
-		sta [$47],y
+		sta ($47),y
 		dey
 		bpl getd4
 		rts
 
 opc1:
-		byte opandy,opcmpy
+		.byte opandy,opcmpy
 opc2:
-		byte opbne, opbcc
+		.byte opbne, opbcc
 opc3:
-		byte opbeq, opbcs
+		.byte opbeq, opbcs
 
 scanbits:
 		txa
@@ -314,8 +314,8 @@ doscan2:
 		pla
 		sta $69
 		lda #0
-		sta var
-		sta var+1
+		sta varbuf
+		sta varbuf+1
 		lda count
 		beq doscan15
 doscan3:
@@ -325,14 +325,14 @@ doscan3:
 doscan5:
 		lda bitmask,y
 		eor #255
-		and [$69],y
-		sta [$69],y
+		and ($69),y
+		sta ($69),y
 		dey
 		bpl doscan5
 doscan6:
 		ldy #0
 doscan7:
-		lda [$6b],y
+		lda ($6b),y
 checkc0:
 		cmp scanfor,y
 checkc1:
@@ -357,11 +357,11 @@ doscan10:
 		ldy #1
 doscan11:
 		lda bitmask,y
-		ora [$69],y
-		sta [$69],y
+		ora ($69),y
+		sta ($69),y
 		dey
 		bpl doscan11
-		inc var+1
+		inc varbuf+1
 doscan12:
 		ldx #2
 doscan13:
@@ -379,16 +379,16 @@ doscan14:
 		bne doscan3
 doscan15:
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 i:
-		word 0
+		.word 0
 j:
-		word 0
+		.word 0
 n:
-		word 0
+		.word 0
 base:
-		word 0
+		.word 0
 
 calcp:
 		stx temp
@@ -418,13 +418,13 @@ calcs:
 		stx temp
 		sty temp+1
 		ldy #0
-		lda [temp],y
+		lda (temp),y
 		pha
 		iny
-		lda [temp],y
+		lda (temp),y
 		tax
 		iny
-		lda [temp],y
+		lda (temp),y
 		tay
 		pla
 		rts
@@ -432,8 +432,8 @@ calcs:
 strcmp:
 		ldy #0
 strcmp1:
-		lda [jstr],y
-		cmp [istr],y
+		lda (jstr),y
+		cmp (istr),y
 		bne strcmp3
 		iny
 		cpy jlen
@@ -449,12 +449,12 @@ strcmp3:
 strptn:
 		ldy #0
 strptn1:
-		lda [jstr],y
+		lda (jstr),y
 		cmp #function_key_2
 		beq strptn2
 		cmp #function_key_7
 		beq strptn4
-		cmp [istr],y
+		cmp (istr),y
 		bne strptn4
 strptn2:
 		iny
@@ -513,9 +513,9 @@ sort3:
 		ldy #2
 sort7:
 		lda ilen,y
-		sta [jptr],y
+		sta (jptr),y
 		lda jlen,y
-		sta [iptr],y
+		sta (iptr),y
 		sta ilen,y
 		dey
 		bpl sort7
@@ -540,8 +540,8 @@ sort9:
 		bne sort1
 		rts
 
-; scan numbers
-; &,nn,8,num,siz,acs,a(a,b),a%(a),start
+// scan numbers
+// &,nn,8,num,siz,acs,a(a,b),a%(a),start
 
 scannums:
 		jsr getsize
@@ -557,10 +557,10 @@ scannums:
 		tya
 		pha
 		jsr evalbyt
-		stx var
+		stx varbuf
 		lda #0
-		sta var+2
-		sta var+1
+		sta varbuf+2
+		sta varbuf+1
 		pla
 		sta $6a
 		pla
@@ -574,25 +574,25 @@ scannum1:
 		beq scannum6
 		ldy #0
 scannum2:
-		lda [$6b],y
+		lda ($6b),y
 		and scanfor
 		bne scannum3
 		iny
-		lda [$6b],y
+		lda ($6b),y
 		and scanfor+1
 		beq scannum4
 scannum3:
-		ldy var+2
+		ldy varbuf+2
 		lda #0
-		sta [$69],y
+		sta ($69),y
 		iny
-		lda var
-		sta [$69],y
+		lda varbuf
+		sta ($69),y
 		iny
-		sty var+2
-		inc var+1
+		sty varbuf+2
+		inc varbuf+1
 scannum4:
-		inc var
+		inc varbuf
 		clc
 		lda size
 		adc $6b
@@ -604,12 +604,12 @@ scannum5:
 		bne scannum1
 scannum6:
 		lda #0
-		sta var
+		sta varbuf
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
-; sum
-; &,nn,9,num,siz,a(a,b)
+// sum
+// &,nn,9,num,siz,a(a,b)
 
 scansum:
 		jsr getsize
@@ -617,17 +617,17 @@ scansum:
 		stx $6b
 		sty $6c
 		lda #0
-		sta var
-		sta var+1
+		sta varbuf
+		sta varbuf+1
 scansum1:
 		lda count
 		beq scansum4
 		ldy #1
 		clc
 scansum2:
-		lda [$6b],y
-		adc var,y
-		sta var,y
+		lda ($6b),y
+		adc varbuf,y
+		sta varbuf,y
 		dey
 		bpl scansum2
 		lda size
@@ -640,10 +640,10 @@ scansum3:
 		bne scansum1
 scansum4:
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
-; copy
-; &,nn,10,size,a1(a,b),a2(a,b)
+// copy
+// &,nn,10,size,a1(a,b),a2(a,b)
 
 cpystruc:
 		jsr fnvar
@@ -662,13 +662,13 @@ cpys2:
 		bcc cpys1
 		rts
 
-; scan for string
-; &,nn,11,num,siz,op,str,a1(a,b),a2(b),start
+// scan for string
+// &,nn,11,num,siz,op,str,a1(a,b),a2(b),start
 
 stroplo:
-		byte <strcmp,<strptn
+		.byte <strcmp,<strptn
 strophi:
-		byte >strcmp,>strptn
+		.byte >strcmp,>strptn
 
 scanstr:
 		jsr getsize
@@ -685,7 +685,7 @@ scanstr:
 		tax
 		ldy #0
 scanstr_loop1:
-		lda [$22],y
+		lda ($22),y
 		sta buffer,y
 		iny
 		dex
@@ -723,7 +723,7 @@ scanstr1:
 		beq scanstr5
 		ldy #0
 loop:
-		lda [istr],y
+		lda (istr),y
 		beq scanstr2
 		iny
 		bne loop
@@ -734,10 +734,10 @@ scanstr0:
 		bne scanstr3
 		ldy iptr+1
 		lda #0
-		sta [jptr],y
+		sta (jptr),y
 		iny
 		lda iptr
-		sta [jptr],y
+		sta (jptr),y
 		iny
 		sty iptr+1
 scanstr3:
@@ -753,21 +753,21 @@ scanstr4:
 		bne scanstr1
 scanstr5:
 		lda #0
-		sta var
+		sta varbuf
 		lda iptr+1
 		lsr
-		sta var+1
+		sta varbuf+1
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 arrays1:
-		cbm "tbdenACDEFAS"
+		.text "tbdenACDEFAS"
 arrays2:
-		cbm "TBTDN"
-		byte $80, $80, $80, $80, $80
-		cbm "CO"
+		.text "TBTDN"
+		.byte $80, $80, $80, $80, $80
+		.text "CO"
 
-;* clear an array
+//* clear an array
 clrarr:
 		cpx #12
 		bcs clrar7
@@ -777,17 +777,17 @@ clrarr:
 		sta 72
 clrar0:
 		ldy #3
-		lda [71],y
+		lda (71),y
 		sta 21
 		dey
-		lda [71],y
+		lda (71),y
 		sta 20
 		dey
-		lda [71],y
+		lda (71),y
 		cmp arrays2,x
 		bne clrar1
 		dey
-		lda [71],y
+		lda (71),y
 		cmp arrays1,x
 		beq clrar3
 clrar1:
@@ -824,7 +824,7 @@ clrar3:
 clrar4:
 		ldy #0
 		tya
-		sta [71],y
+		sta (71),y
 		inc 71
 		bne clrar5
 		inc 72
@@ -840,8 +840,8 @@ clrar6:
 clrar7:
 		rts
 
-; game scan
-; &,60,12,count,size,a$,a%(a,b),b$
+// game scan
+// &,60,12,count,size,a$,a%(a,b),b$
 
 gamescan:
 		jsr evalbyt
@@ -860,7 +860,7 @@ gamescan:
 		sty index
 game1:
 		ldy #1
-		lda [$14],y
+		lda ($14),y
 		asl
 		tax
 		ldy index
@@ -879,21 +879,21 @@ game1:
 		ldy #4
 game3:
 		lda $61,y
-		sta [$47],y
+		sta ($47),y
 		dey
 		bpl game3
 		rts
 
 game2:
 		lda $ffff,x
-		sta [$62],y
+		sta ($62),y
 		inx
 		iny
 		rts
 
-; textread:
+// textread:
 
-; &,60,13,number,reclen,scan(),bits,text(),strlen
+// &,60,13,number,reclen,scan(),bits,text(),strlen
 
 textread:
 		jsr getsize
@@ -948,5 +948,5 @@ textr10:
 		bcc textr9
 		jmp textr4
 
-offset 0
-namespace ""
+}
+}

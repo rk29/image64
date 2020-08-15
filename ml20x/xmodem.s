@@ -1,31 +1,33 @@
-version = "9107098739"
+.var version = "9107098739"
 
-include "equat.s"
+.encoding "petscii_mixed"
 
-org protostart, "xmodem.prg"
+#import "equat.s"
 
-chrack = 6
-chrnak = 21
-chreot = 4
-chrcan = 24
-chrsoh = 1
-chrstx = 2
+* = protostart "xmodem.prg"
 
-gcount = 11
-bcount = 23
-ncount = 38
-tcount = 17
+.label chrack = 6
+.label chrnak = 21
+.label chreot = 4
+.label chrcan = 24
+.label chrsoh = 1
+.label chrstx = 2
 
-pbuf0= $658
-pbuf1= $400
-pbuf2= $500
-pbuf3= $630
+.label gcount = 11
+.label bcount = 23
+.label ncount = 38
+.label tcount = 17
 
-;flagbyte:
+.label pbuf0= $658
+.label pbuf1= $400
+.label pbuf2= $500
+.label pbuf3= $630
 
-; 1 = 0=normal,1=relaxed
-; 2 = 0=128b,1=1k
-; 4 =
+//flagbyte:
+
+// 1 = 0=normal,1=relaxed
+// 2 = 0=128b,1=1k
+// 4 =
 
 ml:
 		inx
@@ -43,19 +45,19 @@ ml:
 		bne getflag
 
 defflag:
-		byte 0
+		.byte 0
 flagbyte:
-		byte 0
+		.byte 0
 versiond:
-		byte version
+		.text version
 
 protonum:
 		lda #0
-		sta var
+		sta varbuf
 		lda #1
-		sta var+1
+		sta varbuf+1
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 x49152:
 		jmp xsend
@@ -70,21 +72,21 @@ setflag:
 		rts
 getflag:
 		lda defflag
-		sta var+1
+		sta varbuf+1
 		lda #0
-		sta var
+		sta varbuf
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 t1:
-		byte 60,240
+		.byte 60,240
 
 setup:
 		lda #52
 		ldx #16
 		ldy #3
 		jsr usetbl1
-		lda var+1
+		lda varbuf+1
 		sta oldtrans
 		lda #52
 		ldx #16
@@ -170,9 +172,9 @@ incblk:
 incblk1:
 		inc pbuf0,x
 		lda pbuf0,x
-		cmp #":"
+		cmp #':'
 		bne incblk2
-		lda #"0"
+		lda #'0'
 		sta pbuf0,x
 		dex
 		dey
@@ -235,17 +237,17 @@ exit2:
 		ldy oldtrans
 		jsr usetbl1
 		lda blocks
-		sta var+1
+		sta varbuf+1
 		lda blocks+1
-		sta var
+		sta varbuf
 		ldx #30
-		jsr putvar ;a%
+		jsr putvar //a%
 		lda badblks
-		sta var+1
+		sta varbuf+1
 		lda badblks+1
-		sta var
+		sta varbuf
 		ldx #31
-		jsr putvar ;b%
+		jsr putvar //b%
 		lda bytes
 		ldx bytes+1
 		ldy bytes+2
@@ -272,7 +274,7 @@ exit2:
 		and $62
 		sta $62
 		ldx #17
-		jmp putvar ;rc
+		jmp putvar //rc
 
 getbyte:
 		jsr exit
@@ -350,7 +352,7 @@ xsendc0:
 		bcs xsendc0
 		cmp #chrnak
 		beq xsendc2
-		cmp #cbm("c")
+		cmp #'c'
 		beq xsendc1
 		cmp #chrcan
 		beq xsendc3
@@ -368,7 +370,7 @@ sendblk:
 		lda kflag
 		beq sendblk1
 		lda #chrstx
-		byte $2c
+		.byte $2c
 sendblk1:
 		lda #chrsoh
 		jsr sendbyte
@@ -430,7 +432,7 @@ sendbuf:
 		lda #1
 		sta bufnum
 sendbuf1:
-		lda [$b0],y
+		lda ($b0),y
 		jsr sendbyte
 		jsr calcsum
 		sta pbuf1,y
@@ -484,7 +486,7 @@ fillbuf0:
 		ldy #0
 fillbuf1:
 		jsr chrin
-		sta [$b0],y
+		sta ($b0),y
 		iny
 		jsr readst
 		bne fillbuf2
@@ -507,7 +509,7 @@ fillbuf2:
 		bcs fillbuf4
 fillbuf3:
 		lda #26
-		sta [$b0],y
+		sta ($b0),y
 		iny
 		cpy #128
 		bcc fillbuf3
@@ -569,7 +571,7 @@ xrecvcrc:
 		lda #3
 		sta bufnum
 xrecvc1:
-		lda #cbm("c")
+		lda #'c'
 		jsr sendbyte
 		jsr waitch10
 		bcc xrecvc3
@@ -706,7 +708,7 @@ savebuf:
 		lda #1
 		sta bufnum
 savebuf1:
-		lda [$b0],y
+		lda ($b0),y
 		jsr chrout
 		sta pbuf1,y
 		iny
@@ -743,7 +745,7 @@ recvbuf1:
 		jsr waitch02
 		bcs recvbuf3
 		jsr calcsum
-		sta [$b0],y
+		sta ($b0),y
 		iny
 		cpy #128
 		bcc recvbuf1
@@ -768,45 +770,45 @@ recvbuf3:
 		rts
 
 blocknum:
-		byte 0
+		.byte 0
 blockrcv:
-		byte 0,0
+		.byte 0,0
 blocksiz:
-		word 1024
+		.word 1024
 crcflag:
-		byte 0
+		.byte 0
 kflag:
-		byte 1
+		.byte 1
 bufnum:
-		byte 0
+		.byte 0
 abrtflag:
-		byte 0
+		.byte 0
 endflag:
-		byte 0
+		.byte 0
 lastbuf:
-		byte 0
+		.byte 0
 waitsec:
-		byte 0
+		.byte 0
 stack:
-		byte 0
+		.byte 0
 oldtrans:
-		byte 0
+		.byte 0
 bytes:
-		byte 0,0,0
+		.byte 0,0,0
 crc:
-		word 0
+		.word 0
 crc1:
-		word 0
+		.word 0
 checksum:
-		byte 0
+		.byte 0
 charval:
-		byte 0
+		.byte 0
 errors:
-		byte 0
+		.byte 0
 blocks:
-		word 0
+		.word 0
 badblks:
-		word 0
+		.word 0
 
 xsendnam:
 		tsx
@@ -820,13 +822,13 @@ xsendnam:
 		jsr xsendcrc
 xsendn2:
 		ldx #0
-		jsr usevar ;an$
+		jsr usevar //an$
 		ldy #0
-		lda var
+		lda varbuf
 		beq xsendn4
 xsendn3:
-		lda [var+1],y
-		cmp #","
+		lda (varbuf+1),y
+		cmp #','
 		beq xsendn5
 		cmp #65
 		bcc xsendn7
@@ -840,7 +842,7 @@ xsendn7:
 		sta $568,y
 		sta xbuf,y
 		iny
-		cpy var
+		cpy varbuf
 		bcc xsendn3
 xsendn5:
 		lda #0
@@ -866,7 +868,7 @@ xrecvnam:
 xrecvn1:
 		lda xbuf,y
 		beq xrecvn2
-		cmp #","
+		cmp #','
 		beq xrecvn2
 		cmp #65
 		bcc xrecvn3
@@ -882,19 +884,19 @@ xrecvn3:
 		cpy #16
 		bcc xrecvn1
 xrecvn2:
-		lda #","
+		lda #','
 		sta buffer,y
 		iny
-		lda #cbm("s")
+		lda #'s'
 		sta buffer,y
 		iny
-		sty var
+		sty varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #0
-		jsr putvar ;an$
+		jsr putvar //an$
 		jmp exit2
 
 getmdm:
@@ -932,7 +934,7 @@ displcl1:
 		jsr displcl3
 		dey
 		beq displcl2
-		lda #":"
+		lda #':'
 		jsr displcl4
 		jmp displcl1
 displcl2:

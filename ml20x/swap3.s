@@ -1,5 +1,5 @@
-offset protostart - *
-namespace "swap3"
+.pseudopc protostart {
+.namespace swap3 {
 
 hc000:
 		jmp read0
@@ -12,36 +12,36 @@ hc009:
 hc00c:
 		jmp copyrite
 
-; jump table routines
+// jump table routines
 
 outastr:
 		lda #0
-		byte $2c
+		.byte $2c
 dskin:
 		lda #2
-		byte $2c
+		.byte $2c
 usevar:
 		lda #29
-		byte $2c
+		.byte $2c
 putvar:
 		lda #30
-		byte $2c
+		.byte $2c
 zero:
 		lda #31
-		byte $2c
+		.byte $2c
 minusone:
 		lda #32
-		byte $2c
+		.byte $2c
 prtvar0:
 		lda #46
-		byte $2c
+		.byte $2c
 output:
 		lda #55
 		jmp usetbl1
 
-; file read routines
+// file read routines
 
-;* unabortable for new user
+//* unabortable for new user
 newuser:
 		lda #1
 		sta readmode
@@ -51,7 +51,7 @@ relread:
 		lda #$bf
 		sta read1b+1
 
-;* main file reader
+//* main file reader
 read0:
 		cpx #$00
 		beq read0a
@@ -69,7 +69,7 @@ readf:
 		lda index
 		beq read1
 		lda buf2
-		cmp #"^"
+		cmp #'^'
 		beq read2
 read1:
 		jsr zero
@@ -79,10 +79,10 @@ read1:
 		jsr minusone
 read1a:
 		ldx #15
-		jsr putvar ;lp
+		jsr putvar //lp
 		jsr zero
 		ldx #17
-		jsr putvar ;rc
+		jsr putvar //rc
 		jsr outastr
 		lda dstat
 read1b:
@@ -91,8 +91,8 @@ read1b:
 		lda readmode
 		bne readf
 		ldx #17
-		jsr usevar ;rc
-		lda var
+		jsr usevar //rc
+		lda varbuf
 		beq readf
 read2:
 		lda #$ff
@@ -101,7 +101,7 @@ read2:
 		sta readmode
 		rts
 
-; movie view
+// movie view
 
 movie:
 		sty movdly
@@ -129,9 +129,9 @@ dl1:
 movie2:
 		rts
 movdly:
-		byte 0
+		.byte 0
 
-; print copyright message
+// print copyright message
 
 copyrite:
 		lda outastrp+1
@@ -139,30 +139,30 @@ copyrite:
 		lda outastrp+2
 		sta jmptbl+1
 
-		ldy #copylen-1
+		ldy #copymsg_end - copymsg - 1
 loop:
 		lda copymsg,y
 		sta buffer,y
 		dey
 		bpl loop
 
-		lda #copylen
-		sta var
+		lda #copymsg_end-copymsg
+		sta varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #0
-		jsr putvar ;an$
+		jsr putvar //an$
 
 		ldx #0
-		jmp prtvar0 ;an$
+		jmp prtvar0 //an$
 
 copymsg:
-		byte function_key_6, british_pound, 95
-		cbm "07IMAGE BBS 64 V" + version_number
-		byte function_key_6
-copylen = *-copymsg
+		.byte function_key_6, british_pound, 95
+		.text "07IMAGE BBS 64 V" + version_number
+		.byte function_key_6
+copymsg_end:
 
 mult3:
 		tya
@@ -174,7 +174,7 @@ mult3a:
 		tay
 		rts
 
-;* convert date to string *
+//* convert date to string *
 convdate:
 		jsr timezone
 		lda datebuf
@@ -197,7 +197,7 @@ convdate_loop1:
 		lda datebuf+4
 		and #15
 		ldx datebuf+3
-		cpx #"0"
+		cpx #'0'
 		beq conv01
 		clc
 		adc #10
@@ -232,7 +232,7 @@ convdate_loop2:
 		lda datebuf+10
 		sta date1+21
 		lda datebuf+7
-		and #cbm("1")
+		and #'1'
 		sta date1+17
 		lda datebuf+8
 		sta date1+18
@@ -241,19 +241,19 @@ convdate_loop2:
 		ldx #8
 		jsr convert6
 		lda datebuf+7
-		ldx #cbm("P")
-		cmp #cbm("8")
+		ldx #'P'
+		cmp #'8'
 		bcs convert5
-		ldx #cbm("A")
+		ldx #'A'
 convert5:
 		stx date1+23
 		rts
 
 convert6:
 		lda date1,x
-		cmp #cbm("0")
+		cmp #'0'
 		bne convert7
-		lda #cbm(" ")
+		lda #' '
 		sta date1,x
 convert7:
 		rts
@@ -328,17 +328,17 @@ mtoh3:
 		rts
 
 dday:
-		byte 0
+		.byte 0
 dyear:
-		byte 0
+		.byte 0
 dmonth:
-		byte 0
+		.byte 0
 ddate:
-		byte 0
+		.byte 0
 dhour:
-		byte 0
+		.byte 0
 dmin:
-		byte 0
+		.byte 0
 
 timezone:
 		ldx #0
@@ -450,5 +450,5 @@ tz11:
 		jsr btoa
 		rts
 
-offset 0
-namespace ""
+}
+}

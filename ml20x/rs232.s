@@ -1,6 +1,6 @@
-include "equat.s"
+#import "equat.s"
 
-org protostart, "rs232.prg"
+* =  protostart "rs232.prg"
 
 ml:
 		cpx #2
@@ -25,11 +25,11 @@ ml3:
 		jmp rs232
 
 rslow:
-		byte <rs232a, <rs232b
+		.byte <rs232a, <rs232b
 rshigh:
-		byte >rs232a, >rs232b
+		.byte >rs232a, >rs232b
 
 rs232a:
-		prg "rs232_user.prg"
+		.import c64 "rs232_user.prg"
 rs232b:
-		prg "rs232_swift.prg"
+		.import c64 "rs232_swift.prg"

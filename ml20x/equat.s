@@ -1,438 +1,445 @@
-version_number = "3.0"
+.var version_number = "3.0"
 
-;image ml equates
+// image ml equates
 
-var = $61
-chrget = $73
-chrgot = $79
-ridbe = $29b
-ridbs = $29c
+.label varbuf = $61
+.label chrget = $73
+.label chrgot = $79
 
-; control-codes
+// rs232 buffer pointers
 
-dish = $08     ; disable case-shift
-ensh = $09     ; enable case-shift
-swlc = $0e     ; switch to lower case
-swuc = $8e     ; switch to upper case
-carriage_return = 13
-cbm_backspace = 20
-ascii_backspace = 8
-ascii_bel = 7
-ascii_escape = 27
-ascii_formfeed = 12
-ascii_ctrl_d = 4
-ascii_ctrl_x = 24
+.label baudof = $299
+.label rodbe = $29e
+.label rodbs = $29d
+.label ridbe = $29b
+.label ridbs = $29c
+.label enabl = $2a1
 
-cursor_right = $1d
-cursor_left =  $9d
-cursor_up =    $91
-cursor_down =  $11
-reverse_on =   $12
-reverse_off =  $92
-clear_screen = $93
-cursor_home = $13
-british_pound = $5c
+// control-codes
 
-function_key_2 = 137
-function_key_5 = $87
-function_key_6 = 139
-function_key_7 = 136
-function_key_8 = 140
+.label dish = $08     // disable case-shift
+.label ensh = $09     // enable case-shift
+.label swlc = $0e     // switch to lower case
+.label swuc = $8e     // switch to upper case
+.label carriage_return = 13
+.label cbm_backspace = 20
+.label ascii_backspace = 8
+.label ascii_bel = 7
+.label ascii_escape = 27
+.label ascii_formfeed = 12
+.label ascii_ctrl_d = 4
+.label ascii_ctrl_x = 24
 
-cursor_black =    $90
-cursor_white =    $05
-cursor_red =      $1c
-cursor_cyan =     $9f
-cursor_purple =   $9c
-cursor_green =    $1e
-cursor_blue =     $1f
-cursor_yellow =   $9e
-cursor_orange =   $81
-cursor_brown =    $95
-cursor_lt_red =   $96
-cursor_gray1 =    $97
-cursor_gray2 =    $98
-cursor_lt_green = $99
-cursor_lt_blue =  $9a
-cursor_gray3 =    $9b
+.label cursor_right = $1d
+.label cursor_left =  $9d
+.label cursor_up =    $91
+.label cursor_down =  $11
+.label reverse_on =   $12
+.label reverse_off =  $92
+.label clear_screen = $93
+.label cursor_home = $13
+.label british_pound = $5c
 
-ten = $dc08
-scs = $dc09
-min = $dc0a
-hrs = $dc0b
-;carrier = $dd01
+.label function_key_2 = 137
+.label function_key_5 = $87
+.label function_key_6 = 139
+.label function_key_7 = 136
+.label function_key_8 = 140
+ 
+.label cursor_black =    $90
+.label cursor_white =    $05
+.label cursor_red =      $1c
+.label cursor_cyan =     $9f
+.label cursor_purple =   $9c
+.label cursor_green =    $1e
+.label cursor_blue =     $1f
+.label cursor_yellow =   $9e
+.label cursor_orange =   $81
+.label cursor_brown =    $95
+.label cursor_lt_red =   $96
+.label cursor_gray1 =    $97
+.label cursor_gray2 =    $98
+.label cursor_lt_green = $99
+.label cursor_lt_blue =  $9a
+.label cursor_gray3 =    $9b
 
-getin = $ffe4
-chkout= $ffc9
-chrout= $ffd2
-clrchn= $ffcc
-chkin = $ffc6
-setnam= $ffbd
-setlfs= $ffba
-loadf = $ffd5
-savef = $ffd8
-readst= $ffb7
-romcolors= $e8da
-chrin = $ffcf
-setmsg= $ff90
-openf = $ffc0
-closef= $ffc3
+.label ten = $dc08
+.label scs = $dc09
+.label min = $dc0a
+.label hrs = $dc0b
+//.label carrier = $dd01
 
-poketok= 151
-peektok= 194
-systok = 158
-loadtok= 147
-newtok = 162
+.label getin = $ffe4
+.label chkout= $ffc9
+.label chrout= $ffd2
+.label clrchn= $ffcc
+.label chkin = $ffc6
+.label setnam= $ffbd
+.label setlfs= $ffba
+.label loadf = $ffd5
+.label savef = $ffd8
+.label readst= $ffb7
+.label romcolors= $e8da
+.label chrin = $ffcf
+.label setmsg= $ff90
+.label openf = $ffc0
+.label closef= $ffc3
 
-linkprg=$a533
-makerm1=$b475
-getbytc=$b79b
-ptrget1=$b0e7
-synerr =$af08
-getnum =$b7eb
-ilqerr =$b248
-retval =$bc49
-parchk =$aef1
-getadr =$b7f7
-retbyt =$b3a2
-gone1 = $a7e7
-gone2 = $a7ea
-eval1 = $ae8d
-frmnum =$ad8a
-syscll =$e130
-comma = $aefd
-getfile=57812
-linget = $a96b
-error = $a437
-chkcom= $aefd
+.label poketok= 151
+.label peektok= 194
+.label systok = 158
+.label loadtok= 147
+.label newtok = 162
 
-jmptbl = $a000
-buffer = $ce77
-buf2 = $ce27
-fbuf = $ce13
+.label linkprg=$a533
+.label makerm1=$b475
+.label getbytc=$b79b
+.label ptrget1=$b0e7
+.label synerr =$af08
+.label getnum =$b7eb
+.label ilqerr =$b248
+.label retval =$bc49
+.label parchk =$aef1
+.label getadr =$b7f7
+.label retbyt =$b3a2
+.label gone1 = $a7e7
+.label gone2 = $a7ea
+.label eval1 = $ae8d
+.label frmnum =$ad8a
+.label syscll =$e130
+.label comma = $aefd
+.label getfile=57812
+.label linget = $a96b
+.label error = $a437
+.label chkcom= $aefd
 
-death= $1800
-prgstart = $1801
+.label jmptbl = $a000
+.label buffer = $ce77
+.label buf2 = $ce27
+.label fbuf = $ce13
 
-protostart = $c000
-protoend = $ca80
+.label death= $1800
+.label prgstart = $1801
 
-mainline = 1000
-trapline = 2000
-imodline = 2300
-immdline = 3000
-immdsize = $a00
+.label protostart = $c000
+.label protoend = $ca80
 
-tdisp=$0400+960
-tcolr=$d800+960
-sdisp=$0400+920
-scolr=$d800+920
-ldisp=$0400+640
-lcolr=$d800+640
-adisp=$0400+880
-acolr=$d800+880
+.label mainline = 1000
+.label trapline = 2000
+.label imodline = 2300
+.label immdline = 3000
+.label immdsize = $a00
 
-fkeybuf = 679 ;32
-emptym0 = 711 ;57
+.label tdisp=$0400+960
+.label tcolr=$d800+960
+.label sdisp=$0400+920
+.label scolr=$d800+920
+.label ldisp=$0400+640
+.label lcolr=$d800+640
+.label adisp=$0400+880
+.label acolr=$d800+880
 
-cassbuff = 828
-loadflag = 829
-idlemax =830
-datebuf = 831 ;11
-daytbl = 842 ;24
-tzoneh = 866
-tzonem = 867
-uzoneh = 868
-uzonem = 869
-wrapbuf = 870 ;80
-wrapflg = 950
-modclmn = 951
-ptrclmn = 952
-wrapind = 953
-wrapdmp = 954
-ptrclm = 955
-modclm = 956
-sndtim1 = 957
-sndtim2 = 958
-sndwav1 = 959
-sndwav2 = 960
-sndwav3 = 961
-sndrept = 962
-sndtim1a= 963
-sndtim2a= 964
-jiffy = 965
-blnkflag =966
-blnkcntr =967
-ptrlin = 968
-ptrlinm= 969
-usrlin = 970
-usrlinm= 971
-fredmode= 972
-montbl = 973 ; 36
-rom0= 1009
-timeset= 1010
-flag1 = 1011
-case1 = 1012
-temp3 = 1015
-mline = 1016
-comm = 1017
-flags = 1018
-cline = 1019
-lines = 1022
-modes = 1023
+.label fkeybuf = 679 //32
+.label emptym0 = 711 //57
 
-gc = $c000
-gchide = $e000
-gclen = 4
+.label cassbuff = 828
+.label loadflag = 829
+.label idlemax =830
+.label datebuf = 831 //11
+.label daytbl = 842 //24
+.label tzoneh = 866
+.label tzonem = 867
+.label uzoneh = 868
+.label uzonem = 869
+.label wrapbuf = 870 //80
+.label wrapflg = 950
+.label modclmn = 951
+.label ptrclmn = 952
+.label wrapind = 953
+.label wrapdmp = 954
+.label ptrclm = 955
+.label modclm = 956
+.label sndtim1 = 957
+.label sndtim2 = 958
+.label sndwav1 = 959
+.label sndwav2 = 960
+.label sndwav3 = 961
+.label sndrept = 962
+.label sndtim1a= 963
+.label sndtim2a= 964
+.label jiffy = 965
+.label blnkflag =966
+.label blnkcntr =967
+.label ptrlin = 968
+.label ptrlinm= 969
+.label usrlin = 970
+.label usrlinm= 971
+.label fredmode= 972
+.label montbl = 973 // 36
+.label rom0= 1009
+.label timeset= 1010
+.label flag1 = 1011
+.label case1 = 1012
+.label temp3 = 1015
+.label mline = 1016
+.label comm = 1017
+.label flags = 1018
+.label cline = 1019
+.label lines = 1022
+.label modes = 1023
 
-ecs = $c000
-ecshide = $e400
-ecslen = 10
+.label gc = $c000
+.label gchide = $e000
+.label gclen = 4
 
-;screen parameters
+.label ecs = $c000
+.label ecshide = $e400
+.label ecslen = 10
 
-mcolor = 646
-mreverse = 199
-curptr = 209
-scnpos = 211
-sline = 214
-colptr = 243
-undchr = 206
-undcol = 647
-crsrflg = 204
-crsrmode = 207
-scnclm = scnpos
+// screen parameters
 
-mjump =$07e8
-mresult=$07e9
-mspeed =$07ea
-mprint =$07eb
-;mcolor =$07ec
-;mprtr =$07ed
-;mreverse=$07ee
-mci =$07ef
-mdigits=$07f0
-carrst =$07f1
-tsp1 =$07f2
-tsp2 =$07f3
-chks =$07f4
-readmode=$07f6
-filenum =$07f7
-tmp5 =$07f8
-abtchr =$07f9
-clock =$07fa
-filetyp =$07fb
-tmp1 =$07fc
-tmp2 =$07fd
-tmp3 =$07fe
-tmp4 =$07ff
+.label mcolor = 646
+.label mreverse = 199
+.label curptr = 209
+.label scnpos = 211
+.label sline = 214
+.label colptr = 243
+.label undchr = 206
+.label undcol = 647
+.label crsrflg = 204
+.label crsrmode = 207
+.label scnclm = scnpos
 
-local =$d000
-case =$d001
-editor =$d002
-;tsr =$d003
-llen =$d004
-flag =$d005
-chat =$d006
-inchat =$d007
-chatpage=$d008
-carrier=$d009
-mxor =$d00a
-mkolor =$d00b
-mupcase =$d00c
-irqcount=$d00d
-trans =$d00e
-index =$d00f
+.label mjump =$07e8
+.label mresult=$07e9
+.label mspeed =$07ea
+.label mprint =$07eb
+//.label mcolor =$07ec
+//.label mprtr =$07ed
+//.label mreverse=$07ee
+.label mci =$07ef
+.label mdigits=$07f0
+.label carrst =$07f1
+.label tsp1 =$07f2
+.label tsp2 =$07f3
+.label chks =$07f4
+.label readmode=$07f6
+.label filenum =$07f7
+.label tmp5 =$07f8
+.label abtchr =$07f9
+.label clock =$07fa
+.label filetyp =$07fb
+.label tmp1 =$07fc
+.label tmp2 =$07fd
+.label tmp3 =$07fe
+.label tmp4 =$07ff
 
-tempscn = $1000 ;$140
-tempscn0= tempscn+000
-tempscn1= tempscn+040
-tempscn2= tempscn+080
-tempscn3= tempscn+120
-tempscn4= tempscn+160
-tempscn5= tempscn+200
-tempscn6= tempscn+240
-tempscn7= tempscn+280
-tempcol = $1140 ;$140
-tempcol0= tempcol+000
-tempcol1= tempcol+040
-tempcol2= tempcol+080
-tempcol3= tempcol+120
-tempcol4= tempcol+160
-tempcol5= tempcol+200
-tempcol6= tempcol+240
-tempcol7= tempcol+280
-emptym3 = $1280 ;96
+.label local =$d000
+.label case =$d001
+.label editor =$d002
+//.label tsr =$d003
+.label llen =$d004
+.label flag =$d005
+.label chat =$d006
+.label inchat =$d007
+.label chatpage=$d008
+.label carrier=$d009
+.label mxor =$d00a
+.label mkolor =$d00b
+.label mupcase =$d00c
+.label irqcount=$d00d
+.label trans =$d00e
+.label index =$d00f
 
-idlejif=$12e0
-idlesec=$12e1
-idleten=$12e2
-idlemin=$12e3
-curdsp =$12e4
-bar =$12e5
-tsr2 =$12e6
-mright =$12e7
-mleft =$12e8
-cphase =$12e9
-key =$12ea
-shft =$12eb
-ptrlnfd=$12f0
-ha577 =$12f1
-mask =$12f2
-scnmode=$12f3
-dflag =$12f4
-dstat =$12f5
-cytmp =$12f6
-interm =$12f7
-cxsav =$12f8
-len1 =$12f9
-passmode=$12fa
-scnlock =$12fb
-tmp6 =$12fc
-tmp7 =$12fd
-freq =$12fe
+.label tempscn = $1000 //$140
+.label tempscn0= tempscn+000
+.label tempscn1= tempscn+040
+.label tempscn2= tempscn+080
+.label tempscn3= tempscn+120
+.label tempscn4= tempscn+160
+.label tempscn5= tempscn+200
+.label tempscn6= tempscn+240
+.label tempscn7= tempscn+280
+.label tempcol = $1140 //$140
+.label tempcol0= tempcol+000
+.label tempcol1= tempcol+040
+.label tempcol2= tempcol+080
+.label tempcol3= tempcol+120
+.label tempcol4= tempcol+160
+.label tempcol5= tempcol+200
+.label tempcol6= tempcol+240
+.label tempcol7= tempcol+280
+.label emptym3 = $1280 //96
 
-rs232 = $0800
-rsinabl = rs232+ $03
-rsdisab = rs232+ $06
-rsget = rs232+ $09
-rsout = rs232+ $0c
-rsbaud = rs232+ $0f
-rschar = rs232+ $12
+.label idlejif=$12e0
+.label idlesec=$12e1
+.label idleten=$12e2
+.label idlemin=$12e3
+.label curdsp =$12e4
+.label bar =$12e5
+.label tsr2 =$12e6
+.label mright =$12e7
+.label mleft =$12e8
+.label cphase =$12e9
+.label key =$12ea
+.label shft =$12eb
+.label ptrlnfd=$12f0
+.label ha577 =$12f1
+.label mask =$12f2
+.label scnmode=$12f3
+.label dflag =$12f4
+.label dstat =$12f5
+.label cytmp =$12f6
+.label interm =$12f7
+.label cxsav =$12f8
+.label len1 =$12f9
+.label passmode=$12fa
+.label scnlock =$12fb
+.label tmp6 =$12fc
+.label tmp7 =$12fd
+.label freq =$12fe
 
-chktbl = $1300 ;$10
-bartbl = $1310 ;$c0
-arryptrs=$13d0 ;$10
-daysofm= $13e0 ;$0c
-emptym2= $13ec ;$04
-sndtbl = $13f0 ;$60
-netalrm= $1450 ;$30
-tblatc = $1480 ;$80
-tblcta = $1500 ;$100
-tblcta1= $1600 ;$20
-tblcta2= $1620 ;$20
-tblcta3= $1640 ;$20
-alarmtb= $1660 ;$80
-date1 = $16e0 ;$20
-lobytes =$1700 ;25
-hibytes =$1719 ;25
-lobytec =$1732 ;25
-hibytec =$174b ;25
-emptym4 =$1764 ;28
-pmodetbl=$1780 ;$80
+.label rs232 = $0800
+.label rsinabl = rs232+ $03
+.label rsdisab = rs232+ $06
+.label rsget = rs232+ $09
+.label rsout = rs232+ $0c
+.label rsbaud = rs232+ $0f
+.label rschar = rs232+ $12
 
-ribuf = $0b00
-robuf = $0b80
+.label chktbl = $1300 //$10
+.label bartbl = $1310 //$c0
+.label arryptrs=$13d0 //$10
+.label daysofm= $13e0 //$0c
+.label emptym2= $13ec //$04
+.label sndtbl = $13f0 //$60
+.label netalrm= $1450 //$30
+.label tblatc = $1480 //$80
+.label tblcta = $1500 //$100
+.label tblcta1= $1600 //$20
+.label tblcta2= $1620 //$20
+.label tblcta3= $1640 //$20
+.label alarmtb= $1660 //$80
+.label date1 = $16e0 //$20
+.label lobytes =$1700 //25
+.label hibytes =$1719 //25
+.label lobytec =$1732 //25
+.label hibytec =$174b //25
+.label emptym4 =$1764 //28
+.label pmodetbl=$1780 //$80
 
-wedgemem= $0c00
-trapoff =wedgemem+0
-trapon = wedgemem+3
-loadprg =wedgemem+6
-arraysav=wedgemem+9
-arrayres=wedgemem+12
-forcegc =wedgemem+15
+.label ribuf = $0b00
+.label robuf = $0b80
 
-; interface page jump table
+.label wedgemem= $0c00
+.label trapoff =wedgemem+0
+.label trapon = wedgemem+3
+.label loadprg =wedgemem+6
+.label arraysav=wedgemem+9
+.label arrayres=wedgemem+12
+.label forcegc =wedgemem+15
 
-outastrp= $cd00+0
-usetbl1= $cd00+3
-swapper= $cd00+6
-swapagn= $cd00+9
-trace= $cd00+12
-chkspcl= $cd00+15
-convchr= $cd00+18
-fnvar= $cd00+21
-fnvar1= $cd00+24
-evalstr= $cd00+27
-evalbyt= $cd00+30
-evalint= $cd00+33
-evalfil= $cd00+36
+// interface page jump table
 
-d1icr = $dc0d
-timblo= $dc06
-timbhi= $dc07
-ciacrb= $dc0f
+.label outastrp= $cd00+0
+.label usetbl1= $cd00+3
+.label swapper= $cd00+6
+.label swapagn= $cd00+9
+.label trace= $cd00+12
+.label chkspcl= $cd00+15
+.label convchr= $cd00+18
+.label fnvar= $cd00+21
+.label fnvar1= $cd00+24
+.label evalstr= $cd00+27
+.label evalbyt= $cd00+30
+.label evalint= $cd00+33
+.label evalfil= $cd00+36
 
-ltk_bnkout= $fc4e
-ltk_bankin= $fc71
-ltk_getprt= $9f03
-ltk_driver= $8045
-ltk_redbuf= $91e0
-ltk_clrhdr= $806c
-ltk_fnfile= $804b
-ltk_alcont= $807b
-ltk_mnsext= $809c
-ltk_output= $8048
-ltk_activl= $8000
-ltk_activu= $8001
-ltk_setlun= $8099
+.label d1icr = $dc0d
+.label timblo= $dc06
+.label timbhi= $dc07
+.label ciacrb= $dc0f
 
-hdrblk=$91e0
-filnam=hdrblk+$00
-filtyp=hdrblk+$18
-nbinfl=hdrblk+$10
-loadad=hdrblk+$1a
-blmilo=hdrblk+$20
-nrpblk=hdrblk+$12
+.label ltk_bnkout= $fc4e
+.label ltk_bankin= $fc71
+.label ltk_getprt= $9f03
+.label ltk_driver= $8045
+.label ltk_redbuf= $91e0
+.label ltk_clrhdr= $806c
+.label ltk_fnfile= $804b
+.label ltk_alcont= $807b
+.label ltk_mnsext= $809c
+.label ltk_output= $8048
+.label ltk_activl= $8000
+.label ltk_activu= $8001
+.label ltk_setlun= $8099
 
-; address of modules in the ml file (where they initially load)
+.label hdrblk=$91e0
+.label filnam=hdrblk+$00
+.label filtyp=hdrblk+$18
+.label nbinfl=hdrblk+$10
+.label loadad=hdrblk+$1a
+.label blmilo=hdrblk+$20
+.label nrpblk=hdrblk+$12
 
-wedge_load_address = $6c00
-editor_load_address = $7000
-gc_load_address = $8000
-ecs_load_address = $8400
-struct_load_address = $8e00
-swap1_load_address = $9400
-swap2_load_address = $9800
-swap3_load_address = $9c00
+// address of modules in the ml file (where they initially load)
 
-; address of modules when they are executing
-; swap modules use protostart if not listed here
+.label wedge_load_address = $6c00
+.label editor_load_address = $7000
+.label gc_load_address = $8000
+.label ecs_load_address = $8400
+.label struct_load_address = $8e00
+.label swap1_load_address = $9400
+.label swap2_load_address = $9800
+.label swap3_load_address = $9c00
 
-wedge_exec_address = $0c00
-editor_exec_address = $1800
+// address of modules when they are executing
+// swap modules use protostart if not listed here
 
-; address of modules  when they are "swapped out", waiting to be used
+.label wedge_exec_address = $0c00
+.label editor_exec_address = $1800
 
-editor_swap_address = $d000
-gc_swap_address = $e000
-ecs_swap_address = $e400
-struct_swap_address = $ee00
-swap1_swap_address = $f400
-swap2_swap_address = $f800
-swap3_swap_address = $fc00
+// address of modules  when they are "swapped out", waiting to be used
 
-; start of the kernal ROM
+.label editor_swap_address = $d000
+.label gc_swap_address = $e000
+.label ecs_swap_address = $e400
+.label struct_swap_address = $ee00
+.label swap1_swap_address = $f400
+.label swap2_swap_address = $f800
+.label swap3_swap_address = $fc00
 
-kernal_rom_start = $e000
+// start of the kernal ROM
 
-; 6510 data direction register
+.label kernal_rom_start = $e000
 
-d6501 = 0
+// 6510 data direction register
 
-; 6510 data register
+.label d6501 = 0
 
-r6510 = 1
+// 6510 data register
 
-r6510_loram =           %00000001 ; (out) 1=basic, 0=RAM
-r6510_hiram =           %00000010 ; (out) 1=kernal, 0=RAM
-r6510_charen =          %00000100 ; (out) 1=I/O, 0=Character ROM
-r6510_cassette_data =   %00001000 ; (out) cassette port data output line
-r6510_cassette_switch = %00010000 ; (in) senses the cassette switch
-r6510_cassette_motor =  %00100000 ; (out) 1=motor on, 0=motor off
-r6510_nc1            =  %01000000 ; not connected
-r6510_nc2            =  %10000000 ; not connected
+.label r6510 = 1
+
+.label r6510_loram =           %00000001 // (out) 1=basic, 0=RAM
+.label r6510_hiram =           %00000010 // (out) 1=kernal, 0=RAM
+.label r6510_charen =          %00000100 // (out) 1=I/O, 0=Character ROM
+.label r6510_cassette_data =   %00001000 // (out) cassette port data output line
+.label r6510_cassette_switch = %00010000 // (in) senses the cassette switch
+.label r6510_cassette_motor =  %00100000 // (out) 1=motor on, 0=motor off
+.label r6510_nc1            =  %01000000 // not connected
+.label r6510_nc2            =  %10000000 // not connected
 
 
-; allow access to character ROM ($33)
-r6510_char_rom = (r6510_cassette_motor | r6510_cassette_switch | r6510_hiram | r6510_loram)
+// allow access to character ROM ($33)
+.label r6510_char_rom = (r6510_cassette_motor | r6510_cassette_switch | r6510_hiram | r6510_loram)
 
-; allow access to all ram ($34)
-r6510_all_ram = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen)
+// allow access to all ram ($34)
+.label r6510_all_ram = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen)
 
-; "normal" for this register is $37
-r6510_normal = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen | r6510_hiram | r6510_loram)
+// "normal" for this register is $37
+.label r6510_normal = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen | r6510_hiram | r6510_loram)
 
-; $allow access to the RAM "underneath" the BASIC ROM ($36)
-r6510_basic_ram = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen | r6510_hiram)
+// $allow access to the RAM "underneath" the BASIC ROM ($36)
+.label r6510_basic_ram = (r6510_cassette_motor | r6510_cassette_switch | r6510_charen | r6510_hiram)
 

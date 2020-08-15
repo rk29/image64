@@ -1,7 +1,7 @@
-;* character output routines *
+//* character output routines *
 
-;* output character in .a
-;* preserve registers
+//* output character in .a
+//* preserve registers
 xchrout:
 		sta $fe
 xchrout1:
@@ -18,8 +18,8 @@ xchrout2:
 		lda $fe
 		rts
 
-;* output character, and
-;* get response character
+//* output character, and
+//* get response character
 output:
 		jsr outchr
 		jsr getchr
@@ -30,20 +30,20 @@ output:
 		beq output2
 output0:
 		ldx #$a0
-		cmp #"/"
+		cmp #'/'
 		beq output1
-		cmp #" "
+		cmp #' '
 		beq output1
 		cmp #3
 		bne output1a
 output1:
 		sta chat
-		ldx #$c1 ; reverse capital "A"
+		ldx #$c1 // reverse capital "A"
 output1a:
 		stx tdisp+30
 		rts
 output2:
-		lda #$d0 ; reverse capital "P"
+		lda #$d0 // reverse capital "P"
 		sta tdisp+30
 		jsr xgetchr0
 		lda #$a0
@@ -78,7 +78,7 @@ setout4:
 		sty outchr0+2
 		rts
 
-;* output character
+//* output character
 outchr:
 		lda $fe
 		jsr chkspcl
@@ -212,7 +212,7 @@ outmdm1:
 		beq outmdm3
 		stx outmdmc
 		jsr outmod
-		lda #" "
+		lda #' '
 		sta $fe
 outmdm4:
 		jsr outmod
@@ -226,14 +226,14 @@ outmdm3:
 outmdm2:
 		rts
 outmdmc:
-		byte 0
+		.byte 0
 
-		mprtr = *+1
 outptr:
+// target of self-modifying code (was mprtr)
 		ldx #0
 		bne outptr5
-		outptrfl=*+1
 outptr6:
+// target of self modifying code (was outptrfl)
 		ldx #0
 		bne outptr5
 		rts
@@ -270,11 +270,11 @@ outptr1:
 		jsr chrout
 outptr2:
 		lda #0
-		sta mprtr
+		sta outptr+1
 		ldx mleft
 		beq outptr3
 outptr7:
-		lda #" "
+		lda #' '
 		jsr chrout
 		dex
 		bne outptr7
@@ -283,19 +283,19 @@ outptr3:
 outptr4:
 		rts
 
-;* output carriage return
+//* output carriage return
 prcr:
 		lda #$0d
 		jmp xchrout
-;* output delete character
+//* output delete character
 prdel:
 		lda #$14
 		jmp xchrout
 
-;* character input routines *
+//* character input routines *
 
-;* get character into .a
-;* handle mci access
+//* get character into .a
+//* handle mci access
 xgetin:
 		jsr xgetchr
 		cmp #cursor_home
@@ -329,23 +329,23 @@ xgetchr1:
 		lda #13
 		rts
 
-;* input character to an$
-;* waits for character
+//* input character to an$
+//* waits for character
 inchr:
 		jsr xgetin
 		lda $fe
 		sta buffer
 		lda #1
-		sta var
+		sta varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #$00
-		jmp putvar ;an$
+		jmp putvar //an$
 
-;* get character
-;* with case setting
+//* get character
+//* with case setting
 getchr:
 		jsr getkbd
 		bne getchr1
@@ -471,8 +471,8 @@ getkbd1:
 		cmp #0
 		rts
 
-;* get character from the modem
-;* and move recieve window
+//* get character from the modem
+//* and move recieve window
 getmdm:
 		jsr rsinabl
 		sec
@@ -493,17 +493,17 @@ getmdm6:
 		lda #0
 		rts
 
-;********************************
-;* misc character routines *
-;* last revision: 8/30/87 *
-;********************************
+//********************************
+//* misc character routines *
+//* last revision: 8/30/87 *
+//********************************
 
-;check carrier
-; returns:
+//check carrier
+// returns:
 
-;0 if carrier / local
-;1 if carrier dropped
-;2 if time out
+//0 if carrier / local
+//1 if carrier dropped
+//2 if time out
 
 carchk:
 		lda local
@@ -530,17 +530,17 @@ carchk1:
 carchk2:
 		lda #0
 		rts
-; check actual carrier
-; 0 = ok
-; 1 = drop
+// check actual carrier
+// 0 = ok
+// 1 = drop
 carchk3:
 		lda carrst
 		and #127
 		rts
 
-;check if it's ok to use the modem
-; 0 = ok
-; <>0 = no
+//check if it's ok to use the modem
+// 0 = ok
+// <>0 = no
 carchk4:
 		ldx #4
 		ldy #5

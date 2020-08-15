@@ -1,24 +1,24 @@
 modst:
-		word prgstart
+		.word prgstart
 
 modtbl:
-		word 0 ;0
-		word 0 ;1
-		word protostart ;2
-		word 0 ;3
-		word 0 ;4
-		word 0 ;5
-		word 0 ;6
-		word pmodetbl ;7
-		word bartbl ;8
-		word alarmtb ;9
-		word tblatc ;10
-		word tblcta ;11
-		word netalrm ;12
+		.word 0 //0
+		.word 0 //1
+		.word protostart //2
+		.word 0 //3
+		.word 0 //4
+		.word 0 //5
+		.word 0 //6
+		.word pmodetbl //7
+		.word bartbl //8
+		.word alarmtb //9
+		.word tblatc //10
+		.word tblcta //11
+		.word netalrm //12
 
-;* program load routines
+//* program load routines
 
-;* load various types of modules
+//* load various types of modules
 
 prgfile:
 		cpx #0
@@ -40,16 +40,16 @@ prg1:
 		stx modst
 		sty modst+1
 		ldx #1
-		jsr usevar ;a$
+		jsr usevar //a$
 		lda #0
 		jsr setmsg
 		lda #1
 		ldy #0
 		ldx filenum
 		jsr setlfs
-		ldx var+1
-		ldy var+2
-		lda var
+		ldx varbuf+1
+		ldy varbuf+2
+		lda varbuf
 		jsr setnam
 		lda modst+1
 		beq prg2
@@ -61,7 +61,7 @@ prg1:
 		jsr rsinabl
 		bcs prgerr
 		rts
-; load error
+// load error
 prgerr:
 		ldx #29
 		jmp farerr
@@ -69,7 +69,7 @@ prgerr:
 prg2:
 		jmp loadprg
 
-;* read disk directory
+//* read disk directory
 dskdir:
 		sty dflag
 		cpx #0
@@ -90,15 +90,15 @@ dskdir1:
 		bne dskdir2
 		jsr minusone
 		ldx #15
-		jsr putvar ;lp
+		jsr putvar //lp
 		jsr outastr
 		ldx #17
-		jsr usevar ;rc
-		lda var
+		jsr usevar //rc
+		lda varbuf
 		beq dskdir1
 dskdir2:
 		rts
-;* read single line of directory
+//* read single line of directory
 dir:
 		ldx filenum
 		jsr chkin
@@ -114,13 +114,13 @@ dir:
 		ldx #0
 dir3:
 		lda decchr,y
-		cmp #"0"
+		cmp #'0'
 		beq dir3a
 		inx
 dir3a:
 		cpx #0
 		bne dir3b
-		lda #" "
+		lda #' '
 dir3b:
 		sta buf2,y
 		iny
@@ -128,12 +128,12 @@ dir3b:
 		bcc dir3
 dir4:
 		ldy #5
-		lda #" "
+		lda #' '
 		sta buf2,y
 		iny
 dir0:
 		jsr chrin
-		cmp #" "
+		cmp #' '
 		beq dir0
 		sta buf2,y
 		iny
@@ -146,21 +146,21 @@ dir1:
 		beq dir1
 dir2:
 		lda buf2-1,y
-		cmp #" "
+		cmp #' '
 		bne dir5
 		dey
 		bne dir2
 dir5:
-		sty var
+		sty varbuf
 		lda #<buf2
-		sta var+1
+		sta varbuf+1
 		lda #>buf2
-		sta var+2
+		sta varbuf+2
 		ldx #$01
-		jsr putvar ;a$
+		jsr putvar //a$
 		jmp clrchn
 
-;* input from disk
+//* input from disk
 dskin:
 		cpx #0
 		bne dskin0a
@@ -185,19 +185,19 @@ dskin1:
 		lda $90
 		and #$42
 		beq dskin1
-		lda #"^"
+		lda #'^'
 		sta buf2
 		lda #$40
 		sta $90
 		ldy #1
 dskin3:
-		sty var
+		sty varbuf
 		lda #<buf2
-		sta var+1
+		sta varbuf+1
 		lda #>buf2
-		sta var+2
+		sta varbuf+2
 		ldx #$01
-		jsr putvar ;a$
+		jsr putvar //a$
 		jmp clrchn
 
 bytin:
@@ -227,9 +227,9 @@ dumparr1:
 		jsr getarr
 		ldy #0
 dumparr2:
-		cpy var
+		cpy varbuf
 		beq dumparr3
-		lda [var+1],y
+		lda (varbuf+1),y
 		jsr chrout
 		iny
 		bne dumparr2

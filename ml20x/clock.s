@@ -1,10 +1,10 @@
-include "equat.s"
+#import "equat.s"
 
-org protostart, "clock.prg"
+* = protostart "clock.prg"
 
-screen= $0428
-colorm= $d828
-c1= 646
+.label screen= $0428
+.label colorm= $d828
+.label c1= 646
 
 ml:
 		jmp doclock
@@ -82,31 +82,31 @@ bcdtob:
 		rts
 
 h0:
-		byte 0
+		.byte 0
 h1:
-		byte 0
+		.byte 0
 m0:
-		byte 0
+		.byte 0
 m1:
-		byte 0
+		.byte 0
 clockscs:
-		byte 0
+		.byte 0
 a:
-		byte 0
+		.byte 0
 x:
-		byte 0
+		.byte 0
 y:
-		byte 0
+		.byte 0
 w:
-		byte 0
+		.byte 0
 c2:
-		byte 11
+		.byte 11
 
 charbuf:
-		dup 0,8
+		.fill 8, 0
 
 quadchr:
-		byte 160,236,251,226,252,97,127,126,254,255,225,124,98,123,108,32
+		.byte 160,236,251,226,252,97,127,126,254,255,225,124,98,123,108,32
 
 quad:
 		sta a
@@ -182,110 +182,110 @@ quad3:
 		rts
 
 chrset:
-		byte %00011100
-		byte %00100010
-		byte %00100010
-		byte %00100010
-		byte %00100010
-		byte %00100010
-		byte %00011100
-		byte %00000000
+		.byte %00011100
+		.byte %00100010
+		.byte %00100010
+		.byte %00100010
+		.byte %00100010
+		.byte %00100010
+		.byte %00011100
+		.byte %00000000
 
-		byte %00001000
-		byte %00011000
-		byte %00001000
-		byte %00001000
-		byte %00001000
-		byte %00001000
-		byte %00011100
-		byte %00000000
+		.byte %00001000
+		.byte %00011000
+		.byte %00001000
+		.byte %00001000
+		.byte %00001000
+		.byte %00001000
+		.byte %00011100
+		.byte %00000000
 
-		byte %00011100
-		byte %00100010
-		byte %00000010
-		byte %00011100
-		byte %00100000
-		byte %00100000
-		byte %00111110
-		byte %00000000
+		.byte %00011100
+		.byte %00100010
+		.byte %00000010
+		.byte %00011100
+		.byte %00100000
+		.byte %00100000
+		.byte %00111110
+		.byte %00000000
 
-		byte %00011100
-		byte %00100010
-		byte %00000010
-		byte %00001100
-		byte %00000010
-		byte %00100010
-		byte %00011100
-		byte %00000000
+		.byte %00011100
+		.byte %00100010
+		.byte %00000010
+		.byte %00001100
+		.byte %00000010
+		.byte %00100010
+		.byte %00011100
+		.byte %00000000
 
-		byte %00100100
-		byte %00100100
-		byte %00100100
-		byte %00111110
-		byte %00000100
-		byte %00000100
-		byte %00000100
-		byte %00000000
+		.byte %00100100
+		.byte %00100100
+		.byte %00100100
+		.byte %00111110
+		.byte %00000100
+		.byte %00000100
+		.byte %00000100
+		.byte %00000000
 
-		byte %00111110
-		byte %00100000
-		byte %00100000
-		byte %00111100
-		byte %00000010
-		byte %00000010
-		byte %00111100
-		byte %00000000
+		.byte %00111110
+		.byte %00100000
+		.byte %00100000
+		.byte %00111100
+		.byte %00000010
+		.byte %00000010
+		.byte %00111100
+		.byte %00000000
 
-		byte %00011100
-		byte %00100010
-		byte %00100000
-		byte %00111100
-		byte %00100010
-		byte %00100010
-		byte %00011100
-		byte %00000000
+		.byte %00011100
+		.byte %00100010
+		.byte %00100000
+		.byte %00111100
+		.byte %00100010
+		.byte %00100010
+		.byte %00011100
+		.byte %00000000
 
-		byte %00111110
-		byte %00000010
-		byte %00000010
-		byte %00000100
-		byte %00001000
-		byte %00010000
-		byte %00010000
-		byte %00000000
+		.byte %00111110
+		.byte %00000010
+		.byte %00000010
+		.byte %00000100
+		.byte %00001000
+		.byte %00010000
+		.byte %00010000
+		.byte %00000000
 
-		byte %00011100
-		byte %00100010
-		byte %00100010
-		byte %00011100
-		byte %00100010
-		byte %00100010
-		byte %00011100
-		byte %00000000
+		.byte %00011100
+		.byte %00100010
+		.byte %00100010
+		.byte %00011100
+		.byte %00100010
+		.byte %00100010
+		.byte %00011100
+		.byte %00000000
 
-		byte %00011100
-		byte %00100010
-		byte %00100010
-		byte %00011110
-		byte %00000010
-		byte %00100010
-		byte %00011100
-		byte %00000000
+		.byte %00011100
+		.byte %00100010
+		.byte %00100010
+		.byte %00011110
+		.byte %00000010
+		.byte %00100010
+		.byte %00011100
+		.byte %00000000
 
-		byte %00000000
-		byte %00000000
-		byte %00000000
-		byte %00000000
-		byte %00000000
-		byte %00000000
-		byte %00000000
-		byte %00000000
+		.byte %00000000
+		.byte %00000000
+		.byte %00000000
+		.byte %00000000
+		.byte %00000000
+		.byte %00000000
+		.byte %00000000
+		.byte %00000000
 
-		byte %00000000
-		byte %01000000
-		byte %00000000
-		byte %00000000
-		byte %00000000
-		byte %01000000
-		byte %00000000
-		byte %00000000
+		.byte %00000000
+		.byte %01000000
+		.byte %00000000
+		.byte %00000000
+		.byte %00000000
+		.byte %01000000
+		.byte %00000000
+		.byte %00000000

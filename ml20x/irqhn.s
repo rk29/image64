@@ -1,7 +1,7 @@
-;*irq routine
+//*irq routine
 
-;* counter to execute a different
-;* part of the routine each jiffy
+//* counter to execute a different
+//* part of the routine each jiffy
 
 irq:
 		jsr irq9
@@ -31,19 +31,19 @@ irq0a:
 irqjmp:
 		jmp $ffff
 irqtbl:
-		word irq1 ;page
-		word irq2 ;time
-		word irq3 ;blanker
-		word irq4 ;lightbar
-		word irq5 ;carrier
-		word irq6 ;flag
-		word irq7 ;lightbar
-		word irq4 ;lightbar
+		.word irq1 //page
+		.word irq2 //time
+		.word irq3 //blanker
+		.word irq4 //lightbar
+		.word irq5 //carrier
+		.word irq6 //flag
+		.word irq7 //lightbar
+		.word irq4 //lightbar
 
 caseflag:
-		byte 255
+		.byte 255
 
-;* chat page
+//* chat page
 
 irq1:
 		ldy #4
@@ -87,12 +87,12 @@ irq1f:
 		rts
 
 pagecol:
-		byte 1,15,12,11,12,15
+		.byte 1,15,12,11,12,15
 
-;* update time on screen
+//* update time on screen
 
 timeflag:
-		byte 0
+		.byte 0
 
 irq2:
 		lda min
@@ -177,7 +177,7 @@ ha872:
 		sec
 		sbc scs
 		cld
-; display tsr
+// display tsr
 ha083:
 		jsr bcdtoa
 		pha
@@ -209,7 +209,7 @@ gettsr:
 		txa
 		pha
 		ldx #29
-		jsr gvarptr ;tr%
+		jsr gvarptr //tr%
 		stx getts1+1
 		sty getts1+2
 		stx setts1+1
@@ -228,9 +228,9 @@ setts1:
 		sta $ffff,y
 		rts
 
-;* make string out of current date
-;* for d1$ (convert from 6 byte to
-;* 11 byte format)
+//* make string out of current date
+//* for d1$ (convert from 6 byte to
+//* 11 byte format)
 
 mkdate:
 		pha
@@ -281,7 +281,7 @@ dispd1:
 		iny
 		cpx #3
 		bne dispd1
-		lda #" "
+		lda #' '
 		jsr dispdt
 		lda bootdate+1
 		cmp #$10
@@ -297,46 +297,46 @@ dispd2:
 		iny
 		cpx #7
 		bne dispd2
-		lda #" "
+		lda #' '
 		jsr dispdt
 		lda d1str+5
-		cmp #"0"
+		cmp #'0'
 		bne dispd3
-		lda #" "
+		lda #' '
 dispd3:
 		jsr dispdt
 		lda d1str+6
 		jsr dispdt
-		lda #","
+		lda #','
 		jsr dispdt
-		lda #" "
+		lda #' '
 		jsr dispdt
-		lda #"2"
+		lda #'2'
 		jsr dispdt
-		lda #"0"
+		lda #'0'
 		jsr dispdt
 		lda d1str+1
 		jsr dispdt
 		lda d1str+2
 		jsr dispdt
-		lda #" "
+		lda #' '
 		jsr dispdt
 		lda d1str+7
 		and #$31
-		cmp #"0"
+		cmp #'0'
 		bne dispd4
-		lda #" "
+		lda #' '
 dispd4:
 		jsr dispdt
 		lda d1str+8
 		jsr dispdt
-		lda #":"
+		lda #':'
 		jsr dispdt
 		lda d1str+9
 		jsr dispdt
 		lda d1str+10
 		jsr dispdt
-		lda #":"
+		lda #':'
 		jsr dispdt
 		lda scs
 		pha
@@ -350,21 +350,21 @@ dispd4:
 		and #$0f
 		ora #$30
 		jsr dispdt
-		lda #" "
+		lda #' '
 		jsr dispdt
 		lda d1str+7
-		cmp #"8"
+		cmp #'8'
 		bcs dispd5
-		lda #cbm("A")
+		lda #'A'
 		bne dispd6
 dispd5:
-		lda #cbm("P")
+		lda #'P'
 dispd6:
 		jsr dispdt
-		lda #cbm("M")
+		lda #'M'
 		jsr dispdt
-		lda #" "
-;* convert to screen, store it
+		lda #' '
+//* convert to screen, store it
 dispdt:
 		pha
 		and caseflag
@@ -382,7 +382,7 @@ dispdt3:
 		pla
 		rts
 
-;* convert bcd to ascii
+//* convert bcd to ascii
 bcdtoa:
 		tax
 		lsr
@@ -398,11 +398,11 @@ bcdtoa:
 		tya
 		rts
 
-;* display time remaining
+//* display time remaining
 
 disptime:
 		ldx #32
-		lda #" "
+		lda #' '
 		jsr dispdt
 		jsr gettsr
 		beq dt0
@@ -410,7 +410,7 @@ disptime:
 		bcc dt01
 		lda #101
 		jsr settsr
-		lda #"-"
+		lda #'-'
 		tay
 		bne dt3
 dt01:
@@ -432,7 +432,7 @@ dt3:
 		jsr dispdt
 		pla
 		jsr dispdt
-		lda #":"
+		lda #':'
 		jmp dispdt
 
 irq3:
@@ -461,9 +461,9 @@ chkblnk:
 		jmp chkflag
 
 bits:
-		byte 1,2,4,8,16,32,64,128
+		.byte 1,2,4,8,16,32,64,128
 
-;* put check on screen for carrier
+//* put check on screen for carrier
 irq5:
 		ldx #$fa
 		lda carrier
@@ -534,10 +534,10 @@ irq6e:
 		sty fredmode
 		rts
 
-;* display lightbar checkmarks
+//* display lightbar checkmarks
 irq7:
 
-; self modifying code changes this
+// self modifying code changes this
 
 		ldy #1
 		lda bar
@@ -566,7 +566,7 @@ irq7:
 
 irq7a:
 
-; self modifying code changes this
+// self modifying code changes this
 
 		adc #0
 		tay
@@ -594,14 +594,14 @@ irq7c:
 irq7z:
 		rts
 
-; display either a space or a checkmark for a lightbar flag
+// display either a space or a checkmark for a lightbar flag
 
 irq7d:
 		lsr
 		pha
-		lda #" "
+		lda #' '
 		bcc irq7e
-		lda #$7a ; "checkmark"
+		lda #$7a // "checkmark"
 irq7e:
 		jsr irq7f
 		pla
@@ -611,14 +611,14 @@ irq7j:
 		lda bartbl,y
 		iny
 
-; write a single character to the on-screen lightbar
+// write a single character to the on-screen lightbar
 
 irq7f:
 		ora #$80
 		sta ldisp,x
 irq7g:
 
-; self-modifying code changes this
+// self-modifying code changes this
 
 		lda #15
 		sta lcolr,x
@@ -628,7 +628,7 @@ irq7g:
 irq7h:
 		pha
 
-; set the highlight color for this lightbar position
+// set the highlight color for this lightbar position
 
 		lda #15
 		cpx tmpbar
@@ -688,54 +688,54 @@ chkflag8:
 		txa
 		rts
 
-; clear a flag
+// clear a flag
 
 chkflag0:
 		eor #$ff
 		and chktbl,x
 		jmp chkflag6
 
-; set a flag
+// set a flag
 
 chkflag1:
 		ora chktbl,x
 		jmp chkflag6
 
-; toggle a flag
+// toggle a flag
 
 chkflag2:
 		eor chktbl,x
 		jmp chkflag6
 
-; read a flag (basic, result in a%)
+// read a flag (basic, result in a%)
 
 chkflag3:
 		ldy #0
-		sty var
+		sty varbuf
 		and chktbl,x
 		beq chkflg3a
 		iny
 chkflg3a:
-		sty var+1
+		sty varbuf+1
 		ldx #30
-		jsr putvar ;a%
+		jsr putvar //a%
 		jmp chkflag8
 
-; set selected position
+// set selected position
 
 chkflag4:
 		lda $ff
 		sta bar
 		jmp chkflag7
 
-; read a flag (ml), result in accumulator
+// read a flag (ml), result in accumulator
 
 chkflag5:
 		and chktbl,x
 		jmp chkflag8
 
 tmpbar:
-		byte 0
+		.byte 0
 
 fkey:
 		ldx tmpkey
@@ -758,20 +758,20 @@ fkey1:
 		lda vars+1,y
 		sta 4
 		ldy #0
-		lda [3],y
+		lda (3),y
 		sta fkeybuf
 		iny
-		lda [3],y
+		lda (3),y
 		tax
 		iny
-		lda [3],y
+		lda (3),y
 		sta 4
 		stx 3
 		ldy #0
 		ldx fkeybuf
 		beq fkey3
 fkey2:
-		lda [3],y
+		lda (3),y
 		sta fkeybuf+1,y
 		iny
 		dex
@@ -799,12 +799,12 @@ irq9:
 		ldy $d3
 		lsr $cf
 		ldx $0287
-		lda [$d1],y
+		lda ($d1),y
 		bcs irq9e
 		inc $cf
 		sta $ce
 		jsr $ea24
-		lda [$f3],y
+		lda ($f3),y
 		sta $287
 		ldx $0286
 		lda $ce
@@ -859,7 +859,7 @@ irq10d:
 
 settim:
 		lda #$01
-		byte $2c
+		.byte $2c
 setalm:
 		lda #$81
 		sta ciacrb
@@ -941,17 +941,17 @@ irq4d:
 		jmp fkey
 
 tmpkey:
-		byte 0
+		.byte 0
 oldkey:
-		byte 64
+		.byte 64
 shfkey:
-		byte 0
+		.byte 0
 
 ktbl1:
-		word t1fk1,t1fk2
-		word t1fk3,t1fk4
-		word t1fk5,t1fk6
-		word t1fk7,t1fk7
+		.word t1fk1,t1fk2
+		.word t1fk3,t1fk4
+		.word t1fk5,t1fk6
+		.word t1fk7,t1fk7
 
 t1init:
 		ldy #0
@@ -1011,21 +1011,21 @@ t1fk7:
 		beq t1fk7c
 		rts
 t1fk7a:
-		jmp t3init ;acs
+		jmp t3init //acs
 t1fk7b:
-		jmp t2init ;tsr
+		jmp t2init //tsr
 t1fk7c:
-		lda outptrfl
+		lda outptr6+1
 		eor #1
-		sta outptrfl
+		sta outptr6+1
 		rts
 
-;edit users time
+//edit users time
 ktbl2:
-		word t2fk1,t2fk2
-		word t2fk3,t2fk4
-		word t2fk5,t2fk6
-		word t2fk7,t2fk7
+		.word t2fk1,t2fk2
+		.word t2fk3,t2fk4
+		.word t2fk5,t2fk6
+		.word t2fk7,t2fk7
 
 t2init:
 		ldx #<ktbl2
@@ -1033,14 +1033,14 @@ t2init:
 		jmp usekey
 t2fk1:
 		lda #0
-		byte $2c
+		.byte $2c
 t2fk2:
 		lda #101
 t2fk2a:
 		jmp settsr
 t2fk3:
 		ldx #1
-		byte $2c
+		.byte $2c
 t2fk4:
 		ldx #10
 t2fk4a:
@@ -1058,7 +1058,7 @@ t2fk4b:
 		jmp disptime
 t2fk5:
 		ldx #1
-		byte $2c
+		.byte $2c
 t2fk6:
 		ldx #10
 t2fk6a:
@@ -1076,19 +1076,19 @@ t2fk7:
 		ldx #6
 		jmp t1init
 
-;edit users access
+//edit users access
 ktbl3:
-		word t3fk1,t3fk2
-		word t3fk5,t3fk5
-		word t3fk3,t3fk3
-		word t3fk7,t3fk7
+		.word t3fk1,t3fk2
+		.word t3fk5,t3fk5
+		.word t3fk3,t3fk3
+		.word t3fk7,t3fk7
 
 t3init:
 		ldx #<ktbl3
 		ldy #>ktbl3
 		jsr usekey
 		ldx #24
-		jsr gvarptr ;ac%
+		jsr gvarptr //ac%
 		stx t3ini1+1
 		sty t3ini1+2
 		stx t3fk7a+1
@@ -1130,9 +1130,9 @@ t3fk7a:
 		jmp t1init
 
 minhi:
-		byte 0
+		.byte 0
 minlo:
-		byte 0
+		.byte 0
 
 cminute:
 		txa
@@ -1204,7 +1204,7 @@ alarm:
 		ldy bootdate+4
 		jsr cminute
 		ldx #49
-		jsr gvarptr ;mn%
+		jsr gvarptr //mn%
 		stx alarmy+1
 		sty alarmy+2
 		ldy #1
@@ -1258,7 +1258,7 @@ alarm6:
 		adc #8
 		bpl alarm0
 		ldx #28
-		ldy #5 ;net-l
+		ldy #5 //net-l
 		jsr chkflags
 		beq alarm8
 		ldy #0
@@ -1278,6 +1278,6 @@ alarm8:
 		rts
 alarm9:
 		ldx #29
-		ldy #1 ;net-r
+		ldy #1 //net-r
 		jmp chkflags
 

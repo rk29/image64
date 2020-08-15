@@ -1,28 +1,27 @@
-offset editor_exec_address - *
-namespace "editor"
+.pseudopc editor_exec_address {
+.namespace editorml {
 
-editor_version = "01/22/91 06:51p"
+.var editor_version = "01/22/91 06:51p"
 
-;* editor sub-system
+//* editor sub-system
 
-temp = $6f
-temp1 = $5f
-temp2 = $60
-delx = $52
-numx = $14
-numy = $15
+.label temp = $6f
+.label temp1 = $5f
+.label temp2 = $60
+.label delx = $52
+.label numx = $14
+.label numy = $15
 
-		jmp entry1 ;no text
-		jmp entry2 ;re-enter main
-		jmp entry3 ;re-enter not command
+		jmp entry1 //no text
+		jmp entry2 //re-enter main
+		jmp entry3 //re-enter not command
 
-;exits:
+//exits:
 
-; .x=0 - aborted
-; .x=1 - save .a=lines
-; .x=2 - command typed .a=char
-; .x=3 - help command
-
+// .x=0 - aborted
+// .x=1 - save .a=lines
+// .x=2 - command typed .a=char
+// .x=3 - help command
 
 done:
 		sta 780
@@ -38,7 +37,7 @@ done:
 		rts
 
 passflag:
-		byte 0
+		.byte 0
 
 entry2:
 		lda case
@@ -86,11 +85,11 @@ getc2:
 		beq ret
 getc3:
 		cmp #1
-		bne getc4 ;dot
+		bne getc4 //dot
 		jmp command
 getc4:
 		cmp #3
-		bne ret ;drop
+		bne ret //drop
 drop:
 		ldx #0
 		jmp done
@@ -131,8 +130,8 @@ store:
 		rts
 
 dotmsg:
-		byte 8
-		cbm "Command:"
+		.byte 8
+		.text "Command:"
 dodot:
 		lda #0
 		sta passflag
@@ -143,7 +142,7 @@ dodot:
 		lda flags
 		and #1
 		beq com1
-		lda #cbm("x")
+		lda #'x'
 		ldx #0
 		beq getcom0
 com1:
@@ -160,11 +159,11 @@ com1:
 		jmp drop
 com2:
 		lda comchar
-		cmp #cbm(".")
+		cmp #'.'
 		bne getcom0
 		ldx dotmsg
 		jsr xdels
-		lda #cbm(".")
+		lda #'.'
 		jmp getc1
 entry3:
 		ldx dotmsg
@@ -225,124 +224,169 @@ comjump:
 		jsr $ffff
 		jmp main0
 stack:
-		byte 0
+		.byte 0
 comchar:
-		byte 0
+		.byte 0
 compoint:
-		byte 0
+		.byte 0
 comflag:
-		byte 0
+		.byte 0
 
-; offset 1 in comlist is %aaab
-; aaa= which parameter routine
-; b= dissallow if buffer empty
+// offset 1 in comlist is %aaab
+// aaa= which parameter routine
+// b= dissallow if buffer empty
 
 paramrtn:
-		word getcr ;000x
-		word lastline ;001x
-		word alllines ;010x
-		word firstlin ;011x
-		word gettxm ;100x
-		word getzero ;101x
-		word nothing ;110x
-		word prcr ;111x
+		.word getcr //000x
+		.word lastline //001x
+		.word alllines //010x
+		.word firstlin //011x
+		.word gettxm //100x
+		.word getzero //101x
+		.word nothing //110x
+		.word prcr //111x
 
 comlist:
 
-		byte cbm("a"),%0000
-		word tabrt,abort
-		byte cbm("b"),%1000
-		word tbnnr,banner
-		byte cbm("c"),%1010
-		word tmrgn,margin
-		byte cbm("d"),%0011
-		word tdele,delet
-		byte cbm("e"),%0011
-		word tedit,editlns
-		byte cbm("f"),%0101
-		word tfind,find
-		byte cbm("h"),%1110
-		word thelp,help
-		byte cbm("i"),%0111
-		word tinst,insert
-		byte cbm("j"),%1101
-		word tjust,justify
-		byte cbm("k"),%0101
-		word trepl,repl
-		byte cbm("l"),%0101
-		word tlist,clist
-		byte cbm("m"),%0101
-		word tmcir,mciread
-		byte cbm("n"),%0001
-		word tclrt,clrtx
-		byte cbm("o"),%1100
-		word tline,linnum
-		byte cbm("r"),%0101
-		word tread,cread
-		byte cbm("s"),%0001
-		word tsave,csave
-		byte cbm("t"),%1110
-		word ttext,ctext
-		byte cbm("v"),%1110
-		word tvers,cvers
-		byte cbm("x"),%1100
-		word texit,exit
-		byte cbm("y"),%0011
-		word tmove,cmove
-		byte cbm("z"),%0011
-		word tcopy,ccopy
-		byte ensh,%1110
-		word thelp,help
-		byte cbm("#"),%1110
-		word tscal,scale
-		byte 0
+		.text "a"
+		.byte %0000
+		.word tabrt,abort
+		.text "b"
+		.byte %1000
+		.word tbnnr,banner
+		.text "c"
+		.byte %1010
+		.word tmrgn,margin
+		.text "d"
+		.byte %0011
+		.word tdele,delet
+		.text "e"
+		.byte %0011
+		.word tedit,editlns
+		.text "f"
+		.byte %0101
+		.word tfind,find
+		.text "h"
+		.byte %1110
+		.word thelp,help
+		.text "i"
+		.byte %0111
+		.word tinst,insert
+		.text "j"
+		.byte %1101
+		.word tjust,justify
+		.text "k"
+		.byte %0101
+		.word trepl,repl
+		.text "l"
+		.byte %0101
+		.word tlist,clist
+		.text "m"
+		.byte %0101
+		.word tmcir,mciread
+		.text "n"
+		.byte %0001
+		.word tclrt,clrtx
+		.text "o"
+		.byte %1100
+		.word tline,linnum
+		.text "r"
+		.byte %0101
+		.word tread,cread
+		.text "s"
+		.byte %0001
+		.word tsave,csave
+		.text "t"
+		.byte %1110
+		.word ttext,ctext
+		.text "v"
+		.byte %1110
+		.word tvers,cvers
+		.text "x"
+		.byte %1100
+		.word texit,exit
+		.text "y"
+		.byte %0011
+		.word tmove,cmove
+		.text "z"
+		.byte %0011
+		.word tcopy,ccopy
+		.byte ensh
+		.byte %1110
+		.word thelp,help
+		.text "#"
+		.byte %1110
+		.word tscal,scale
+		.byte 0
 
 tabrt:
-		cbm "Abort",0
+		.text "Abort"
+		.byte 0
 tbnnr:
-		cbm "Banner",0
+		.text "Banner"
+		.byte 0
 tdele:
-		cbm "Delete",0
+		.text "Delete"
+		.byte 0
 tedit:
-		cbm "Edit",0
+		.text "Edit"
+		.byte 0
 tfind:
-		cbm "Find",0
+		.text "Find"
+		.byte 0
 thelp:
-		cbm "Help!",0
+		.text "Help!"
+		.byte 0
 tinst:
-		cbm "Insert",0
+		.text "Insert"
+		.byte 0
 tjust:
-		cbm "Justify (C,E,I,L,P,R,U)",0
+		.text "Justify (C,E,I,L,P,R,U)"
+		.byte 0
 trepl:
-		cbm "Replace",0
+		.text "Replace"
+		.byte 0
 tlist:
-		cbm "List",0
+		.text "List"
+		.byte 0
 tmcir:
-		cbm "MCI Read",0
+		.text "MCI Read"
+		.byte 0
 tclrt:
-		cbm "Clear Text",0
+		.text "Clear Text"
+		.byte 0
 tread:
-		cbm "Read",0
+		.text "Read"
+		.byte 0
 tsave:
-		cbm "Save Text",0
+		.text "Save Text"
+		.byte 0
 ttext:
-		cbm "Text Transfer On",0
+		.text "Text Transfer On"
+		.byte 0
 texit:
-		cbm "Exit",0
+		.text "Exit"
+		.byte 0
 tline:
-		cbm "Line Numbers",0
+		.text "Line Numbers"
+		.byte 0
 tmrgn:
-		cbm "Columns",0
+		.text "Columns"
+		.byte 0
 tcopy:
-		cbm "Copy",0
+		.text "Copy"
+		.byte 0
 tmove:
-		cbm "Move",0
+		.text "Move"
+		.byte 0
 tscal:
-		cbm "Scale",0
+		.text "Scale"
+		.byte 0
 tvers:
-		cbm "Version",0
+		.text "Version"
+		.byte 0
 
-;get params/default to last line
+//get params/default to last line
 lastline:
 		ldx mline
 		dex
@@ -350,23 +394,23 @@ lastline:
 		tay
 		jmp getxy
 
-;get params/default to all lines
+//get params/default to all lines
 alllines:
 		ldx #1
 		ldy mline
 		dey
 		jmp getxy
 
-;get param/default to 1st line
+//get param/default to 1st line
 firstlin:
 		ldx #1
 		jmp getx
 
-;no parameters/instant command
+//no parameters/instant command
 nothing:
 		rts
 
-;get param/default to zero
+//get param/default to zero
 getzero:
 		ldx #0
 		jmp getnumx
@@ -436,7 +480,7 @@ banner4:
 banner5:
 		rts
 blen:
-		byte 0
+		.byte 0
 
 delet:
 		ldx #<delmsg1
@@ -446,7 +490,7 @@ dele2:
 		lda numx
 		cmp numy
 		beq dele3
-		lda #cbm("s")
+		lda #'s'
 		jsr xchrout
 		jsr prspc
 		lda numx
@@ -466,11 +510,14 @@ dele4:
 delet1:
 		jmp dontdo
 delmsg1:
-		cbm "(Line",0
+		.text "(Line"
+		.byte 0
 delmsg2:
-		cbm " To",0
+		.text " To"
+		.byte 0
 delmsg3:
-		cbm " Deleted.)",13,0
+		.text " Deleted.)"
+		.byte 13, 0
 
 find:
 		inc comflag
@@ -497,7 +544,8 @@ find2:
 		rts
 
 tfind1:
-		cbm "Search Phrase:",0
+		.text "Search Phrase:"
+		.byte 0
 
 repl:
 		inc comflag
@@ -541,9 +589,11 @@ repl2:
 		rts
 
 trepl1:
-		cbm "Search Phrase:",0
+		.text "Search Phrase:"
+		.byte 0
 trepl2:
-		cbm "Replace With :",0
+		.text "Replace With :"
+		.byte 0
 
 help:
 		ldx #3
@@ -565,31 +615,31 @@ justify:
 		jsr xgetin
 		and #$7f
 		ldx #$ff
-		cmp #cbm("c")
+		cmp #'c'
 		bne justif0a
 		ldx #0
 justif0a:
-		cmp #cbm("e")
+		cmp #'e'
 		bne justif0b
 		ldx #1
 justif0b:
-		cmp #cbm("p")
+		cmp #'p'
 		bne justif0c
 		ldx #2
 justif0c:
-		cmp #cbm("l")
+		cmp #'l'
 		bne justif0d
 		ldx #3
 justif0d:
-		cmp #cbm("r")
+		cmp #'r'
 		bne justif0e
 		ldx #4
 justif0e:
-		cmp #cbm("i")
+		cmp #'i'
 		bne justif0f
 		ldx #5
 justif0f:
-		cmp #cbm("u")
+		cmp #'u'
 		bne justif0g
 		ldx #6
 justif0g:
@@ -599,30 +649,37 @@ justif0:
 		jmp dontdo
 
 tcen:
-		cbm "Center",0
+		.text "Center"
+		.byte 0
 texp:
-		cbm "Expand",0
+		.text "Expand"
+		.byte 0
 tpak:
-		cbm "Packed",0
+		.text "Packed"
+		.byte 0
 tlft:
-		cbm "Left",0
+		.text "Left"
+		.byte 0
 trgt:
-		cbm "Right",0
+		.text "Right"
+		.byte 0
 tind:
-		cbm "Indent",0
+		.text "Indent"
+		.byte 0
 tund:
-		cbm "Un-Indent",0
+		.text "Un-Indent"
+		.byte 0
 
 justcom:
-		byte 0
+		.byte 0
 justtxt:
-		word tcen,texp,tpak,tlft
-		word trgt,tind,tund
+		.word tcen,texp,tpak,tlft
+		.word trgt,tind,tund
 justcoms:
-		word jcenter,jexpand
-		word jpacked,jleft
-		word jright,jindent
-		word jundent
+		.word jcenter,jexpand
+		.word jpacked,jleft
+		.word jright,jindent
+		.word jundent
 
 justify1:
 		stx justcom
@@ -684,9 +741,9 @@ read0:
 read1:
 		jmp dontdo
 mciflg:
-		byte 0
+		.byte 0
 wrapfl:
-		byte 0
+		.byte 0
 
 csave:
 		lda cline
@@ -730,8 +787,10 @@ pr1:
 pr2:
 		rts
 msg4:
-		cbm " On.",13,0
-		cbm " Off.",13,0
+		.text " On."
+		.byte 13,0
+		.text " Off."
+		.byte 13,0
 
 margin:
 		ldx numx
@@ -754,7 +813,8 @@ mar2:
 		jsr prtnum
 		jmp prcr
 marmsg:
-		cbm "Set To: ",0
+		.text "Set To: "
+		.byte 0
 
 ccopy:
 		ldx #<cpymsg
@@ -786,7 +846,8 @@ copy1:
 		sta cline
 		jmp dontdo
 cpymsg:
-		cbm "Copy To:",0
+		.text "Copy To:"
+		.byte 0
 
 cmove:
 		ldx #<movmsg
@@ -818,33 +879,37 @@ move1:
 		sta cline
 		jmp dontdo
 movmsg:
-		cbm "Move To:",0
+		.text "Move To:"
+		.byte 0
 
 scale:
-		lda #scalelen
+		lda #scalemsg_end - scalemsg
 		ldx #<scalemsg
 		ldy #>scalemsg
 		jmp prmsg0
 scalemsg:
-		byte function_key_6
-		byte british_pound, "_101"
-		byte british_pound, "_202"
-		byte british_pound, "_303"
-		byte function_key_6
-		cbm "0123456789012345678901234567890123456789"
-		byte function_key_6
-scalelen = * - scalemsg
+		.byte function_key_6
+		.byte british_pound
+		.text "_101"
+		.byte british_pound
+		.text "_202"
+		.byte british_pound
+		.text "_303"
+		.byte function_key_6
+		.text "0123456789012345678901234567890123456789"
+		.byte function_key_6
+scalemsg_end:
 
 cvers:
-		lda #verslen
+		lda #versmsg_end-versmsg
 		ldx #<versmsg
 		ldy #>versmsg
 		jmp prmsg0
 versmsg:
-		byte function_key_6
-		cbm "Image BBS " + version_number + " Editor (" + editor_version + ")"
-		byte function_key_6
-verslen = *-versmsg
+		.byte function_key_6
+		.text "Image BBS " + version_number + " Editor (" + editor_version + ")"
+		.byte function_key_6
+versmsg_end:
 
 delc:
 		sty temp
@@ -882,7 +947,7 @@ insc2:
 		inc index
 insc3:
 		ldy temp
-		lda #cbm(" ")
+		lda #' '
 		sta buffer,y
 		rts
 
@@ -923,13 +988,14 @@ doj2:
 jump:
 		jmp $ffff
 jdone:
-		cbm "Done.",0
+		.text "Done."
+		.byte 0
 
 jleft:
 		lda index
 		beq jleft1
 		lda buffer
-		cmp #cbm(" ")
+		cmp #' '
 		bne jleft1
 		ldy #0
 		jsr delc
@@ -972,13 +1038,13 @@ jpacked:
 jpacked1:
 		lda buffer,y
 		iny
-		cmp #cbm(" ")
+		cmp #' '
 		bne jpacked2
 		cpy index
 		bcs jpacked3
 		bcs jpacked3
 		lda buffer,y
-		cmp #cbm(" ")
+		cmp #' '
 		bne jpacked2
 		dey
 		jsr delc
@@ -991,7 +1057,7 @@ jpacked3:
 		dey
 		beq jpacked4
 		lda buffer,y
-		cmp #cbm(" ")
+		cmp #' '
 		bne jpacked4
 		sty index
 jpacked4:
@@ -1007,7 +1073,7 @@ jexpand1:
 		ldy #$00
 jexpand2:
 		lda buffer,y
-		cmp #cbm(" ")
+		cmp #' '
 		bne jexpand4
 		jsr insc
 		inx
@@ -1016,7 +1082,7 @@ jexpand2:
 		bcs jexpand5
 jexpand3:
 		lda buffer,y
-		cmp #cbm(" ")
+		cmp #' '
 		bne jexpand4
 		iny
 		cpy index
@@ -1068,14 +1134,14 @@ prtlnx1:
 		lda wrapfl
 		beq prtlnx2
 		lda #129
-		sta var
+		sta varbuf
 		lda #0
-		sta var+1
-		sta var+2
-		sta var+3
-		sta var+4
+		sta varbuf+1
+		sta varbuf+2
+		sta varbuf+3
+		sta varbuf+4
 		ldx #15
-		jsr putvar ;lp
+		jsr putvar //lp
 prtlnx2:
 		pla
 		tax
@@ -1120,15 +1186,15 @@ findln6:
 		jsr prtlnx
 		jmp findln7
 flen:
-		byte 0
+		.byte 0
 ftmpx:
-		byte 0
+		.byte 0
 rtmpx:
-		byte 0
+		.byte 0
 rlen:
-		byte 0
+		.byte 0
 fflg:
-		byte 0
+		.byte 0
 
 repllns:
 		ldx numx
@@ -1223,7 +1289,8 @@ replln1:
 		jsr prmsg3
 		jmp replln7
 trepln:
-		cbm "Too Big. Can't Replace.",13,0
+		.text "Too Big. Can't Replace."
+		.byte 13,0
 
 dellns:
 		ldx numy
@@ -1298,7 +1365,7 @@ editlnx:
 		stx temp3
 		jsr getlnx
 		ldx #27
-		jsr putvar ;w$
+		jsr putvar //w$
 		lda temp3
 		jsr prtnum
 		jsr prcol
@@ -1338,11 +1405,13 @@ editln10:
 		ldy #>(editnoc+1)
 		jmp prmsg
 editnoc:
-		byte 13
-		cbm "(No Change.)",13
+		.byte 13
+		.text "(No Change.)"
+		.byte 13
 editext:
-		byte 13
-		cbm "Command:Exit",13
+		.byte 13
+		.text "Command:Exit"
+		.byte 13
 
 del11:
 		ldx #$0b
@@ -1369,7 +1438,7 @@ clear1:
 clearln:
 		jsr getdes
 		lda #$00
-		sta var
+		sta varbuf
 		ldx numx
 		jmp putdes
 
@@ -1423,11 +1492,11 @@ movlnx:
 		cpx cline
 		bcc movlnx1
 		jsr getdes
-		lda var
+		lda varbuf
 		pha
-		lda var+1
+		lda varbuf+1
 		pha
-		lda var+2
+		lda varbuf+2
 		pha
 movlnx0a:
 		ldx temp
@@ -1440,22 +1509,22 @@ movlnx0a:
 		cpx cline
 		bcs movlnx0a
 		pla
-		sta var+2
+		sta varbuf+2
 		pla
-		sta var+1
+		sta varbuf+1
 		pla
-		sta var
+		sta varbuf
 		ldx cline
 		jsr putdes
 		inc cline
 		rts
 movlnx1:
 		jsr getdes
-		lda var
+		lda varbuf
 		pha
-		lda var+1
+		lda varbuf+1
 		pha
-		lda var+2
+		lda varbuf+2
 		pha
 movlnx1a:
 		ldx temp
@@ -1468,11 +1537,11 @@ movlnx1a:
 		cpx cline
 		bcc movlnx1a
 		pla
-		sta var+2
+		sta varbuf+2
 		pla
-		sta var+1
+		sta varbuf+1
 		pla
-		sta var
+		sta varbuf
 		dec numx
 		dec numy
 		ldx cline
@@ -1515,13 +1584,13 @@ inline:
 		jmp usetbl1
 
 prtnum:
-		sta var+1
+		sta varbuf+1
 		lda mci
 		pha
 		lda #0
-		sta var
+		sta varbuf
 		ldx #30
-		jsr putvar ;a%
+		jsr putvar //a%
 		lda #3
 		ldx #<prtn
 		ldy #>prtn
@@ -1530,8 +1599,8 @@ prtnum:
 		sta mci
 		rts
 prtn:
-		byte british_pound
-		cbm "%a"
+		.byte british_pound
+		.text "%a"
 
 doline:
 		lda mline
@@ -1549,7 +1618,7 @@ doln1:
 		lda flags
 		and #1
 		beq noinst
-		lda #cbm("I")
+		lda #'I'
 		jsr xchrout
 noinst:
 		lda flags
@@ -1566,8 +1635,10 @@ noline:
 		sta case
 		rts
 msg3:
-		cbm "** End Of Memory **",13
-		cbm "Type 'S' To Save, Or 'H' For Help.",13,0
+		.text "** End Of Memory **"
+		.byte 13
+		.text "Type 'S' To Save, Or 'H' For Help."
+		.byte 13,0
 
 getnumm:
 		stx numx
@@ -1666,9 +1737,9 @@ getn:
 		ldx #0
 getn1:
 		lda buffer,y
-		cmp #cbm("0")
+		cmp #'0'
 		bcc getn3
-		cmp #cbm(":")
+		cmp #':'
 		bcs getn3
 		cpx #0
 		bne getn2
@@ -1741,10 +1812,10 @@ bell:
 		lda #ascii_bel
 		jmp xchrout
 prcol:
-		lda #cbm(":")
+		lda #':'
 		jmp xchrout
 prspc:
-		lda #cbm(" ")
+		lda #' '
 		jmp xchrout
 
 prcolor:
@@ -1753,8 +1824,8 @@ prcolor:
 		ldy #>color
 		jmp prmsg0
 color:
-		byte british_pound
-		cbm "q0"
+		.byte british_pound
+		.text "q0"
 
 xchrout:
 		sta $fe
@@ -1782,34 +1853,34 @@ prmsg1:
 prmsg2:
 		pla
 prmsg:
-		sta var
-		stx var+1
-		sty var+2
+		sta varbuf
+		stx varbuf+1
+		sty varbuf+2
 		sta delx
 		ldx #1
-		jsr putvar ;a$
+		jsr putvar //a$
 		jsr outastr
 		lda #1
 		sta mci
 		rts
 prmsg3:
-		stx var+1
-		sty var+2
+		stx varbuf+1
+		sty varbuf+2
 		ldy #0
 prmsg4:
-		lda [var+1],y
+		lda (varbuf+1),y
 		beq prmsg5
 		sta $fe
-		lda var+1
+		lda varbuf+1
 		pha
-		lda var+2
+		lda varbuf+2
 		pha
 		lda $fe
 		jsr xchrout
 		pla
-		sta var+2
+		sta varbuf+2
 		pla
-		sta var+1
+		sta varbuf+1
 		iny
 		bne prmsg4
 prmsg5:
@@ -1817,27 +1888,27 @@ prmsg5:
 		rts
 
 tmpa:
-		byte 0
+		.byte 0
 tmpx:
-		byte 0
+		.byte 0
 tmpx1:
-		byte 0
+		.byte 0
 tmpy:
-		byte 0
+		.byte 0
 
 bitbuf:
-		dup 0,8
+		.fill 8, 0
 rvsflag:
-		byte reverse_off
+		.byte reverse_off
 
 quadrvs:
-		dup reverse_off, 5
-		dup reverse_on, 3
-		dup reverse_off, 3
-		dup reverse_on, 5
+		.fill 5, reverse_off
+		.fill 3, reverse_on
+		.fill 3, reverse_off
+		.fill 5, reverse_on
 quadchr:
-		byte $20, $ac, $bb, $a2, $bc, $a1, $bf, $be
-		byte $be, $bf, $a1, $bc, $a2, $bb, $ac, $20
+		.byte $20, $ac, $bb, $a2, $bc, $a1, $bf, $be
+		.byte $be, $bf, $a1, $bc, $a2, $bb, $ac, $20
 
 quad:
 		sta tmpa
@@ -1924,7 +1995,10 @@ conver1a:
 		rts
 
 spchars:
-		byte ",:",34,"*?=",13,"^"
-
-offset 0
-namespace ""
+		.text ",:"
+		.byte 34
+		.text "*?="
+		.byte 13
+		.text "^"
+}
+}

@@ -1,16 +1,16 @@
-devnum = 186
+.label devnum = 186
 
-; intro is a proto
+// intro is a proto
 		jmp intro
 		jmp setup
-		byte $ff ;intro
+		.byte $ff //intro
 
 
-;* intro program
+//* intro program
 
 intro:
 
-;fake rs232 driver filled with "RTS" instructions
+//fake rs232 driver filled with "RTS" instructions
 
 		lda #$60
 		ldy #0
@@ -19,23 +19,23 @@ intro_loop1:
 		dey
 		bne intro_loop1
 
-; move editor code to it's "swapped out" location
-; also moves other modules after the editor
-; TODO split this out to swap each module individually
+// move editor code to it's "swapped out" location
+// also moves other modules after the editor
+// TODO split this out to swap each module individually
 
 		lda #>editor_load_address
 		ldy #>editor_swap_address
 		ldx #48
 		jsr swapper
 
-;move wedge to it's execution location
+//move wedge to it's execution location
 
 		lda #>wedge_load_address
 		ldy #>wedge_exec_address
 		ldx #>wedge_module_size
 		jsr swapper
 
-;load "im" basic program
+//load "im" basic program
 
 		ldx #<prgstart
 		ldy #>prgstart
@@ -64,7 +64,7 @@ intro_loop1:
 		jsr loadprg
 		lda #1
 		sta loadflag
-;restore screen
+//restore screen
 		lda #11
 		sta $d011
 		lda #$17
@@ -73,7 +73,7 @@ intro_loop1:
 		jsr $e716
 		lda #27
 		sta $d011
-;fake lightbar table
+//fake lightbar table
 		lda #0
 		ldy #0
 intro_loop2:
@@ -88,19 +88,19 @@ intro_loop3:
 		iny
 		cpy #192
 		bne intro_loop3
-;run program
+//run program
 		lda #0
 		jsr $a871
 		jmp $a7ae
 
-;* filenames
+//* filenames
 file2:
-		byte 2
-		cbm "im"
+		.byte 2
+		.text "im"
 
-;* setup routines *
+//* setup routines *
 
-;* main setup routine
+//* main setup routine
 setup:
 		lda #0
 		tay
@@ -208,7 +208,7 @@ setup_loop11:
 setup1:
 		lda #0
 		sta passmode
-		lda #cbm("X")
+		lda #'X'
 		sta mask
 		lda #2
 		sta bar
@@ -232,7 +232,7 @@ setup1:
 		sta $01
 		rts
 
-;* setup i/o windows
+//* setup i/o windows
 
 iosetup:
 		lda $0326
@@ -245,7 +245,7 @@ iosetup:
 		sta $0327
 		rts
 
-;* setup irq vector
+//* setup irq vector
 
 setirq:
 		lda #$1f
@@ -269,8 +269,8 @@ setirq:
 		sta irqcount
 		rts
 
-;* initial setup of screen
-;* colors/ clear/ etc
+//* initial setup of screen
+//* colors/ clear/ etc
 setscrn:
 		lda #$00
 		sta $d020
@@ -285,7 +285,7 @@ setscrn:
 		jsr makdate
 		jmp dispdate
 
-;* find basic variable
+//* find basic variable
 getvarp:
 		txa
 		asl
@@ -297,64 +297,64 @@ getvarp:
 		stx $46
 		jmp findvar1
 
-;********************************
-;* variables used by ml *
-;********************************
+//********************************
+//* variables used by ml *
+//********************************
 
 varlist:
-		byte $41, $ce         ;  0 an$
-		byte $41, $80         ;  1 a$
-		byte $42, $80         ;  2 b$
-		byte $54, $d2         ;  3 tr$
-		byte $44, $b1         ;  4 d1$
-		byte $44, $b2         ;  5 d2$
-		byte $44, $b3         ;  6 d3$
-		byte $44, $b4         ;  7 d4$
-		byte $44, $b5         ;  8 d5$
-		byte $4c, $c4         ;  9 ld$
-		byte $54, $d4         ; 10 tt$
-		byte $4e, $c1         ; 11 na$
-		byte $52, $ce         ; 12 rn$
-		byte $50, $c8         ; 13 ph$
-		byte $41, $cb         ; 14 ak$
-		byte $4c, $50         ; 15 lp
-		byte $50, $4c         ; 16 pl
-	 	byte $52, $43         ; 17 rc
-		byte $53, $48         ; 18 sh
-		byte $4d, $57         ; 19 mw
-		byte $4e, $4c         ; 20 nl
-		byte $55, $4c         ; 21 ul
-		byte $51, $45         ; 22 qe
-		byte $52, $51         ; 23 rq
-		byte $c1, $c3         ; 24 ac%
-		byte $45, $46         ; 25 ef
-		byte $4c, $46         ; 26 lf
-		byte $57, $80         ; 27 w$
-		byte $50, $80         ; 28 p$
-		byte $d4, $d2         ; 29 tr%
-		byte $c1, $80         ; 30 a%
-		byte $c2, $80         ; 31 b$
-		byte $c4, $d6         ; 32 dv%
-		byte $44, $d2         ; 33 dr$
-		byte $43, $b1         ; 34 c1$
-		byte $43, $b2         ; 35 c2$
-		byte $43, $cf         ; 36 co$
-		byte $43, $c8         ; 37 ch$
-		byte $cb, $d0         ; 38 kp%
-		byte $43, $b3         ; 39 c3$
-		byte $46, $b1         ; 40 f1$
-		byte $46, $b2         ; 41 f2$
-		byte $46, $b3         ; 42 f3$
-		byte $46, $b4         ; 43 f4$
-		byte $46, $b5         ; 44 f5$
-		byte $46, $b6         ; 45 f6$
-		byte $46, $b7         ; 46 f7$
-		byte $46, $b8         ; 47 f8$
-		byte $4d, $d0         ; 48 mp$
-		byte $cd, $ce         ; 49 mn%
+		.byte $41, $ce         //  0 an$
+		.byte $41, $80         //  1 a$
+		.byte $42, $80         //  2 b$
+		.byte $54, $d2         //  3 tr$
+		.byte $44, $b1         //  4 d1$
+		.byte $44, $b2         //  5 d2$
+		.byte $44, $b3         //  6 d3$
+		.byte $44, $b4         //  7 d4$
+		.byte $44, $b5         //  8 d5$
+		.byte $4c, $c4         //  9 ld$
+		.byte $54, $d4         // 10 tt$
+		.byte $4e, $c1         // 11 na$
+		.byte $52, $ce         // 12 rn$
+		.byte $50, $c8         // 13 ph$
+		.byte $41, $cb         // 14 ak$
+		.byte $4c, $50         // 15 lp
+		.byte $50, $4c         // 16 pl
+	 	.byte $52, $43         // 17 rc
+		.byte $53, $48         // 18 sh
+		.byte $4d, $57         // 19 mw
+		.byte $4e, $4c         // 20 nl
+		.byte $55, $4c         // 21 ul
+		.byte $51, $45         // 22 qe
+		.byte $52, $51         // 23 rq
+		.byte $c1, $c3         // 24 ac%
+		.byte $45, $46         // 25 ef
+		.byte $4c, $46         // 26 lf
+		.byte $57, $80         // 27 w$
+		.byte $50, $80         // 28 p$
+		.byte $d4, $d2         // 29 tr%
+		.byte $c1, $80         // 30 a%
+		.byte $c2, $80         // 31 b$
+		.byte $c4, $d6         // 32 dv%
+		.byte $44, $d2         // 33 dr$
+		.byte $43, $b1         // 34 c1$
+		.byte $43, $b2         // 35 c2$
+		.byte $43, $cf         // 36 co$
+		.byte $43, $c8         // 37 ch$
+		.byte $cb, $d0         // 38 kp%
+		.byte $43, $b3         // 39 c3$
+		.byte $46, $b1         // 40 f1$
+		.byte $46, $b2         // 41 f2$
+		.byte $46, $b3         // 42 f3$
+		.byte $46, $b4         // 43 f4$
+		.byte $46, $b5         // 44 f5$
+		.byte $46, $b6         // 45 f6$
+		.byte $46, $b7         // 46 f7$
+		.byte $46, $b8         // 47 f8$
+		.byte $4d, $d0         // 48 mp$
+		.byte $cd, $ce         // 49 mn%
 
-;find all vars used by ml,
-;get their pointers
+//find all vars used by ml,
+//get their pointers
 
 setptrs:
 		lda #49
@@ -377,7 +377,7 @@ setp1:
 		rts
 
 date2:
-		cbm "Sat Aug 08, 2020 12:25 PM   "
+		.text "Sat Aug 08, 2020 12:25 PM   "
 
 copytran:
 		ldy #0
@@ -406,94 +406,102 @@ copytran_loop3:
 		bcc copytran_loop3
 		rts
 
-; tblatc
+// tblatc
 tr1:
-		byte $00,$00,$02,$00,$04,$00,$00,$00
-		byte $14,$09,$00,$00,$93,$0d,$0e,$0f
-		byte 0,$11,0,$13,20,$15,$16,$17,$18,$19,0,27,0,0,0,0
-		cbm " !",34,"#$%&'()*+,-./"
-		cbm "0123456789:;<=>?"
-		cbm "@ABCDEFGHIJKLMNOPQRSTUVWXYZ["
-		byte $5c
-		cbm "]^_"
-		cbm 0,"abcdefghijklmnopqrstuvwxyz",0,0,0,0,20
+		.byte $00,$00,$02,$00,$04,$00,$00,$00
+		.byte $14,$09,$00,$00,$93,$0d,$0e,$0f
+		.byte 0,$11,0,$13,20,$15,$16,$17,$18,$19,0,27,0,0,0,0
+		.text " !"
+		.byte 34
+		.text "#$%&'()*+,-./"
+		.text "0123456789:;<=>?"
+		.text "@ABCDEFGHIJKLMNOPQRSTUVWXYZ["
+		.byte $5c
+		.text "]^_"
+		.byte 0
+		.text "abcdefghijklmnopqrstuvwxyz"
+		.byte 0,0,0,0,20
 
-; tblcta
+// tblcta
+.encoding "ascii"
 tr2:
-		byte $00, $01, $02, $03, $04, $05, $06, $07
-		byte $08, $09, $0a, $0b, $0c, $0d, $00, $0f
-		byte $10, $11, $12, $13, $08, $15, $16, $17
-		byte $18, $19, $1a, $1b, $1c, $1d, $1e, $1f
-		byte " !",34,"#$%&'()*+,-./"
-		byte "0123456789:;<=>?"
-		byte "@abcdefghijklmnopqrstuvwxyz[\]^_"
-		byte "-ABCDEFGHIJKLMNOPQRSTUVWXYZ*-!**"
-		byte 0,129,0,0,0,0,0,0,0,0,0,0,0,$d,0,0
-		byte 0,145,146,12,0,149,150,151,152,153,154,155,156,157,158,159
-		byte " !---!*!-*!****-"
-		byte "****!!!---******"
-		byte "-ABCDEFGHIJKLMNOPQRSTUVWXYZ*!!**"
-		byte " !---!*!-*!****-"
-		byte "****!!!---******"
+		.byte $00, $01, $02, $03, $04, $05, $06, $07
+		.byte $08, $09, $0a, $0b, $0c, $0d, $00, $0f
+		.byte $10, $11, $12, $13, $08, $15, $16, $17
+		.byte $18, $19, $1a, $1b, $1c, $1d, $1e, $1f
+		.text " !"
+		.byte 34
+		.text "#$%&'()*+,-./"
+		.text "0123456789:;<=>?"
+		.text "@abcdefghijklmnopqrstuvwxyz[\]^_"
+		.text "-ABCDEFGHIJKLMNOPQRSTUVWXYZ*-!**"
+		.byte 0,129,0,0,0,0,0,0,0,0,0,0,0,$d,0,0
+		.byte 0,145,146,12,0,149,150,151,152,153,154,155,156,157,158,159
+		.text " !---!*!-*!****-"
+		.text "****!!!---******"
+		.text "-ABCDEFGHIJKLMNOPQRSTUVWXYZ*!!**"
+		.text " !---!*!-*!****-"
+		.text "****!!!---******"
+.encoding "petscii_mixed"
 
-; tblcta1
+// tblcta1
 tr3:
-		byte 032,221,220,196,095,179,178,179
-		byte 220,047,222,195,201,192,191,220
-		byte 218,193,194,180,221,221,222,223
-		byte 223,220,217,187,200,217,188,176
+		.byte 032,221,220,196,095,179,178,179
+		.byte 220,047,222,195,201,192,191,220
+		.byte 218,193,194,180,221,221,222,223
+		.byte 223,220,217,187,200,217,188,176
 
-; tblcta2
+// tblcta2
 tr4:
-		byte 196,065,066,067,068,069,070,071
-		byte 072,073,074,075,076,077,078,079
-		byte 080,081,082,083,084,085,086,087
-		byte 088,089,090,197,221,179,178,092
+		.byte 196,065,066,067,068,069,070,071
+		.byte 072,073,074,075,076,077,078,079
+		.byte 080,081,082,083,084,085,086,087
+		.byte 088,089,090,197,221,179,178,092
 
-; tblcta3
+// tblcta3
 tr5:
-		byte 196,042,179,196,196,196,196,179
-		byte 179,191,192,217,192,092,047,218
-		byte 191,254,196,042,179,218,042,254
-		byte 042,179,042,197,221,179,227,092
+		.byte 196,042,179,196,196,196,196,179
+		.byte 179,191,192,217,192,092,047,218
+		.byte 191,254,196,042,179,218,042,254
+		.byte 042,179,042,197,221,179,227,092
 
-;* months and days
+//* months and days
 montbl0:
-		cbm "JanFebMarAprMayJun"
-		cbm "JulAugSepOctNovDec"
+		.text "JanFebMarAprMayJun"
+		.text "JulAugSepOctNovDec"
 daytbl0:
-		cbm "???SunMonTueWedThu"
-		cbm "FriSat"
+		.text "???SunMonTueWedThu"
+		.text "FriSat"
 daysofm0:
-		byte 31,28,31,30,31,30
-		byte 31,31,30,31,30,31
+		.byte 31,28,31,30,31,30
+		.byte 31,31,30,31,30,31
 
 date1fmt:
-		cbm "Sat Dec  9, 2020"
-		cbm " 12:00 AM EST   "
+		.text "Sat Dec  9, 2020"
+		.text " 12:00 AM EST   "
 
 sndtbl0:
 
-;(0) beep
-		byte $00,$40,$10,$f0,$11
-		byte $00,$00,$00,$00,$00
-		byte $00,$00,$00,$00,$00
-		byte $10
-;(1) ding
-		byte $44,$40,$0b,$00,$15
-		byte $00,$00,$00,$00,$00
-		byte $d8,$2a,$00,$00,$00
-		byte $50
-;(2) bell
-		byte $00,$60,$09,$00,$11
-		byte $00,$60,$09,$00,$11
-		byte $00,$60,$09,$00,$11
-		byte $20
-;(3) bong
-		byte $44,$10,$0d,$00,$15
-		byte $30,$08,$0b,$00,$15
-		byte $1c,$04,$0d,$00,$15
-		byte $e0
+//(0) beep
+		.byte $00,$40,$10,$f0,$11
+		.byte $00,$00,$00,$00,$00
+		.byte $00,$00,$00,$00,$00
+		.byte $10
+//(1) ding
+		.byte $44,$40,$0b,$00,$15
+		.byte $00,$00,$00,$00,$00
+		.byte $d8,$2a,$00,$00,$00
+		.byte $50
+//(2) bell
+		.byte $00,$60,$09,$00,$11
+		.byte $00,$60,$09,$00,$11
+		.byte $00,$60,$09,$00,$11
+		.byte $20
+//(3) bong
+		.byte $44,$10,$0d,$00,$15
+		.byte $30,$08,$0b,$00,$15
+		.byte $1c,$04,$0d,$00,$15
+		.byte $e0
 
 startmsg:
 		lda #1
@@ -502,51 +510,52 @@ startmsg:
 		jsr setmode
 		lda #5
 		jsr usetbl1
-		lda #verslen
-		sta var
+		lda #bootvers_end - bootvers
+		sta varbuf
 		lda #<bootvers
-		sta var+1
+		sta varbuf+1
 		lda #>bootvers
-		sta var+2
+		sta varbuf+2
 		ldx #0
-		jsr putvar ;an$
+		jsr putvar //an$
 		ldx #0
-		jmp prtvar0 ;an$
+		jmp prtvar0 //an$
 
 bootvers:
-		byte clear_screen
-		cbm " Image BBS V" + version_number + " "
-		byte british_pound
-		cbm "$a"
-		byte function_key_6
-verslen = *-bootvers
+		.byte clear_screen
+		.text " Image BBS V" + version_number + " "
+		.byte british_pound
+		.text "$a"
+		.byte function_key_6
+bootvers_end:
+
 
 screentb:
-		word $400+000,$d800+000
-		word $400+040,$d800+040
-		word $400+080,$d800+080
-		word $400+120,$d800+120
-		word $400+160,$d800+160
-		word $400+200,$d800+200
-		word $400+240,$d800+240
-		word $400+280,$d800+280
-		word $400+320,$d800+320
-		word $400+360,$d800+360
-		word $400+400,$d800+400
-		word $400+440,$d800+440
-		word $400+480,$d800+480
-		word $400+520,$d800+520
-		word $400+560,$d800+560
-		word $400+600,$d800+600
-		word tempscn0,tempcol0
-		word tempscn1,tempcol1
-		word tempscn2,tempcol2
-		word tempscn3,tempcol3
-		word tempscn4,tempcol4
-		word tempscn5,tempcol5
-		word tempscn6,tempcol6
-		word tempscn7,tempcol7
-		word $400+960,$d800+960
+		.word $400+000,$d800+000
+		.word $400+040,$d800+040
+		.word $400+080,$d800+080
+		.word $400+120,$d800+120
+		.word $400+160,$d800+160
+		.word $400+200,$d800+200
+		.word $400+240,$d800+240
+		.word $400+280,$d800+280
+		.word $400+320,$d800+320
+		.word $400+360,$d800+360
+		.word $400+400,$d800+400
+		.word $400+440,$d800+440
+		.word $400+480,$d800+480
+		.word $400+520,$d800+520
+		.word $400+560,$d800+560
+		.word $400+600,$d800+600
+		.word tempscn0,tempcol0
+		.word tempscn1,tempcol1
+		.word tempscn2,tempcol2
+		.word tempscn3,tempcol3
+		.word tempscn4,tempcol4
+		.word tempscn5,tempcol5
+		.word tempscn6,tempcol6
+		.word tempscn7,tempcol7
+		.word $400+960,$d800+960
 
 lockinit:
 		jsr ltk_bnkout
@@ -570,12 +579,12 @@ lockint1:
 		jsr ltk_fnfile
 		bcs lkerror
 		lda blmilo+1
-		sta blkl
+		sta blkl_load+1
 		lda blmilo+0
-		sta blkh
+		sta blkh_load+1
 		jsr ltk_getprt
 		ora #$80
-		sta port
+		sta port_load+1
 lkerror:
 		pla
 		jsr ltk_setlun
@@ -586,5 +595,6 @@ lkerror:
 		rts
 
 lockname:
-		cbm "lockfile",0
+		.text "lockfile"
+		.byte 0
 

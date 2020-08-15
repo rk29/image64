@@ -1,5 +1,6 @@
 #ASM = ../tools/asm.py
-ASM = assemble
+#ASM = assemble
+ASM = java -jar ~/Applications/KickAssembler/KickAss.jar
 TARGETS = ml.prg boot.prg image.prg \
 rs232.prg rs232_user.prg rs232_swift.prg \
 post.prg path.prg tagscan.prg net.prg \

@@ -4,13 +4,13 @@ logoff:
 		sta chatpage
 		sta sndrept
 		lda #11
-		sta var
+		sta varbuf
 		lda #<d1str
-		sta var+1
+		sta varbuf+1
 		lda #>d1str
-		sta var+2
+		sta varbuf+2
 		ldx #4
-		jsr putvar ;d1$
+		jsr putvar //d1$
 		lda #$a0
 		sta tdisp+30
 		sta tdisp+31

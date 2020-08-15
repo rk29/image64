@@ -1,27 +1,27 @@
-include "equat.s"
+#import "equat.s"
 
-org $c000, "sort.prg"
+* = protostart "sort.prg"
 
-ilen = $61 ;1
-istr = $62 ;2
-iptr = $64 ;2
-jlen = $69 ;1
-jstr = $6a ;2
-jptr = $6c ;2
-temp = $14 ;2
+.label ilen = $61 //1
+.label istr = $62 //2
+.label iptr = $64 //2
+.label jlen = $69 //1
+.label jstr = $6a //2
+.label jptr = $6c //2
+.label temp = $14 //2
 
-; sys 49152,a$(1),n
+// sys 49152,a$(1),n
 
 		jmp sort
 
 i:
-		word 0
+		.word 0
 j:
-		word 0
+		.word 0
 n:
-		word 0
+		.word 0
 base:
-		word 0
+		.word 0
 
 calcptr:
 		stx temp
@@ -51,13 +51,13 @@ calcstr:
 		stx temp
 		sty temp+1
 		ldy #0
-		lda [temp],y
+		lda (temp),y
 		pha
 		iny
-		lda [temp],y
+		lda (temp),y
 		tax
 		iny
-		lda [temp],y
+		lda (temp),y
 		tay
 		pla
 		rts
@@ -117,8 +117,8 @@ sort3:
 		sty jstr+1
 		ldy #0
 sort4:
-		lda [istr],y
-		cmp [jstr],y
+		lda (istr),y
+		cmp (jstr),y
 		bne sort6
 		iny
 		cpy ilen
@@ -134,9 +134,9 @@ sort6:
 		ldy #2
 sort7:
 		lda ilen,y
-		sta [jptr],y
+		sta (jptr),y
 		lda jlen,y
-		sta [iptr],y
+		sta (iptr),y
 		sta ilen,y
 		dey
 		bpl sort7

@@ -1,16 +1,16 @@
-;*
-;* string output routines *
-;*
+//*
+//* string output routines *
+//*
 
-;* output string
+//* output string
 outstr:
 		lda #0
 		sta $96
-		lda var
+		lda varbuf
 		sta len1
-		lda var+1
+		lda varbuf+1
 		sta $71
-		lda var+2
+		lda varbuf+2
 		sta $72
 		jsr gettsr
 		beq outstr0
@@ -25,11 +25,11 @@ outstr0:
 outstr1:
 		jsr zero
 		ldx #17
-		jsr putvar ;rc
+		jsr putvar //rc
 		ldx #15
-		jsr usevar ;lp
+		jsr usevar //lp
 		ldx #0
-		lda var
+		lda varbuf
 		beq outstr2
 		inx
 outstr2:
@@ -39,26 +39,26 @@ outstr2:
 		jsr outstr7
 		jsr zero
 		lda chat
-		sta var+1
+		sta varbuf+1
 		ldx #38
-		jsr putvar ;kp%
+		jsr putvar //kp%
 		lda chat
 		beq outstr3
 		jsr minusone
 		ldx #17
-		jsr putvar ;rc
+		jsr putvar //rc
 		jsr zero
 		ldx #18
-		jsr putvar ;sh
+		jsr putvar //sh
 		lda chat
-		cmp #"/"
+		cmp #'/'
 		bne outstr3
 		lda #$86
-		sta var
+		sta varbuf
 		lda #$3c
-		sta var+1
+		sta varbuf+1
 		ldx #18
-		jsr putvar ;sh
+		jsr putvar //sh
 outstr3:
 		lda wrapflg
 		beq outstr6
@@ -72,12 +72,12 @@ outstr4:
 outstr5:
 		jsr zero
 		ldx #15
-		jsr putvar ;lp
+		jsr putvar //lp
 outstr6:
 		rts
 
 lastout:
-		byte 0
+		.byte 0
 
 outstr7:
 		jsr setoutmd
@@ -86,7 +86,7 @@ outstr7:
 		jsr carchk
 		cmp #1
 		bne outstr8
-		lda #"/"
+		lda #'/'
 		sta chat
 		rts
 outstr8:
@@ -95,7 +95,7 @@ outstr8:
 		ldy $96
 outstr9:
 		sty $96
-		lda [$71],y
+		lda ($71),y
 		sta $fe
 		sta lastout
 		jsr domci
@@ -116,17 +116,17 @@ outstr11:
 		rts
 
 convtbl:
-		byte <convan0,<convstr
-		byte <convstr,<convstr
-		byte <convstr,<newdate
-		byte <strscan
+		.byte <convan0,<convstr
+		.byte <convstr,<convstr
+		.byte <convstr,<newdate
+		.byte <strscan
 convtbh:
-		byte >convan0,>convstr
-		byte >convstr,>convstr
-		byte >convstr,>newdate
-		byte >strscan
+		.byte >convan0,>convstr
+		.byte >convstr,>convstr
+		.byte >convstr,>newdate
+		.byte >strscan
 
-; manipluate an$
+// manipluate an$
 convan:
 		cpx #7
 		bcs cjmp
@@ -139,10 +139,10 @@ cjmp:
 
 convan0:
 		ldx #0
-		jsr usevar ;an$
+		jsr usevar //an$
 		ldy #10
 convan1:
-		lda [var+1],y
+		lda (varbuf+1),y
 		sta datebuf,y
 		dey
 		bpl convan1
@@ -152,11 +152,11 @@ convan1:
 		ldy #19
 convan2:
 		lda date1+4,y
-		sta [var+1],y
+		sta (varbuf+1),y
 		dey
 		bpl convan2
 		ldx #0
-		jmp putvar ;an$
+		jmp putvar //an$
 
 ctrlchk0:
 		pha
@@ -165,7 +165,7 @@ ctrlchk0:
 		pla
 		rts
 
-; carry clear if control
+// carry clear if control
 ctrlchk:
 		pha
 		lda editor
@@ -197,7 +197,7 @@ ctrlch1:
 		clc
 		rts
 
-; carry clear if color chr
+// carry clear if color chr
 colorchk:
 		sty cytmp
 		ldy #15
@@ -251,23 +251,23 @@ moreprmt:
 		sta usrlin
 		ldx #4
 moreprmt_loop1:
-		lda var,x
+		lda varbuf,x
 		pha
 		dex
 		bpl moreprmt_loop1
 		ldx #48
-		jsr usevar ;mp$
+		jsr usevar //mp$
 		ldy #0
 moreprmt_loop2:
-		lda [var+1],y
+		lda (varbuf+1),y
 		jsr xchrout
 		iny
-		cpy var
+		cpy varbuf
 		bcc moreprmt_loop2
 		lda #1
 		jsr comy0
 		bne more1
-		lda #"/"
+		lda #'/'
 		sta chat
 more1:
 		ldy #0
@@ -275,12 +275,12 @@ moreprmt_loop3:
 		lda #20
 		jsr xchrout
 		iny
-		cpy var
+		cpy varbuf
 		bcc moreprmt_loop3
 		ldx #0
 moreprmt_loop4:
 		pla
-		sta var,x
+		sta varbuf,x
 		inx
 		cpx #5
 		bcc moreprmt_loop4
@@ -288,67 +288,67 @@ moreprmt_loop4:
 
 newdate:
 		ldx #0
-		jsr usevar ;an$
-		lda var
+		jsr usevar //an$
+		lda varbuf
 		cmp #11
 		bne newd0
 		ldy #7
-		lda [var+1],y
-		and #"1"
-		cmp #"1"
+		lda (varbuf+1),y
+		and #'1'
+		cmp #'1'
 		bne newd2
 		iny
-		lda [var+1],y
-		cmp #"2"
+		lda (varbuf+1),y
+		cmp #'2'
 		bne newd2
-		lda #"0"
-		sta [var+1],y
+		lda #'0'
+		sta (varbuf+1),y
 		dey
-		lda [var+1],y
-		and #"8"
-		sta [var+1],y
+		lda (varbuf+1),y
+		and #'8'
+		sta (varbuf+1),y
 newd2:
-		dec var
-		inc var+1
+		dec varbuf
+		inc varbuf+1
 		bne newd1
-		inc var+2
+		inc varbuf+2
 newd1:
 		ldx #0
-		jsr putvar ;an$
+		jsr putvar //an$
 newd0:
 		rts
 
 strscan:
 		sty strsc2+1
 		ldx #0
-		jsr usevar ;an$
+		jsr usevar //an$
 		ldy #0
 		ldx #0
-		lda var
+		lda varbuf
 		beq strsc3
 strsc1:
-		lda [var+1],y
-		dec var
-		inc var+1
+		lda (varbuf+1),y
+		dec varbuf
+		inc varbuf+1
 		bne strsc2
-		inc var+2
+		inc varbuf+2
 strsc2:
 		cmp #32
 		beq strsc3
 		sta buf2,x
 		inx
-		lda var
+		lda varbuf
 		bne strsc1
 strsc3:
 		stx index
 		ldx #0
-		jsr putvar ;an$
+		jsr putvar //an$
 		lda index
-		sta var
+		sta varbuf
 		lda #<buf2
-		sta var+1
+		sta varbuf+1
 		lda #>buf2
-		sta var+2
+		sta varbuf+2
 		ldx #1
-		jmp putvar ;a$
+		jmp putvar //a$
 

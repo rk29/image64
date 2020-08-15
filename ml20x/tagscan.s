@@ -1,32 +1,32 @@
-include "equat.s"
+#import "equat.s"
 
-org protostart, "tagscan.prg"
+* = protostart "tagscan.prg"
 
-zp1= $71 ; pointer
+.label zp1= $71 // pointer
 
-; offset to bits in objlist (ob)
-obbitoff = 0
-; offset to type in objlist (ob)
-obtypoff = 2
-; offset to loc in objlist (ob)
-oblocoff = 4
-; offset to bits in deflist (od)
-odbitoff = 0
-; offset to type in deflist (od)
-odtypoff = 2
-; offset to piece1 in deflist (od)
-odpc1off = 4
-; offset to piece2 in deflist (od)
-odpc2off = 6
-; offset to piece3 in deflist (od)
-odpc3off = 8
+// offset to bits in objlist (ob)
+.label obbitoff = 0
+// offset to type in objlist (ob)
+.label obtypoff = 2
+// offset to loc in objlist (ob)
+.label oblocoff = 4
+// offset to bits in deflist (od)
+.label odbitoff = 0
+// offset to type in deflist (od)
+.label odtypoff = 2
+// offset to piece1 in deflist (od)
+.label odpc1off = 4
+// offset to piece2 in deflist (od)
+.label odpc2off = 6
+// offset to piece3 in deflist (od)
+.label odpc3off = 8
 
-; syntax:
+// syntax:
 
-; scanvirt: &,16,0,0,list(),obj(),objsize,def(),defsize
-; findobjd: &,16,1,0,list(x),obj(),objsize,def(),defsize
-; haveobjt: &,16,2,0,list(),obj(),objsize,def(),defsize,objtyp
-; makelist: &,16,3,0,list(),obj(),objsize,def(),usernumber
+// scanvirt: &,16,0,0,list(),obj(),objsize,def(),defsize
+// findobjd: &,16,1,0,list(x),obj(),objsize,def(),defsize
+// haveobjt: &,16,2,0,list(),obj(),objsize,def(),defsize,objtyp
+// makelist: &,16,3,0,list(),obj(),objsize,def(),usernumber
 
 entry1:
 		lda #r6510_normal
@@ -48,27 +48,27 @@ entry1:
 
 entry2:
 		lda lstptr
-		sta var
+		sta varbuf
 		lda lstptr+1
-		sta var+1
+		sta varbuf+1
 		ldy #1
-		lda [var],y
+		lda (varbuf),y
 		sta objnum
 
 		lda objptr
-		sta var
+		sta varbuf
 		lda objptr+1
-		sta var+1
+		sta varbuf+1
 		ldy #1
-		lda [var],y
+		lda (varbuf),y
 		sta objcnt
 
 		lda defptr
-		sta var
+		sta varbuf
 		lda defptr+1
-		sta var+1
+		sta varbuf+1
 		ldy #1
-		lda [var],y
+		lda (varbuf),y
 		sta defcnt
 
 		lda func
@@ -86,64 +86,64 @@ abort:
 		rts
 
 table:
-		word scanvirt ;0
-		word findobjd ;1
-		word haveobjt ;2
-		word makelist ;3
+		.word scanvirt //0
+		.word findobjd //1
+		.word haveobjt //2
+		.word makelist //3
 
 putint:
-		stx var+1
+		stx varbuf+1
 		lda #0
-		sta var
-		ldx #30 ;a%
+		sta varbuf
+		ldx #30 //a%
 putvar:
 		lda #30
 		jmp usetbl1
 
 func:
-		byte 0
+		.byte 0
 
 lstptr:
-		word 0
+		.word 0
 target:
-		word 0
+		.word 0
 bitval:
-		word 0
+		.word 0
 
 defptr:
-		word 0
+		.word 0
 defsiz:
-		byte 0
+		.byte 0
 defcnt:
-		byte 0
+		.byte 0
 defnum:
-		byte 0
+		.byte 0
 
 objptr:
-		word 0
+		.word 0
 objsiz:
-		byte 0
+		.byte 0
 objtyp:
-		word 0
+		.word 0
 objnum:
-		byte 0
+		.byte 0
 objcnt:
-		byte 0
+		.byte 0
 
 piece1:
-		byte 0
+		.byte 0
 piece2:
-		byte 0
+		.byte 0
 piece3:
-		byte 0
+		.byte 0
 
 deltmp:
-		byte 0
+		.byte 0
 scatmp:
-		byte 0
+		.byte 0
 
 change:
-		byte 0
+		.byte 0
 
 fnvarx:
 		jsr chkcom
@@ -187,34 +187,34 @@ calclst3:
 
 scanlst:
 		lda lstptr
-		sta var+4
+		sta varbuf+4
 		lda lstptr+1
-		sta var+5
+		sta varbuf+5
 		ldx #0
 		stx scatmp
 scanlst1:
 		inc scatmp
 		clc
-		lda var+4
+		lda varbuf+4
 		adc #2
-		sta var+4
+		sta varbuf+4
 		bcc scanlst2
-		inc var+5
+		inc varbuf+5
 scanlst2:
 		ldy #1
-		lda [var+4],y
+		lda (varbuf+4),y
 		tax
 		jsr calcobj
-		sta var
-		sty var+1
+		sta varbuf
+		sty varbuf+1
 		ldx scatmp
 		bcs scanlst3
 		ldy #obtypoff
-		lda [var],y
+		lda (varbuf),y
 		iny
 		cmp objtyp
 		bne scanlst3
-		lda [var],y
+		lda (varbuf),y
 		cmp objtyp+1
 		beq scanlst4
 scanlst3:
@@ -248,25 +248,25 @@ calcobj3:
 
 scanobj:
 		lda objptr
-		sta var
+		sta varbuf
 		lda objptr+1
-		sta var+1
+		sta varbuf+1
 		ldx #0
 scanobj1:
 		inx
 		clc
-		lda var
+		lda varbuf
 		adc objsiz
-		sta var
+		sta varbuf
 		bcc scanobj2
-		inc var+1
+		inc varbuf+1
 scanobj2:
 		ldy #obtypoff
-		lda [var],y
+		lda (varbuf),y
 		cmp objtyp
 		bne scanobj3
 		iny
-		lda [var],y
+		lda (varbuf),y
 		cmp objtyp+1
 		beq scanobj4
 scanobj3:
@@ -300,25 +300,25 @@ calcdef3:
 
 scandef:
 		lda defptr
-		sta var
+		sta varbuf
 		lda defptr+1
-		sta var+1
+		sta varbuf+1
 		ldx #0
 scandef1:
 		inx
 		clc
-		lda var
+		lda varbuf
 		adc defsiz
-		sta var
+		sta varbuf
 		bcc scandef2
-		inc var+1
+		inc varbuf+1
 scandef2:
 		ldy #odtypoff
-		lda [var],y
+		lda (varbuf),y
 		iny
 		cmp objtyp
 		bne scandef3
-		lda [var],y
+		lda (varbuf),y
 		cmp objtyp+1
 		beq scandef4
 scandef3:
@@ -334,14 +334,14 @@ findobjd:
 		ldx objnum
 		jsr calcobj
 		bcs findobj1
-		sta var
-		sty var+1
+		sta varbuf
+		sty varbuf+1
 		ldy #obtypoff
-		lda [var],y
-		lda [var],y
+		lda (varbuf),y
+		lda (varbuf),y
 		iny
 		sta objtyp
-		lda [var],y
+		lda (varbuf),y
 		sta objtyp+1
 		jsr scandef
 		bcc findobj2
@@ -354,19 +354,19 @@ scanvirt:
 		lda #0
 		sta change
 		lda defptr
-		sta var+2
+		sta varbuf+2
 		lda defptr+1
-		sta var+3
+		sta varbuf+3
 		lda #0
 		sta defnum
 scanvir1:
 		inc defnum
 		clc
-		lda var+2
+		lda varbuf+2
 		adc defsiz
-		sta var+2
+		sta varbuf+2
 		bcc scanvir2
-		inc var+3
+		inc varbuf+3
 scanvir2:
 		jsr checkdef
 		lda defnum
@@ -378,19 +378,19 @@ scanvir2:
 
 checkdef:
 		ldy #odpc1off
-		lda [var+2],y
+		lda (varbuf+2),y
 		iny
-		ora [var+2],y
+		ora (varbuf+2),y
 		bne checkd1
 		ldy #odpc2off
-		lda [var+2],y
+		lda (varbuf+2),y
 		iny
-		ora [var+2],y
+		ora (varbuf+2),y
 		bne checkd1
 		ldy #odpc3off
-		lda [var+2],y
+		lda (varbuf+2),y
 		iny
-		ora [var+2],y
+		ora (varbuf+2),y
 		bne checkd1
 checkd0:
 		rts
@@ -408,10 +408,10 @@ checkd1:
 		bcs checkd0
 		stx piece3
 		ldy #odtypoff
-		lda [var+2],y
+		lda (varbuf+2),y
 		sta objtyp
 		iny
-		lda [var+2],y
+		lda (varbuf+2),y
 		sta objtyp+1
 		jsr scanobj
 		bcs checkd0
@@ -431,13 +431,13 @@ checkd7:
 deletpc:
 		jsr calclst
 		bcs deletpc1
-		sta var
-		sty var+1
+		sta varbuf
+		sty varbuf+1
 		lda #0
 		tay
-		sta [var],y
+		sta (varbuf),y
 		iny
-		sta [var],y
+		sta (varbuf),y
 deletpc1:
 		rts
 
@@ -445,45 +445,45 @@ addpc:
 		txa
 		pha
 		lda lstptr
-		sta var
+		sta varbuf
 		lda lstptr+1
-		sta var+1
+		sta varbuf+1
 		ldy #1
-		lda [var],y
+		lda (varbuf),y
 		tax
 		inx
 		txa
-		sta [var],y
+		sta (varbuf),y
 		stx objnum
 		jsr calclst
-		sta var
-		sty var+1
+		sta varbuf
+		sty varbuf+1
 		ldy #0
 		tya
-		sta [var],y
+		sta (varbuf),y
 		pla
 		tax
 		iny
-		sta [var],y
+		sta (varbuf),y
 		rts
 
 scandel:
 		lda lstptr
-		sta var
+		sta varbuf
 		sta zp1
 		lda lstptr+1
-		sta var+1
+		sta varbuf+1
 		sta zp1+1
 		ldx #0
 		stx deltmp
 scandel1:
 		inc deltmp
 		clc
-		lda var
+		lda varbuf
 		adc #2
-		sta var
+		sta varbuf
 		bcc scandel2
-		inc var+1
+		inc varbuf+1
 scandel2:
 		cpx objnum
 		beq scandel5
@@ -496,36 +496,36 @@ scandel2:
 		inc zp1+1
 scandel3:
 		ldy #0
-		lda [zp1],y
+		lda (zp1),y
 		iny
-		ora [zp1],y
+		ora (zp1),y
 		beq scandel2
 scandel4:
-		lda [zp1],y
-		sta [var],y
+		lda (zp1),y
+		sta (varbuf),y
 		dey
 		bpl scandel4
 		jmp scandel1
 scandel5:
 		lda lstptr
-		sta var
+		sta varbuf
 		lda lstptr+1
-		sta var+1
+		sta varbuf+1
 		ldy #1
 		lda deltmp
 		sec
 		sbc #1
-		sta [var],y
+		sta (varbuf),y
 		sta objnum
 		rts
 
 checkpc:
 		ldx #0
 		clc
-		lda [var+2],y
+		lda (varbuf+2),y
 		sta objtyp
 		iny
-		lda [var+2],y
+		lda (varbuf+2),y
 		sta objtyp+1
 		ora objtyp
 		beq checkpc1
@@ -551,42 +551,42 @@ makelist:
 		sty bitval
 		stx bitval+1
 		lda lstptr
-		sta var
+		sta varbuf
 		lda lstptr+1
-		sta var+1
+		sta varbuf+1
 		ldy #0
 		lda #0
-		sta [var],y
+		sta (varbuf),y
 		iny
-		sta [var],y
+		sta (varbuf),y
 		lda objptr
-		sta var+2
+		sta varbuf+2
 		lda objptr+1
-		sta var+3
+		sta varbuf+3
 		ldx #0
 makelst1:
 		inx
 		clc
-		lda var+2
+		lda varbuf+2
 		adc objsiz
-		sta var+2
+		sta varbuf+2
 		bcc makelst2
-		inc var+3
+		inc varbuf+3
 makelst2:
 		ldy #oblocoff
-		lda [var+2],y
+		lda (varbuf+2),y
 		iny
 		cmp target
 		bne makelst3
-		lda [var+2],y
+		lda (varbuf+2),y
 		cmp target+1
 		bne makelst3
 		ldy #obbitoff
-		lda [var+2],y
+		lda (varbuf+2),y
 		iny
 		and bitval
 		bne makelst3
-		lda [var+2],y
+		lda (varbuf+2),y
 		and bitval+1
 		bne makelst3
 		jsr addpc

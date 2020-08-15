@@ -1,54 +1,52 @@
-version = "07/05/90 11:34p"
+.var version = "07/05/90 11:34p"
 
-include "equat.s"
+.encoding "petscii_mixed"
 
-org $c000, "path.prg"
+#import "equat.s"
 
-usetbl1 = $cd03
-buffer = $ce77
-buf2 = $ce27
+* = $c000 "path.prg"
 
 		jmp pathfind
 
-		byte 255
-		cbm version
+		.byte 255
+		.text version
 
 src:
-		byte 0
+		.byte 0
 dst:
-		byte 0
+		.byte 0
 
 dir:
-		dup 0,32
+		.fill 32, 0
 nod:
-		dup 0,32
+		.fill 32, 0
 
 pathfind:
 		txa
-		beq loadfile ;0
+		beq loadfile //0
 		dex
-		beq srchpath ;1
+		beq srchpath //1
 		dex
-		beq findnode ;2
+		beq findnode //2
 		dex
-		beq jshortct ;3
+		beq jshortct //3
 		rts
 
 jshortct:
 		jmp shortcut
 
-;load index file to end of proto
+//load index file to end of proto
 loadfile:
 		ldx #1
-		jsr usevar ;a$
-		lda var
-		ldx var+1
-		ldy var+2
+		jsr usevar //a$
+		lda varbuf
+		ldx varbuf+1
+		ldy varbuf+2
 		jsr setnam
 		ldx #32
-		jsr usevar ;dv%
+		jsr usevar //dv%
 		lda #8
-		ldx var+1
+		ldx varbuf+1
 		ldy #0
 		jsr setlfs
 		lda #0
@@ -56,42 +54,42 @@ loadfile:
 		ldy #>last
 		jsr loadf
 		lda last
-		sta var+1
+		sta varbuf+1
 		lda #0
-		sta var
+		sta varbuf
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 findnode:
 		ldx #1
-		jsr usevar ;a$
+		jsr usevar //a$
 		jsr find
-		sta var+1
+		sta varbuf+1
 		lda #0
-		sta var
+		sta varbuf
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 srchpath:
 		ldx #31
-		jsr usevar ;b%
-		lda var+1
+		jsr usevar //b%
+		lda varbuf+1
 		sta dst
 		bne srchpth1
 		ldx #2
-		jsr usevar ;b$
+		jsr usevar //b$
 		jsr find
 		sta dst
 		tax
 		beq srchpth3
 srchpth1:
 		ldx #30
-		jsr usevar ;a%
-		lda var+1
+		jsr usevar //a%
+		lda varbuf+1
 		sta src
 		bne srchpth2
 		ldx #1
-		jsr usevar ;a$
+		jsr usevar //a$
 		jsr find
 		sta src
 		tax
@@ -99,13 +97,13 @@ srchpth1:
 srchpth2:
 		jsr srch
 srchpth3:
-		stx var
+		stx varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #0
-		jmp putvar ;an$
+		jmp putvar //an$
 
 srch:
 		ldx #0
@@ -129,7 +127,7 @@ srch03:
 		jsr calc
 		lda dir,x
 		tay
-		lda [20],y
+		lda (20),y
 		beq srch02
 		cpx #0
 		beq srch04
@@ -145,7 +143,7 @@ srch04:
 		jsr calc
 		ldy #4
 srch05:
-		lda [20],y
+		lda (20),y
 		cmp nod-1,x
 		bne srch06
 		tya
@@ -162,7 +160,7 @@ srch07:
 		ldy #0
 		ldx #0
 srch08:
-		lda #"/"
+		lda #'/'
 		jsr srch12
 		lda nod,y
 		beq srch10
@@ -172,7 +170,7 @@ srch08:
 		jsr calc
 		ldy #0
 srch09:
-		lda [20],y
+		lda (20),y
 		jsr srch12
 		iny
 		cpy #3
@@ -198,8 +196,8 @@ find01:
 		jsr calc
 		ldy #0
 find02:
-		lda [20],y
-		cmp [var+1],y
+		lda (20),y
+		cmp (varbuf+1),y
 		bne find03
 		iny
 		cpy #3
@@ -239,7 +237,7 @@ shortcut:
 		jsr usevar
 		ldy #2
 shortcut_loop:
-		lda [var+1],y
+		lda (varbuf+1),y
 		sta 105,y
 		dey
 		bpl shortcut_loop
@@ -248,10 +246,10 @@ shortcut_loop:
 		ldy #0
 		ldx #0
 shortc0:
-		cpy var
+		cpy varbuf
 		bcs shortc3
 shortc0_loop:
-		lda [var+1],y
+		lda (varbuf+1),y
 		cmp 105,x
 		bne shortc1
 		iny
@@ -263,16 +261,16 @@ shortc0_loop:
 		dey
 		tya
 		clc
-		adc var+1
-		sta var+1
+		adc varbuf+1
+		sta varbuf+1
 		lda #0
-		adc var+2
-		sta var+2
-		sty var+3
-		lda var
+		adc varbuf+2
+		sta varbuf+2
+		sty varbuf+3
+		lda varbuf
 		sec
-		sbc var+3
-		sta var
+		sbc varbuf+3
+		sta varbuf
 		ldx #0
 		jsr putvar
 shortc1:

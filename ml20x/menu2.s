@@ -1,6 +1,8 @@
-include "equat.s"
+.encoding "petscii_mixed"
 
-org protostart, "menu2.prg"
+#import "equat.s"
+
+* = protostart "menu2.prg"
 
 ml:
 		stx ml1+1
@@ -96,32 +98,32 @@ chkflags:
 		rts
 
 stsize:
-		byte 0
+		.byte 0
 stcount:
-		byte 0
+		.byte 0
 
 addstr:
-		jsr evalstrx ;key$
+		jsr evalstrx //key$
 		ldx #0
 		ldy #0
 		cmp #1
 		beq addstr1
-		lda [$22],y
+		lda ($22),y
 		tax
 		iny
 addstr1:
-		lda [$22],y
+		lda ($22),y
 		ldy #7
-		sta [$14],y
+		sta ($14),y
 		dey
 		txa
-		sta [$14],y
+		sta ($14),y
 		ldy #8
 		lda #0
-		sta [$14],y
+		sta ($14),y
 		iny
-		sta [$14],y
-		jsr evalstrx ;type$
+		sta ($14),y
+		jsr evalstrx //type$
 		sta stcount
 		stx addstr2+1
 		sty addstr2+2
@@ -132,7 +134,7 @@ addstr1:
 addstr2:
 		lda $ffff,x
 		inx
-		sta [$14],y
+		sta ($14),y
 		iny
 		cpx #4
 		bcs addstr4
@@ -140,13 +142,13 @@ addstr2:
 		bcc addstr2
 addstr3:
 		lda #0
-		sta [$14],y
+		sta ($14),y
 		iny
 		inx
 		cpx #4
 		bcc addstr3
 addstr4:
-		jsr evalstrx ;title$
+		jsr evalstrx //title$
 		sta stcount
 		stx addstr5+1
 		sty addstr5+2
@@ -157,7 +159,7 @@ addstr4:
 addstr5:
 		lda $ffff,x
 		inx
-		sta [$14],y
+		sta ($14),y
 		iny
 		cpy stsize
 		bcs addstr7
@@ -165,7 +167,7 @@ addstr5:
 		bcc addstr5
 addstr6:
 		lda #0
-		sta [$14],y
+		sta ($14),y
 		iny
 		cpy stsize
 		bcc addstr6
@@ -173,48 +175,48 @@ addstr7:
 		rts
 
 keyvalue:
-		byte 0
+		.byte 0
 itemsiz:
-		byte 0
+		.byte 0
 bitvalue:
-		word 0
+		.word 0
 titlsize:
-		byte 0
+		.byte 0
 maxcount:
-		byte 0
+		.byte 0
 chkcount:
-		byte 0
+		.byte 0
 addcount:
-		byte 0
+		.byte 0
 maxadd:
-		byte 0
+		.byte 0
 arrvalue:
-		word 0
+		.word 0
 
 addarr:
 		lda $14
 		pha
 		lda $15
 		pha
-		jsr evalstrx ;key$
+		jsr evalstrx //key$
 		ldy #0
-		lda [$22],y
+		lda ($22),y
 		sta keyvalue
-		jsr evalstrx ;type$
+		jsr evalstrx //type$
 		stx addarr6+1
 		sty addarr6+2
 		jsr evalbytx
 		stx itemsiz
-		jsr fnvarx ;flags
+		jsr fnvarx //flags
 		stx addarr2+1
 		sty addarr2+2
 		jsr getword
 		stx bitvalue+1
 		sty bitvalue
-		jsr fnvarx ;type
+		jsr fnvarx //type
 		stx addarr5+1
 		sty addarr5+2
-		jsr fnvarx ;title
+		jsr fnvarx //title
 		stx addarr7+1
 		sty addarr7+2
 		jsr evalbytx
@@ -248,16 +250,16 @@ addarr2:
 addarr4:
 		lda #0
 		ldy #6
-		sta [$14],y
+		sta ($14),y
 		lda keyvalue
 		iny
-		sta [$14],y
+		sta ($14),y
 		lda arrvalue+1
 		iny
-		sta [$14],y
+		sta ($14),y
 		lda arrvalue
 		iny
-		sta [$14],y
+		sta ($14),y
 		ldx #1
 addarr5:
 		lda $ffff,x
@@ -267,7 +269,7 @@ addarr5:
 		ldy #10
 addarr6:
 		lda $ffff,x
-		sta [$14],y
+		sta ($14),y
 		iny
 		inx
 		cpy #14
@@ -275,7 +277,7 @@ addarr6:
 		ldx #0
 addarr7:
 		lda $ffff,x
-		sta [$14],y
+		sta ($14),y
 		iny
 		inx
 		cpx titlsize
@@ -327,17 +329,17 @@ addarre:
 		jmp addarr1
 addarrd:
 		lda #0
-		sta var
+		sta varbuf
 		lda chkcount
-		sta var+1
+		sta varbuf+1
 		ldx #30
-		jsr putvar ;a%
+		jsr putvar //a%
 		lda #0
-		sta var
+		sta varbuf
 		lda addcount
-		sta var+1
+		sta varbuf+1
 		ldx #31
-		jmp putvar ;b%
+		jmp putvar //b%
 
 calcbase:
 		lda menubase
@@ -419,36 +421,36 @@ putlink:
 		bcc putl1
 		lda #0
 putl1:
-		sta [$14],y
+		sta ($14),y
 		iny
 		rts
 
 menubase:
-		word 0
+		.word 0
 n:
-		byte 0
+		.byte 0
 w:
-		byte 0
+		.byte 0
 r:
-		byte 0
+		.byte 0
 c:
-		byte 0
+		.byte 0
 a:
-		byte 0
+		.byte 0
 x:
-		byte 0
+		.byte 0
 y:
-		byte 0
+		.byte 0
 px:
-		byte 0
+		.byte 0
 py:
-		byte 0
+		.byte 0
 sx:
-		byte 0
+		.byte 0
 sy:
-		byte 0
+		.byte 0
 cp:
-		byte 0
+		.byte 0
 
 usemenu:
 		jsr evalbytx
@@ -506,10 +508,10 @@ usem3:
 		jsr calcbase
 		ldy #0
 		lda px
-		sta [$14],y
+		sta ($14),y
 		iny
 		lda py
-		sta [$14],y
+		sta ($14),y
 		iny
 		jsr linkup
 		jsr linkdown
@@ -573,7 +575,7 @@ usemg:
 putend:
 		lda #reverse_on
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jsr xchrout
 		lda #13
 		jmp xchrout
@@ -583,18 +585,18 @@ put0:
 		jsr xchrout
 		lda #reverse_on
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jsr xchrout
 		lda #cursor_cyan
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jmp xchrout
 
 puttop:
 		jsr put0
 		ldx #1
 putt1:
-		lda #" "
+		lda #' '
 		jsr xchrout
 		inx
 		cpx w
@@ -602,7 +604,7 @@ putt1:
 put2:
 		lda #cursor_blue
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jmp xchrout
 
 putback:
@@ -610,9 +612,9 @@ putback:
 		jsr xchrout
 		lda #reverse_on
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jsr xchrout
 		ldx #0
 		beq putx1
@@ -622,15 +624,15 @@ putlast:
 		jsr xchrout
 		lda #reverse_on
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jsr xchrout
 		lda #reverse_off
 		jsr xchrout
 		ldx #0
 putx1:
-		lda #" "
+		lda #' '
 		jsr xchrout
 		inx
 		cpx w
@@ -641,7 +643,7 @@ putblank:
 		jsr put0
 		ldx #1
 putb1:
-		lda #" "
+		lda #' '
 		jsr xchrout
 		inx
 		cpx w
@@ -651,7 +653,7 @@ put1:
 		jsr xchrout
 		lda #reverse_off
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jmp xchrout
 
 putitem:
@@ -659,7 +661,7 @@ putitem:
 		ldx #1
 		ldy #10
 puti3:
-		lda [$14],y
+		lda ($14),y
 		beq puti4
 		jsr xchrout0
 		iny
@@ -669,21 +671,21 @@ puti4:
 		lda #cursor_white
 		jsr xchrout
 		ldy #6
-		lda [$14],y
+		lda ($14),y
 		beq puti5
 		jsr xchrout
 		inx
 puti5:
 		ldy #7
-		lda [$14],y
+		lda ($14),y
 		jsr xchrout0
 		lda #cursor_cyan
 		jsr xchrout
-		lda #" "
+		lda #' '
 		jsr xchrout0
 		ldy #14
 puti7:
-		lda [$14],y
+		lda ($14),y
 		beq puti8
 		jsr xchrout0
 		iny
@@ -694,7 +696,7 @@ puti7:
 puti8:
 		cpx w
 		bcs puti9
-		lda #" "
+		lda #' '
 		jsr xchrout
 		inx
 		bne puti8
@@ -702,11 +704,11 @@ puti9:
 		jmp put1
 
 findflag:
-		byte 0
+		.byte 0
 key1:
-		byte 0
+		.byte 0
 key2:
-		byte 0
+		.byte 0
 
 cursmenu:
 		jsr evalbytx
@@ -731,19 +733,19 @@ cursm2:
 		sta key1
 		cmp #13
 		beq cursm3
-		cpx #cbm("[")
+		cpx #'['
 		bne cursm5
 		ldy #2
-		cmp #cbm("A")
+		cmp #'A'
 		beq cursm4
 		iny
-		cmp #cbm("B")
+		cmp #'B'
 		beq cursm4
 		iny
-		cmp #cbm("C")
+		cmp #'C'
 		beq cursm4
 		iny
-		cmp #cbm("D")
+		cmp #'D'
 		beq cursm4
 cursm5:
 		ldy #2
@@ -764,12 +766,12 @@ cursm5:
 		stx findflag
 cursm7:
 		ldy #7
-		lda [$14],y
+		lda ($14),y
 		cmp key1
 		bne cursm7c
 cursm7a:
 		dey
-		lda [$14],y
+		lda ($14),y
 		beq cursm7b
 		cmp key2
 		bne cursm7c
@@ -797,13 +799,13 @@ cursm8:
 		jsr curscalc
 cursm3:
 		lda cp
-		sta var+1
+		sta varbuf+1
 		lda #0
-		sta var
+		sta varbuf
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 cursm4:
-		lda [$14],y
+		lda ($14),y
 		cmp #255
 		beq cursm9
 		sta cp
@@ -813,10 +815,10 @@ cursm9:
 curscalc:
 		jsr calcbase
 		ldy #0
-		lda [$14],y
+		lda ($14),y
 		tax
 		iny
-		lda [$14],y
+		lda ($14),y
 		tay
 
 cursposn:

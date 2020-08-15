@@ -1,60 +1,48 @@
-include "equat.s"
+.encoding "petscii_mixed"
 
-org protostart, "net.prg"
+#import "equat.s"
 
-t3 = 70
+* = protostart "net.prg"
 
-mfile = 131 ;modem file number
-dfile = 2 ;disk file number
-errch = 15 ;disk error channel
+.label t3 = 70
 
-xxx = 0
-goo = 1
-bad = 2
-ack = 3
-snb = 4
-syn = 5
+.label mfile = 131 //modem file number
+.label dfile = 2 //disk file number
+.label errch = 15 //disk error channel
 
-gcount = 11
-bcount = 23
-ncount = 38
+.label xxx = 0
+.label goo = 1
+.label bad = 2
+.label ack = 3
+.label snb = 4
+.label syn = 5
 
-pbuf0= $658
-pbuf1= $400
-pbuf2= $500
+.label gcount = 11
+.label bcount = 23
+.label ncount = 38
 
-usetbl1 = $cd03
-buffer = $ce77
+.label pbuf0= $658
+.label pbuf1= $400
+.label pbuf2= $500
 
-readst = $ffb7
-chkin = $ffc6
-chkout = $ffc9
-clrchn = $ffcc
-chrin = $ffcf
-chrout = $ffd2
-getin = $ffe4
-setlfs = $ffba
-setnam = $ffbd
-openf = $ffc0
-closef = $ffc3
-reset = rsinabl
+.label reset = rsinabl
 
 		jmp entry
 
 relaxflg:
-		byte 0
+		.byte 0
 
-;serialp:
-;		byte "A"
-;serialn:
-;		word 3
+//serialp:
+//		.byte "A"
+//serialn:
+//		.word 3
 
-;code accept
+//code accept
 t1:
-		byte 35,100
-;receive timing
+		.byte 35,100
+//receive timing
 t2:
-		byte 16,30
+		.byte 16,30
 
 entry:
 		txa
@@ -68,19 +56,19 @@ entry:
 		tya
 		inx
 		dex
-		beq jupload ;0
+		beq jupload //0
 		dex
-		beq jdnload ;1
+		beq jdnload //1
 		dex
-		beq jupname ;2
+		beq jupname //2
 		dex
-		beq jdnname ;3
+		beq jdnname //3
 		dex
-		beq juprelx ;4
+		beq juprelx //4
 		dex
-		beq jdnrelx ;5
+		beq jdnrelx //5
 		dex
-		beq jmodemx ;6
+		beq jmodemx //6
 		rts
 
 jupname:
@@ -98,20 +86,20 @@ jdnrelx:
 jmodemx:
 		jmp modemchk
 
-; check carrier/abort
+// check carrier/abort
 exit:
-;		txa
-;		pha
+//		txa
+//		pha
 		lda $28d
 		cmp #2
 		beq ext1
-;		ldx #4
-;		lda bsnpre-4,x
-;		cmp serialp-4,x
-;		lda bsnval-4,x
-;		cmp serialn-4,x
-;		lda bsnval-3,x
-;		cmp serialn-3,x
+//		ldx #4
+//		lda bsnpre-4,x
+//		cmp serialp-4,x
+//		lda bsnval-4,x
+//		cmp serialn-4,x
+//		lda bsnval-3,x
+//		cmp serialn-3,x
 		lda carrst
 		bmi ext2
 ext1:
@@ -124,23 +112,23 @@ ext0:
 		sta 512
 		jsr nobytes
 ext2:
-;		pla
-;		tax
+//		pla
+//		tax
 		rts
 
-; get # bytes and exit
+// get # bytes and exit
 xfer1:
 		lda blocks
-		sta var+1
+		sta varbuf+1
 		lda blocks+1
-		sta var
+		sta varbuf
 		ldx #31
-		jsr putvar ;b%
+		jsr putvar //b%
 		lda #0
 		sta 512
 		rts
 
-; check for code
+// check for code
 accept:
 		sta bitpat
 		lda #$00
@@ -224,13 +212,16 @@ chc4:
 		cmp #255
 		rts
 
-;codes.........012345
+//codes.........012345
 char1:
-		cbm ascii_ctrl_x, "gbass"
+		.byte ascii_ctrl_x
+		.text "gbass"
 char2:
-		cbm ascii_ctrl_x, "oac/y"
+		.byte ascii_ctrl_x
+		.text "oac/y"
 char3:
-		cbm ascii_ctrl_x, "odkbn"
+		.byte ascii_ctrl_x
+		.text "odkbn"
 
 sendcode:
 		txa
@@ -408,7 +399,7 @@ trh2:
 trh3:
 		jsr thisbuf
 		ldy #5+1
-		lda [$64],y
+		lda ($64),y
 		cmp #$ff
 		bne trh4
 		lda #$01
@@ -422,10 +413,10 @@ trh3:
 trh4:
 		jsr dummyblk
 trh5:
-		lda #"-"
-		byte $2c
+		lda #'-'
+		.byte $2c
 trh6:
-		lda #":"
+		lda #':'
 		jsr prtdash
 		lda #0
 		sta ackcount
@@ -443,14 +434,14 @@ trh6b:
 		bne trh6a
 		jsr thisbuf
 		ldy #4
-		lda [$64],y
+		lda ($64),y
 		sta bufcount
 		jsr altbuf
 		ldx #mfile
 		jsr chkout
 		ldy #0
 trh7:
-		lda [$64],y
+		lda ($64),y
 		jsr chrout
 		iny
 		cpy bufcount
@@ -459,42 +450,42 @@ trh7:
 		lda #$00
 		rts
 trh8:
-		lda #"*"
+		lda #'*'
 		jsr prtdash
 		ldx #ack
 		jsr sendcode
 		lda #1<<snb
 		jsr accept
 		bne trh8
-; lda #10
-; sta bufcount
+// lda #10
+// sta bufcount
 trh9:
 		ldx #syn
 		jsr sendcode
 		lda #1<<syn
 		jsr accept
-; bne trha
-; dec bufcount
-; bne trh9
-;trha:
-;		lda #3
-;		sta bufcount
+// bne trha
+// dec bufcount
+// bne trh9
+//trha:
+//		lda #3
+//		sta bufcount
 trhb:
 		ldx #snb
 		jsr sendcode
-; lda #0
-; jsr accept ;wait
-; dec bufcount
-; bne trhb
+// lda #0
+// jsr accept //wait
+// dec bufcount
+// bne trhb
 		lda #1
 		rts
 
-;returns:
+//returns:
 
-; 1 = buffer is full
-; 2 = timeout, stuff in buffer
-; 3 = timeout, buffer empty
-; 4 = timeout, "ack" in buffer
+// 1 = buffer is full
+// 2 = timeout, stuff in buffer
+// 3 = timeout, buffer empty
+// 4 = timeout, "ack" in buffer
 recmodem:
 		ldy #$00
 		lda recsize
@@ -513,13 +504,13 @@ rcm2:
 		cpy #$02
 		bne rcm3
 		lda pbuf1
-		cmp #cbm("a")
+		cmp #'a'
 		bne rcm3
 		lda pbuf1+1
-		cmp #cbm("c")
+		cmp #'c'
 		bne rcm3
 		lda pbuf1+2
-		cmp #cbm("k")
+		cmp #'k'
 		beq rcm4
 rcm3:
 		iny
@@ -567,17 +558,17 @@ dummyblk:
 		lda blocknum
 		clc
 		adc #$01
-		sta [$64],y
+		sta ($64),y
 		iny
 		lda blocknum+1
 		adc #$00
-		sta [$64],y
+		sta ($64),y
 		ldx #dfile
 		jsr chkin
 		ldy #7
 dum1:
 		jsr chrin
-		sta [$64],y
+		sta ($64),y
 		iny
 		jsr readst
 		bne dum2
@@ -591,7 +582,7 @@ dum2:
 		pha
 		ldy #5+1
 		lda #$ff
-		sta [$64],y
+		sta ($64),y
 		jmp dum3
 dummybl1:
 		pha
@@ -601,12 +592,12 @@ dum3:
 		jsr dod2
 		jsr reset
 		ldy #$04
-		lda [$64],y
+		lda ($64),y
 		sta bufcount
 		jsr altbuf
 		pla
 		ldy #$04
-		sta [$64],y
+		sta ($64),y
 		jsr checksum
 		rts
 
@@ -639,13 +630,13 @@ checksum:
 chk1:
 		lda check1
 		clc
-		adc [$64],y
+		adc ($64),y
 		sta check1
 		bcc chk2
 		inc check1+1
 chk2:
 		lda check1+2
-		eor [$64],y
+		eor ($64),y
 		sta check1+2
 		lda check1+3
 		rol
@@ -657,7 +648,7 @@ chk2:
 		ldy #3
 l1:
 		lda check1,y
-		sta [$64],y
+		sta ($64),y
 		dey
 		bpl l1
 		rts
@@ -676,13 +667,13 @@ transmit:
 		jsr altbuf
 		ldy #4
 		lda #7
-		sta [$64],y
+		sta ($64),y
 		jsr thisbuf
 		ldy #5
 		lda #0
-		sta [$64],y
+		sta ($64),y
 		iny
-		sta [$64],y
+		sta ($64),y
 tra1:
 		jsr tranhand
 		beq tra1
@@ -810,13 +801,13 @@ trantype:
 		jsr altbuf
 		ldy #4
 		lda #7+32
-		sta [$64],y
+		sta ($64),y
 		jsr thisbuf
 		ldy #5
 		lda #$ff
-		sta [$64],y
+		sta ($64),y
 		iny
-		sta [$64],y
+		sta ($64),y
 		jsr var2buf
 		lda #1
 		sta specmode
@@ -833,13 +824,13 @@ var2buf:
 		lda $65
 		sta var2buf3+2
 		ldx #2
-		jsr usevar ;b$
+		jsr usevar //b$
 		ldy #0
 		ldx #7
 var2buf2:
-		cpy var
+		cpy varbuf
 		beq var2buf4
-		lda [var+1],y
+		lda (varbuf+1),y
 var2buf3:
 		sta $ffff,x
 		iny
@@ -853,7 +844,7 @@ var2buf4:
 		lda var2buf3+2
 		sta $65
 		lda #13
-		sta [$64],y
+		sta ($64),y
 		iny
 		rts
 
@@ -874,15 +865,15 @@ buf2var2:
 		jsr makerm1
 		ldy #0
 buf2var3:
-		cpy var
+		cpy varbuf
 		beq buf2var4
 		lda buffer,y
-		sta [var+1],y
+		sta (varbuf+1),y
 		iny
 		bne buf2var3
 buf2var4:
 		ldx #2
-		jmp putvar ;b$
+		jmp putvar //b$
 
 dodelay:
 		inc skpdelay
@@ -926,9 +917,9 @@ prd1:
 
 dodash:
 		sta dash
-		cmp #"*"
+		cmp #'*'
 		beq dsh2
-		cmp #"-"
+		cmp #'-'
 		beq dsh1
 		jmp badblok
 dsh1:
@@ -998,63 +989,63 @@ dobytes4:
 		rts
 
 bytes:
-		byte 0,0,0
+		.byte 0,0,0
 bytec:
-		word 0
+		.word 0
 blocks:
-		word 0
+		.word 0
 bitpnt:
-		byte $20
+		.byte $20
 bitcnt:
-		byte $0f
+		.byte $0f
 bitpat:
-		byte $04
+		.byte $04
 tmer1:
-		word $0000
+		.word $0000
 gbsave:
-		byte $00
+		.byte $00
 bufcount:
-		byte $07
+		.byte $07
 delay:
-		byte $00
+		.byte $00
 skpdelay:
-		byte $00
+		.byte $00
 endflag:
-		byte $00
+		.byte $00
 check:
-		word $0000,$0000
+		.word $0000,$0000
 check1:
-		word $0000,$0000
+		.word $0000,$0000
 bufpnt:
-		byte $00
+		.byte $00
 recsize:
-		byte $07
+		.byte $07
 maxsize:
-		byte $ff
+		.byte $ff
 blocknum:
-		word $0000
+		.word $0000
 stack:
-		byte $f6
+		.byte $f6
 dontdash:
-		byte $00
+		.byte $00
 specmode:
-		byte $00
+		.byte $00
 dash:
-		byte $00
+		.byte $00
 codebuf:
-		byte "   "
+		.text "   "
 numx:
-		byte 0
+		.byte 0
 repeat:
-		byte 0
+		.byte 0
 badcount:
-		byte 0
+		.byte 0
 tcount:
-		byte 0
+		.byte 0
 ackcount:
-		byte 0
+		.byte 0
 badblks:
-		word 0
+		.word 0
 
 getln:
 		lda #35
@@ -1085,22 +1076,22 @@ minusone:
 modemchk:
 		sty index
 		ldx #1
-		jsr usevar ;a$
-		lda var
+		jsr usevar //a$
+		lda varbuf
 		beq modemc2
 		ldx #mfile
 		jsr chkout
 		ldy #0
 modemc1:
-		lda [var+1],y
+		lda (varbuf+1),y
 		jsr chrout
 		iny
-		cpy var
+		cpy varbuf
 		bcc modemc1
 		jsr clrchn
 modemc2:
 		ldy #0
-		sty var
+		sty varbuf
 modemc3:
 		lda #0
 		sta tmer1
@@ -1125,9 +1116,9 @@ modemc5:
 modemc6:
 		jsr minusone
 		ldx #17
-		jsr putvar ;rc
+		jsr putvar //rc
 		lda #0
-		sta var
+		sta varbuf
 		jmp modemc9
 modemc7:
 		cmp #13
@@ -1139,11 +1130,11 @@ modemc7:
 		sec
 		sbc #32
 modemc10:
-		ldy var
+		ldy varbuf
 		sta buffer,y
-		inc var
+		inc varbuf
 		jsr xchrout
-		ldy var
+		ldy varbuf
 		cpy index
 		beq modemc3
 		bcc modemc3
@@ -1154,17 +1145,17 @@ modemc8:
 		iny
 		cpy index
 		bcc modemc8
-		sty var
+		sty varbuf
 		jmp modemc3
 modemc9:
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #2
-		jmp putvar ;b$
+		jmp putvar //b$
 
-;increment byte count
+//increment byte count
 commbyte:
 		tya
 		pha
@@ -1181,9 +1172,9 @@ cmb6:
 		tay
 		rts
 commcnt:
-		byte 0
+		.byte 0
 
-;increment good blocks
+//increment good blocks
 goodblok:
 		inc blocks
 		bne goodb1
@@ -1192,7 +1183,7 @@ goodb1:
 		ldx #gcount
 		jmp counter0
 
-;increment bad blocks
+//increment bad blocks
 badblok:
 		inc badblks
 		bne badb1
@@ -1205,9 +1196,9 @@ counter0:
 counter:
 		inc pbuf0,x
 		lda pbuf0,x
-		cmp #":"
+		cmp #':'
 		bne counter1
-		lda #"0"
+		lda #'0'
 		sta pbuf0,x
 		dex
 		dey

@@ -1,107 +1,94 @@
-version = "9101290215"
+.encoding "petscii_mixed"
 
-include "equat.s"
-org protostart, "punter-9101290215.prg"
+.var version = "9101290215"
 
-; modem file number
-		mfile = 131
-; disk file number
-		dfile = 2
-; disk error channel
-		errch = 15
+#import "equat.s"
+* = protostart "punter-9101290215.prg"
 
-;on entry:
+// modem file number
+.label mfile = 131
+// disk file number
+.label dfile = 2
+// disk error channel
+.label errch = 15
 
-; upload - file open to #dfile
-; dnload - file open to #dfile
-; multiup - an$=filename,t
-; multidn - nothing special
+//on entry:
 
-;on exit:
+// upload - file open to #dfile
+// dnload - file open to #dfile
+// multiup - an$=filename,t
+// multidn - nothing special
 
-; upload - a%=# blocks (0 = abort)
-; ........ b%=# bad blocks
-; ........ rc=# bytes sent
-; dnload - a%=# blocks (0 = abort)
-; ........ b%=# bad blocks
-; ........ rc=# bytes received
-; multiup -rc=1
-; multidn -an$="filename,t" ""=end
-; ........ rc=(1=ok, 0=aborted)
+//on exit:
 
-		xxx = 0
-		goo = 1
-		bad = 2
-		ack = 3
-		snb = 4
-		syn = 5
-		iii = 6
-		ddd = 7
-		mjz = 8
-		okm = 9
+// upload - a%=# blocks (0 = abort)
+// ........ b%=# bad blocks
+// ........ rc=# bytes sent
+// dnload - a%=# blocks (0 = abort)
+// ........ b%=# bad blocks
+// ........ rc=# bytes received
+// multiup -rc=1
+// multidn -an$="filename,t" ""=end
+// ........ rc=(1=ok, 0=aborted)
 
-		gcount = 11
-		bcount = 23
-		ncount = 38
+.label xxx = 0
+.label goo = 1
+.label bad = 2
+.label ack = 3
+.label snb = 4
+.label syn = 5
+.label iii = 6
+.label ddd = 7
+.label mjz = 8
+.label okm = 9
 
-		pbuf0= $658
-		pbuf1= $400
-		pbuf2= $500
+.label gcount = 11
+.label bcount = 23
+.label ncount = 38
 
-		usetbl1 = $cd03
-		buffer = $ce77
+.label pbuf0= $658
+.label pbuf1= $400
+.label pbuf2= $500
 
-		readst = $ffb7
-		chkin = $ffc6
-		chkout = $ffc9
-		clrchn = $ffcc
-		chrin = $ffcf
-		chrout = $ffd2
-		getin = $ffe4
-		setlfs = $ffba
-		setnam = $ffbd
-		openf = $ffc0
-		closef = $ffc3
-
-; start - jump table
+// start - jump table
 ml:
 		lda defflag
 		and #2
 		inx
 		beq protonum
 		dex
-		beq upload0 ;0
+		beq upload0 //0
 		dex
-		beq dnload0 ;1
+		beq dnload0 //1
 		dex
-		beq multiup0 ;2
+		beq multiup0 //2
 		dex
-		beq multidn0 ;3
+		beq multidn0 //3
 		dex
-		beq setflag ;4
+		beq setflag //4
 		bne getflag
 
 defflag:
-		byte 0
+		.byte 0
 flagbyte:
-		byte 0
+		.byte 0
 versiond:
-		byte version
+		.text version
 
-;code accept
+//code accept
 t1:
-		byte 50,250
-;receive timing
+		.byte 50,250
+//receive timing
 t2:
-		byte 16,30
+		.byte 16,30
 
 protonum:
 		lda #0
-		sta var
+		sta varbuf
 		lda #0
-		sta var+1
+		sta varbuf+1
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
 upload0:
 		jsr screen
@@ -138,21 +125,21 @@ setflag:
 		rts
 getflag:
 		lda defflag
-		sta var+1
+		sta varbuf+1
 		lda #0
-		sta var
+		sta varbuf
 		ldx #30
-		jmp putvar ;a%
+		jmp putvar //a%
 
-; multi- send
+// multi- send
 multiup:
 		jsr setup
 		tsx
 		stx stack
 		jsr reset
 		ldx #0
-		jsr usevar ;an$
-		lda var
+		jsr usevar //an$
+		lda varbuf
 		beq multiup2
 		ldx #iii
 		jsr sendcode
@@ -162,10 +149,10 @@ multiup:
 		jsr chkout
 		ldy #0
 multiup1:
-		lda [var+1],y
+		lda (varbuf+1),y
 		jsr chrout
 		iny
-		cpy var
+		cpy varbuf
 		bcc multiup1
 		lda #13
 		jsr chrout
@@ -191,7 +178,7 @@ multiup4:
 		sta bytes+2
 		rts
 
-;multi-recieve
+//multi-recieve
 multidn:
 		jsr setup
 		tsx
@@ -238,13 +225,13 @@ multidn3:
 		bne multidn3
 multidn4:
 		lda index
-		sta var
+		sta varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #0
-		jsr putvar ;an$
+		jsr putvar //an$
 		lda index
 		beq multidn5
 		ldx #okm
@@ -260,7 +247,7 @@ multidn6:
 multidn7:
 		jmp multiup4
 
-; check carrier/abort
+// check carrier/abort
 exit0:
 		lda $28d
 		cmp #2
@@ -299,7 +286,7 @@ setup:
 		ldx #16
 		ldy #3
 		jsr chkmark
-		lda var+1
+		lda varbuf+1
 		sta oldtrans
 		ldx #16
 		ldy #0
@@ -308,7 +295,7 @@ setup:
 		sta flagbyte
 		rts
 
-; get # bytes and exit
+// get # bytes and exit
 xfer1:
 		lda oldirqc
 		sta irqcount
@@ -316,17 +303,17 @@ xfer1:
 		ldy oldtrans
 		jsr chkmark
 		lda blocks
-		sta var+1
+		sta varbuf+1
 		lda blocks+1
-		sta var
+		sta varbuf
 		ldx #30
-		jsr putvar ;a%
+		jsr putvar //a%
 		lda badblks
-		sta var+1
+		sta varbuf+1
 		lda badblks+1
-		sta var
+		sta varbuf
 		ldx #31
-		jsr putvar ;b%
+		jsr putvar //b%
 		lda bytes
 		ldx bytes+1
 		ldy bytes+2
@@ -355,7 +342,7 @@ xfer1:
 		ldx #17
 		jmp putvar
 
-; check for code
+// check for code
 accept:
 		sta bitpat
 		lda #$00
@@ -434,15 +421,21 @@ chc4:
 		cmp #255
 		rts
 
-;codes.........01234567..8..9
+//codes.........01234567..8..9
 char1:
-		cbm ascii_ctrl_x, "gbass", ensh, ascii_ctrl_d, 13,"o"
+		.byte ascii_ctrl_x
+		.text "gbass"
+		.byte ensh, ascii_ctrl_d, 13
+		.text "o"
 char2:
-		cbm ascii_ctrl_x, "oac/y", ensh, ascii_ctrl_d
-		byte 10
-		cbm "k"
+		.byte ascii_ctrl_x
+		.text "oac/y"
+		.byte ensh, ascii_ctrl_d, 10
+		.text "k"
 char3:
-		cbm ascii_ctrl_x, "odkbn", ensh, ascii_ctrl_d, 0, 13
+		.byte ascii_ctrl_x
+		.text "odkbn"
+		.byte ensh, ascii_ctrl_d, 0, 13
 
 sendcode:
 		txa
@@ -584,7 +577,7 @@ trh2:
 trh3:
 		jsr thisbuf
 		ldy #6
-		lda [$64],y
+		lda ($64),y
 		cmp #$ff
 		bne trh4
 		lda #1
@@ -598,10 +591,10 @@ trh3:
 trh4:
 		jsr dummyblk
 trh5:
-		lda #"-"
-		byte $2c
+		lda #'-'
+		.byte $2c
 trh6:
-		lda #":"
+		lda #':'
 		jsr prtdash
 		ldx #ack
 		jsr sendcode
@@ -610,14 +603,14 @@ trh6:
 		bne trh5
 		jsr thisbuf
 		ldy #4
-		lda [$64],y
+		lda ($64),y
 		sta bufcount
 		jsr altbuf
 		ldx #mfile
 		jsr chkout
 		ldy #0
 trh7:
-		lda [$64],y
+		lda ($64),y
 		jsr chrout
 		iny
 		cpy bufcount
@@ -672,13 +665,13 @@ rcm2:
 		cpy #$02
 		bne rcm3
 		lda codebuf
-		cmp #cbm("a")
+		cmp #'a'
 		bne rcm3
 		lda codebuf+1
-		cmp #cbm("c")
+		cmp #'c'
 		bne rcm3
 		lda codebuf+2
-		cmp #cbm("k")
+		cmp #'k'
 		beq rcm4
 rcm3:
 		iny
@@ -728,17 +721,17 @@ dummyblk:
 		lda blocknum
 		clc
 		adc #$01
-		sta [$64],y
+		sta ($64),y
 		iny
 		lda blocknum+1
 		adc #$00
-		sta [$64],y
+		sta ($64),y
 		ldx #dfile
 		jsr chkin
 		ldy #$07
 dum1:
 		jsr chrin
-		sta [$64],y
+		sta ($64),y
 		jsr commbyte
 		iny
 		jsr readst
@@ -754,7 +747,7 @@ dum2:
 		ldy #5
 		iny
 		lda #$ff
-		sta [$64],y
+		sta ($64),y
 		jmp dum3
 dummybl1:
 		pha
@@ -764,12 +757,12 @@ dum3:
 		jsr dod2
 		jsr reset
 		ldy #$04
-		lda [$64],y
+		lda ($64),y
 		sta bufcount
 		jsr altbuf
 		pla
 		ldy #$04
-		sta [$64],y
+		sta ($64),y
 		jsr checksum
 		rts
 
@@ -804,13 +797,13 @@ checksum:
 chk1:
 		lda check1
 		clc
-		adc [$64],y
+		adc ($64),y
 		sta check1
 		bcc chk2
 		inc check1+1
 chk2:
 		lda check1+2
-		eor [$64],y
+		eor ($64),y
 		sta check1+2
 		lda check1+3
 		rol
@@ -821,16 +814,16 @@ chk2:
 		bne chk1
 		ldy #0
 		lda check1
-		sta [$64],y
+		sta ($64),y
 		iny
 		lda check1+1
-		sta [$64],y
+		sta ($64),y
 		iny
 		lda check1+2
-		sta [$64],y
+		sta ($64),y
 		iny
 		lda check1+3
-		sta [$64],y
+		sta ($64),y
 		rts
 
 transmit:
@@ -847,13 +840,13 @@ transmit:
 		jsr altbuf
 		ldy #4
 		lda #7
-		sta [$64],y
+		sta ($64),y
 		jsr thisbuf
 		ldy #5
 		lda #0
-		sta [$64],y
+		sta ($64),y
 		iny
-		sta [$64],y ;6
+		sta ($64),y //6
 tra1:
 		jsr tranhand
 		beq tra1
@@ -1007,16 +1000,16 @@ trt0:
 		jsr altbuf
 		ldy #4
 		lda #8
-		sta [$64],y ;4
+		sta ($64),y //4
 		jsr thisbuf
 		ldy #5
 		lda #$ff
-		sta [$64],y ;5
+		sta ($64),y //5
 		iny
-		sta [$64],y ;6
+		sta ($64),y //6
 		lda filetyp
 		iny
-		sta [$64],y ;7
+		sta ($64),y //7
 		lda #1
 		sta specmode
 trt1:
@@ -1066,7 +1059,7 @@ reset:
 		jmp rsinabl
 
 dodash:
-		cmp #"-"
+		cmp #'-'
 		beq dsh1
 		jmp badblok
 dsh1:
@@ -1100,59 +1093,59 @@ nobytes:
 		rts
 
 bytes:
-		byte 0,0,0
+		.byte 0,0,0
 blocks:
-		word 0
+		.word 0
 badblks:
-		word 0
+		.word 0
 limit:
-		byte 0
+		.byte 0
 bitpnt:
-		byte $20
+		.byte $20
 bitcnt:
-		byte $0f
+		.byte $0f
 bitpat:
-		byte $04
+		.byte $04
 tmer1:
-		word $0000
+		.word $0000
 gbsave:
-		byte $00
+		.byte $00
 bufcount:
-		byte $07
+		.byte $07
 delay:
-		byte $00
+		.byte $00
 skpdelay:
-		byte $00
+		.byte $00
 endflag:
-		byte $00
+		.byte $00
 check:
-		word $0000,$0000
+		.word $0000,$0000
 check1:
-		word $0000,$0000
+		.word $0000,$0000
 bufpnt:
-		byte $00
+		.byte $00
 recsize:
-		byte $07
+		.byte $07
 maxsize:
-		byte $ff
+		.byte $ff
 blocknum:
-		word $0000
+		.word $0000
 stack:
-		byte $f6
+		.byte $f6
 oldirqc:
-		byte 0
+		.byte 0
 oldirqc1:
-		byte 0
+		.byte 0
 oldtrans:
-		byte 0
+		.byte 0
 dontdash:
-		byte $00
+		.byte $00
 specmode:
-		byte $00
+		.byte $00
 codebuf:
-		byte "   "
+		.text "   "
 numx:
-		byte 0
+		.byte 0
 
 getln:
 		lda #35
@@ -1176,7 +1169,7 @@ chkmark:
 		lda #52
 		jmp usetbl1
 
-;increment byte count
+//increment byte count
 commbyte:
 		tya
 		pha
@@ -1193,9 +1186,9 @@ cmb6:
 		tay
 		rts
 commcnt:
-		byte 0
+		.byte 0
 
-;increment good blocks
+//increment good blocks
 goodblok:
 		inc blocks
 		bne goodb1
@@ -1204,7 +1197,7 @@ goodb1:
 		ldx #gcount
 		jmp counter0
 
-;increment bad blocks
+//increment bad blocks
 badblok:
 		inc badblks
 		bne badb1
@@ -1217,9 +1210,9 @@ counter0:
 counter:
 		inc pbuf0,x
 		lda pbuf0,x
-		cmp #":"
+		cmp #':'
 		bne counter1
-		lda #"0"
+		lda #'0'
 		sta pbuf0,x
 		dex
 		dey
@@ -1254,11 +1247,11 @@ rcn2:
 		cpy #18
 		bne rcn2
 rcn3:
-		sty var
+		sty varbuf
 		lda #<buffer
-		sta var+1
+		sta varbuf+1
 		lda #>buffer
-		sta var+2
+		sta varbuf+2
 		ldx #0
 		jsr putvar
 		lda #1
@@ -1288,24 +1281,24 @@ tranname:
 		jsr altbuf
 		ldy #4
 		lda #7+18
-		sta [$64],y
+		sta ($64),y
 		jsr thisbuf
 		ldy #5
 		lda #$ff
-		sta [$64],y
+		sta ($64),y
 		iny
-		sta [$64],y
+		sta ($64),y
 		lda $64
 		pha
 		lda $65
 		pha
 		ldx #0
-		jsr usevar ;an$
+		jsr usevar //an$
 		ldy #0
-		cpy var
+		cpy varbuf
 		beq trn2
 trn1:
-		lda [var+1],y
+		lda (varbuf+1),y
 		sta buffer,y
 		iny
 		cpy #18
@@ -1322,7 +1315,7 @@ trn3:
 		cpy index
 		beq trn4
 		lda buffer,x
-		sta [$64],y
+		sta ($64),y
 		iny
 		inx
 		bne trn3
@@ -1330,7 +1323,7 @@ trn4:
 		cpx #18
 		beq trn5
 		lda #0
-		sta [$64],y
+		sta ($64),y
 		inx
 		iny
 		bne trn4
