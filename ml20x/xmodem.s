@@ -56,8 +56,8 @@ protonum:
 		sta varbuf
 		lda #1
 		sta varbuf+1
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 x49152:
 		jmp xsend
@@ -75,8 +75,8 @@ getflag:
 		sta varbuf+1
 		lda #0
 		sta varbuf
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 t1:
 		.byte 60,240
@@ -240,14 +240,14 @@ exit2:
 		sta varbuf+1
 		lda blocks+1
 		sta varbuf
-		ldx #30
-		jsr putvar //a%
+		ldx #var_a_integer
+		jsr putvar
 		lda badblks
 		sta varbuf+1
 		lda badblks+1
 		sta varbuf
-		ldx #31
-		jsr putvar //b%
+		ldx #var_b_integer
+		jsr putvar
 		lda bytes
 		ldx bytes+1
 		ldy bytes+2
@@ -273,8 +273,8 @@ exit2:
 		ora #$7f
 		and $62
 		sta $62
-		ldx #17
-		jmp putvar //rc
+		ldx #var_rc_float
+		jmp putvar
 
 getbyte:
 		jsr exit
@@ -821,8 +821,8 @@ xsendnam:
 		sta blocknum
 		jsr xsendcrc
 xsendn2:
-		ldx #0
-		jsr usevar //an$
+		ldx #var_an_string
+		jsr usevar
 		ldy #0
 		lda varbuf
 		beq xsendn4
@@ -895,8 +895,8 @@ xrecvn2:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #0
-		jsr putvar //an$
+		ldx #var_an_string
+		jsr putvar
 		jmp exit2
 
 getmdm:

@@ -194,8 +194,8 @@ getversn:
 		sta varbuf+1
 		lda #>version
 		sta varbuf+2
-		ldx #1
-		jsr putvar //a$
+		ldx #var_a_string
+		jsr putvar
 
 		ldy #4
 loop:
@@ -203,8 +203,8 @@ loop:
 		sta varbuf,y
 		dey
 		bpl loop
-		ldx #15
-		jmp putvar //lp
+		ldx #var_lp_float
+		jmp putvar
 
 scrnset:
 		sta blnkflag
@@ -329,7 +329,7 @@ outastr2:
 outastr:
 		jsr chrgot
 		bne outastr1
-		ldx #1
+		ldx #var_a_string
 		jmp prtvar
 
 getstr:

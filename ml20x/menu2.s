@@ -332,14 +332,14 @@ addarrd:
 		sta varbuf
 		lda chkcount
 		sta varbuf+1
-		ldx #30
-		jsr putvar //a%
+		ldx #var_a_integer
+		jsr putvar
 		lda #0
 		sta varbuf
 		lda addcount
 		sta varbuf+1
-		ldx #31
-		jmp putvar //b%
+		ldx #var_b_integer
+		jmp putvar
 
 calcbase:
 		lda menubase
@@ -802,8 +802,8 @@ cursm3:
 		sta varbuf+1
 		lda #0
 		sta varbuf
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 cursm4:
 		lda ($14),y
 		cmp #255

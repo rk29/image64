@@ -175,8 +175,8 @@ cursmod2:
 calcgoto:
 		txa
 		pha
-		ldx #30
-		jsr usevar //a%
+		ldx #var_a_integer
+		jsr usevar
 		ldx varbuf+1
 		ldy varbuf
 		pla
@@ -262,8 +262,8 @@ ecsquit:
 		sta varbuf
 		sta varbuf+1
 ecsdone:
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 arbit:
 		sty lu_load+1

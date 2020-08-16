@@ -37,14 +37,14 @@ jshortct:
 
 //load index file to end of proto
 loadfile:
-		ldx #1
-		jsr usevar //a$
+		ldx #var_a_string
+		jsr usevar
 		lda varbuf
 		ldx varbuf+1
 		ldy varbuf+2
 		jsr setnam
-		ldx #32
-		jsr usevar //dv%
+		ldx #var_dv_integer
+		jsr usevar
 		lda #8
 		ldx varbuf+1
 		ldy #0
@@ -57,39 +57,39 @@ loadfile:
 		sta varbuf+1
 		lda #0
 		sta varbuf
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 findnode:
-		ldx #1
-		jsr usevar //a$
+		ldx #var_a_string
+		jsr usevar
 		jsr find
 		sta varbuf+1
 		lda #0
 		sta varbuf
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 srchpath:
-		ldx #31
-		jsr usevar //b%
+		ldx #var_b_integer
+		jsr usevar
 		lda varbuf+1
 		sta dst
 		bne srchpth1
-		ldx #2
-		jsr usevar //b$
+		ldx #var_b_string
+		jsr usevar
 		jsr find
 		sta dst
 		tax
 		beq srchpth3
 srchpth1:
-		ldx #30
-		jsr usevar //a%
+		ldx #var_a_integer
+		jsr usevar
 		lda varbuf+1
 		sta src
 		bne srchpth2
-		ldx #1
-		jsr usevar //a$
+		ldx #var_a_string
+		jsr usevar
 		jsr find
 		sta src
 		tax
@@ -102,8 +102,8 @@ srchpth3:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #0
-		jmp putvar //an$
+		ldx #var_an_string
+		jmp putvar
 
 srch:
 		ldx #0
@@ -233,7 +233,7 @@ calc:
 		rts
 
 shortcut:
-		ldx #1
+		ldx #var_a_string
 		jsr usevar
 		ldy #2
 shortcut_loop:
@@ -241,7 +241,7 @@ shortcut_loop:
 		sta 105,y
 		dey
 		bpl shortcut_loop
-		ldx #0
+		ldx #var_an_string
 		jsr usevar
 		ldy #0
 		ldx #0
@@ -271,7 +271,7 @@ shortc0_loop:
 		sec
 		sbc varbuf+3
 		sta varbuf
-		ldx #0
+		ldx #var_an_string
 		jsr putvar
 shortc1:
 		cpx #0

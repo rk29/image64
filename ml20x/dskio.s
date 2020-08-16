@@ -39,8 +39,8 @@ prg1:
 		tay
 		stx modst
 		sty modst+1
-		ldx #1
-		jsr usevar //a$
+		ldx #var_a_string
+		jsr usevar
 		lda #0
 		jsr setmsg
 		lda #1
@@ -89,11 +89,11 @@ dskdir1:
 		lda dflag
 		bne dskdir2
 		jsr minusone
-		ldx #15
-		jsr putvar //lp
+		ldx #var_lp_float
+		jsr putvar
 		jsr outastr
-		ldx #17
-		jsr usevar //rc
+		ldx #var_rc_float
+		jsr usevar
 		lda varbuf
 		beq dskdir1
 dskdir2:
@@ -156,8 +156,8 @@ dir5:
 		sta varbuf+1
 		lda #>buf2
 		sta varbuf+2
-		ldx #$01
-		jsr putvar //a$
+		ldx #var_a_string
+		jsr putvar
 		jmp clrchn
 
 //* input from disk
@@ -196,8 +196,8 @@ dskin3:
 		sta varbuf+1
 		lda #>buf2
 		sta varbuf+2
-		ldx #$01
-		jsr putvar //a$
+		ldx #var_a_string
+		jsr putvar
 		jmp clrchn
 
 bytin:

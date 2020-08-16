@@ -95,8 +95,8 @@ chatmode:
 inline:
 		stx editor //flags
 		sty passmode
-		ldx #16
-		jsr usevar //pl
+		ldx #var_pl_float
+		jsr usevar
 		lda varbuf //case lock
 		and #1
 		sta case
@@ -111,8 +111,8 @@ inline0:
 		lda editor
 		and #$30 //word wrap
 		beq in0c //and edit mode
-		ldx #27
-		jsr usevar //w$
+		ldx #var_w_string
+		jsr usevar
 		ldy varbuf
 		beq in1
 		sty tmp1
@@ -144,8 +144,8 @@ in0d:
 		jsr prprompt
 in0b:
 		jsr zero
-		ldx #27
-		jsr putvar //w$
+		ldx #var_w_string
+		jsr putvar
 in1:
 		jsr xgetin //main loop
 		sta $fe
@@ -253,8 +253,8 @@ ctrlm:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #0
-		jsr putvar //an$
+		ldx #var_an_string
+		jsr putvar
 		jmp memory
 
 ctrlt:
@@ -424,8 +424,8 @@ wrap2:
 		sta varbuf+1
 		lda #>buf2
 		sta varbuf+2
-		ldx #27
-		jsr putvar //w$
+		ldx #var_w_string
+		jsr putvar
 		jmp ctrlm
 wrap3:
 		ldx #0
@@ -451,8 +451,8 @@ wrap5:
 		sta varbuf+1
 		lda #>buf2
 		sta varbuf+2
-		ldx #$1b
-		jsr putvar //w$
+		ldx #var_w_string
+		jsr putvar
 wrap6:
 		ldy tmp3
 		iny

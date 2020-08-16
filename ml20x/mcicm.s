@@ -82,6 +82,7 @@ comtbl:
 		.word notc,cvar,notc,clen
 		.word cstr,cnum,notc,notc
 
+// TODO change to a table of variable indices
 mcivars:
 		.text "d1ldnarnphbnb"
 		.byte $80
@@ -235,8 +236,8 @@ comi:
 		lda #0
 		sta passmode
 		jsr zero
-		ldx #0
-		jsr putvar //an$
+		ldx #var_an_string
+		jsr putvar
 		lda $96
 		pha
 		lda $71
@@ -334,8 +335,8 @@ coms:
 comt:
 		cpx #2
 		bne comt1
-		ldx #24
-		jsr usevar //ac%
+		ldx #var_ac_integer
+		jsr usevar
 		lda varbuf+1
 		and #$0f
 		ora #'0'

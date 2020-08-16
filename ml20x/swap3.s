@@ -82,11 +82,11 @@ read1:
 		beq read1a
 		jsr minusone
 read1a:
-		ldx #15
-		jsr putvar //lp
+		ldx #var_lp_float
+		jsr putvar
 		jsr zero
-		ldx #17
-		jsr putvar //rc
+		ldx #var_rc_float
+		jsr putvar
 		jsr outastr
 		lda dstat
 read1b:
@@ -94,8 +94,8 @@ read1b:
 		bne read2
 		lda readmode
 		bne readf
-		ldx #17
-		jsr usevar //rc
+		ldx #var_rc_float
+		jsr usevar
 		lda varbuf
 		beq readf
 read2:
@@ -156,11 +156,12 @@ loop:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #0
-		jsr putvar //an$
 
-		ldx #0
-		jmp prtvar0 //an$
+		ldx #var_an_string
+		jsr putvar
+
+		ldx #var_an_string
+		jmp prtvar0
 
 copymsg:
 		.byte function_key_6, british_pound, 95

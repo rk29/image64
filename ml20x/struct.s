@@ -109,6 +109,7 @@ functbl:
 		.word gamescan //12
 		.word textread //13
 
+// TODO move variable selection here since only one is used
 putvar:
 		lda #30
 		jmp usetbl1
@@ -378,8 +379,8 @@ doscan14:
 		dec count
 		bne doscan3
 doscan15:
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 i:
 		.word 0
@@ -605,8 +606,8 @@ scannum5:
 scannum6:
 		lda #0
 		sta varbuf
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 // sum
 // &,nn,9,num,siz,a(a,b)
@@ -639,8 +640,8 @@ scansum3:
 		dec count
 		bne scansum1
 scansum4:
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 // copy
 // &,nn,10,size,a1(a,b),a2(a,b)
@@ -757,8 +758,8 @@ scanstr5:
 		lda iptr+1
 		lsr
 		sta varbuf+1
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 arrays1:
 		.text "tbdenACDEFAS"

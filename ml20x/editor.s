@@ -1140,8 +1140,8 @@ prtlnx1:
 		sta varbuf+2
 		sta varbuf+3
 		sta varbuf+4
-		ldx #15
-		jsr putvar //lp
+		ldx #var_lp_float
+		jsr putvar
 prtlnx2:
 		pla
 		tax
@@ -1364,8 +1364,8 @@ insln4:
 editlnx:
 		stx temp3
 		jsr getlnx
-		ldx #27
-		jsr putvar //w$
+		ldx #var_w_string
+		jsr putvar
 		lda temp3
 		jsr prtnum
 		jsr prcol
@@ -1589,8 +1589,8 @@ prtnum:
 		pha
 		lda #0
 		sta varbuf
-		ldx #30
-		jsr putvar //a%
+		ldx #var_a_integer
+		jsr putvar
 		lda #3
 		ldx #<prtn
 		ldy #>prtn
@@ -1857,8 +1857,8 @@ prmsg:
 		stx varbuf+1
 		sty varbuf+2
 		sta delx
-		ldx #1
-		jsr putvar //a$
+		ldx #var_a_string
+		jsr putvar
 		jsr outastr
 		lda #1
 		sta mci

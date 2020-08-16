@@ -9,8 +9,8 @@ logoff:
 		sta varbuf+1
 		lda #>d1str
 		sta varbuf+2
-		ldx #4
-		jsr putvar //d1$
+		ldx #var_d1_string
+		jsr putvar
 		lda #$a0
 		sta tdisp+30
 		sta tdisp+31

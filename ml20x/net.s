@@ -122,8 +122,8 @@ xfer1:
 		sta varbuf+1
 		lda blocks+1
 		sta varbuf
-		ldx #31
-		jsr putvar //b%
+		ldx #var_b_integer
+		jsr putvar
 		lda #0
 		sta 512
 		rts
@@ -823,8 +823,8 @@ var2buf:
 		sta var2buf3+1
 		lda $65
 		sta var2buf3+2
-		ldx #2
-		jsr usevar //b$
+		ldx #var_b_string
+		jsr usevar
 		ldy #0
 		ldx #7
 var2buf2:
@@ -872,8 +872,8 @@ buf2var3:
 		iny
 		bne buf2var3
 buf2var4:
-		ldx #2
-		jmp putvar //b$
+		ldx #var_b_string
+		jmp putvar
 
 dodelay:
 		inc skpdelay
@@ -1075,8 +1075,8 @@ minusone:
 
 modemchk:
 		sty index
-		ldx #1
-		jsr usevar //a$
+		ldx #var_a_string
+		jsr usevar
 		lda varbuf
 		beq modemc2
 		ldx #mfile
@@ -1115,8 +1115,8 @@ modemc5:
 		jmp modemc9
 modemc6:
 		jsr minusone
-		ldx #17
-		jsr putvar //rc
+		ldx #var_rc_float
+		jsr putvar
 		lda #0
 		sta varbuf
 		jmp modemc9
@@ -1152,8 +1152,8 @@ modemc9:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #2
-		jmp putvar //b$
+		ldx #var_b_string
+		jmp putvar
 
 //increment byte count
 commbyte:

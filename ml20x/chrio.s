@@ -341,8 +341,8 @@ inchr:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #$00
-		jmp putvar //an$
+		ldx #var_an_string
+		jmp putvar
 
 //* get character
 //* with case setting

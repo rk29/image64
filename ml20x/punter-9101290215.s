@@ -87,8 +87,8 @@ protonum:
 		sta varbuf
 		lda #0
 		sta varbuf+1
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 upload0:
 		jsr screen
@@ -128,8 +128,8 @@ getflag:
 		sta varbuf+1
 		lda #0
 		sta varbuf
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 // multi- send
 multiup:
@@ -137,8 +137,8 @@ multiup:
 		tsx
 		stx stack
 		jsr reset
-		ldx #0
-		jsr usevar //an$
+		ldx #var_an_string
+		jsr usevar
 		lda varbuf
 		beq multiup2
 		ldx #iii
@@ -230,8 +230,8 @@ multidn4:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #0
-		jsr putvar //an$
+		ldx #var_an_string
+		jsr putvar
 		lda index
 		beq multidn5
 		ldx #okm
@@ -306,14 +306,14 @@ xfer1:
 		sta varbuf+1
 		lda blocks+1
 		sta varbuf
-		ldx #30
-		jsr putvar //a%
+		ldx #var_a_integer
+		jsr putvar
 		lda badblks
 		sta varbuf+1
 		lda badblks+1
 		sta varbuf
-		ldx #31
-		jsr putvar //b%
+		ldx #var_b_integer
+		jsr putvar
 		lda bytes
 		ldx bytes+1
 		ldy bytes+2
@@ -332,6 +332,7 @@ xfer1:
 		sta r6510
 		lda #0
 		sta $65
+		// TODO get a label for this
 		jsr $bc4f
 		pla
 		sta r6510
@@ -339,7 +340,7 @@ xfer1:
 		ora #$7f
 		and $62
 		sta $62
-		ldx #17
+		ldx #var_rc_float
 		jmp putvar
 
 // check for code
@@ -1252,7 +1253,7 @@ rcn3:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #0
+		ldx #var_an_string
 		jsr putvar
 		lda #1
 		sta endflag
@@ -1292,8 +1293,8 @@ tranname:
 		pha
 		lda $65
 		pha
-		ldx #0
-		jsr usevar //an$
+		ldx #var_an_string
+		jsr usevar
 		ldy #0
 		cpy varbuf
 		beq trn2

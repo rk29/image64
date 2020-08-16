@@ -447,9 +447,16 @@
 
 .label var_an_string = 0
 .label var_a_string = 1
+.label var_b_string = 2
+.label var_d1_string = 4
 .label var_lp_float = 15
+.label var_pl_float = 16
 .label var_rc_float = 17
 .label var_sh_float = 18
+.label var_ac_integer = 24
+.label var_w_string = 27
 .label var_a_integer = 30
 .label var_b_integer = 31
 .label var_dv_integer = 32
+.label var_kp_integer = 38
+.label var_mp_string = 48

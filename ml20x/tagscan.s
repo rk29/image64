@@ -95,7 +95,7 @@ putint:
 		stx varbuf+1
 		lda #0
 		sta varbuf
-		ldx #30 //a%
+		ldx #var_a_integer
 putvar:
 		lda #30
 		jmp usetbl1

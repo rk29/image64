@@ -24,10 +24,10 @@ outstr0:
 		bne outstr5
 outstr1:
 		jsr zero
-		ldx #17
-		jsr putvar //rc
-		ldx #15
-		jsr usevar //lp
+		ldx #var_rc_float
+		jsr putvar
+		ldx #var_lp_float
+		jsr usevar
 		ldx #0
 		lda varbuf
 		beq outstr2
@@ -40,16 +40,16 @@ outstr2:
 		jsr zero
 		lda chat
 		sta varbuf+1
-		ldx #38
-		jsr putvar //kp%
+		ldx #var_kp_integer
+		jsr putvar
 		lda chat
 		beq outstr3
 		jsr minusone
-		ldx #17
-		jsr putvar //rc
+		ldx #var_rc_float
+		jsr putvar
 		jsr zero
-		ldx #18
-		jsr putvar //sh
+		ldx #var_sh_float
+		jsr putvar
 		lda chat
 		cmp #'/'
 		bne outstr3
@@ -57,8 +57,8 @@ outstr2:
 		sta varbuf
 		lda #$3c
 		sta varbuf+1
-		ldx #18
-		jsr putvar //sh
+		ldx #var_sh_float
+		jsr putvar
 outstr3:
 		lda wrapflg
 		beq outstr6
@@ -71,8 +71,8 @@ outstr4:
 		jsr output
 outstr5:
 		jsr zero
-		ldx #15
-		jsr putvar //lp
+		ldx #var_lp_float
+		jsr putvar
 outstr6:
 		rts
 
@@ -138,8 +138,8 @@ cjmp:
 		jmp convan0
 
 convan0:
-		ldx #0
-		jsr usevar //an$
+		ldx #var_an_string
+		jsr usevar
 		ldy #10
 convan1:
 		lda (varbuf+1),y
@@ -155,8 +155,8 @@ convan2:
 		sta (varbuf+1),y
 		dey
 		bpl convan2
-		ldx #0
-		jmp putvar //an$
+		ldx #var_an_string
+		jmp putvar
 
 ctrlchk0:
 		pha
@@ -255,8 +255,8 @@ moreprmt_loop1:
 		pha
 		dex
 		bpl moreprmt_loop1
-		ldx #48
-		jsr usevar //mp$
+		ldx #var_mp_string
+		jsr usevar
 		ldy #0
 moreprmt_loop2:
 		lda (varbuf+1),y
@@ -287,8 +287,8 @@ moreprmt_loop4:
 		rts
 
 newdate:
-		ldx #0
-		jsr usevar //an$
+		ldx #var_an_string
+		jsr usevar
 		lda varbuf
 		cmp #11
 		bne newd0
@@ -313,15 +313,15 @@ newd2:
 		bne newd1
 		inc varbuf+2
 newd1:
-		ldx #0
-		jsr putvar //an$
+		ldx #var_an_string
+		jsr putvar
 newd0:
 		rts
 
 strscan:
 		sty strsc2+1
-		ldx #0
-		jsr usevar //an$
+		ldx #var_an_string
+		jsr usevar
 		ldy #0
 		ldx #0
 		lda varbuf
@@ -341,14 +341,14 @@ strsc2:
 		bne strsc1
 strsc3:
 		stx index
-		ldx #0
-		jsr putvar //an$
+		ldx #var_an_string
+		jsr putvar
 		lda index
 		sta varbuf
 		lda #<buf2
 		sta varbuf+1
 		lda #>buf2
 		sta varbuf+2
-		ldx #1
-		jmp putvar //a$
+		ldx #var_a_string
+		jmp putvar
 

@@ -408,8 +408,8 @@ convert:
 		sta convs2+1
 		lda hitbl,x
 		sta convs2+2
-		ldx #0
-		jsr usevar //an$
+		ldx #var_an_string
+		jsr usevar
 		ldy #0
 		ldx #0
 convs1:

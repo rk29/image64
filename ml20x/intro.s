@@ -516,10 +516,10 @@ startmsg:
 		sta varbuf+1
 		lda #>bootvers
 		sta varbuf+2
-		ldx #0
-		jsr putvar //an$
-		ldx #0
-		jmp prtvar0 //an$
+		ldx #var_an_string
+		jsr putvar
+		ldx #var_an_string
+		jmp prtvar0
 
 bootvers:
 		.byte clear_screen

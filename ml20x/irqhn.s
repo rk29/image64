@@ -717,8 +717,8 @@ chkflag3:
 		iny
 chkflg3a:
 		sty varbuf+1
-		ldx #30
-		jsr putvar //a%
+		ldx #var_a_integer
+		jsr putvar
 		jmp chkflag8
 
 // set selected position

@@ -61,8 +61,8 @@ ecs6:
 		rts
 
 ecsgoto:
-		ldx #30
-		jsr usevar //a%
+		ldx #var_a_integer
+		jsr usevar
 		lda varbuf+1
 		sta $14
 		lda varbuf
@@ -77,8 +77,8 @@ ecsgoto:
 		rts
 
 ecschk:
-		ldx #0
-		jsr usevar //an$
+		ldx #var_an_string
+		jsr usevar
 		ldy varbuf
 		sty index
 ecsc2:
@@ -86,8 +86,8 @@ ecsc2:
 		sta buffer,y
 		dey
 		bpl ecsc2
-		ldx #24
-		jsr usevar //ac%
+		ldx #var_ac_integer
+		jsr usevar
 		ldx varbuf+1
 		sec
 		lda #0
@@ -98,8 +98,8 @@ ecsc3:
 		rol acc+1
 		dex
 		bpl ecsc3
-		ldx #30
-		jsr usevar //a%
+		ldx #var_a_integer
+		jsr usevar
 		lda varbuf+1
 		sta zzf
 		lda index
@@ -160,8 +160,8 @@ ecsquit:
 		sta varbuf+2
 		sta varbuf+3
 		sta varbuf+4
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 ecsnext:
 		ldy #0
@@ -236,8 +236,8 @@ ecslong7:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #2
-		jsr putvar //b$
+		ldx #var_b_string
+		jsr putvar
 		ldy #24
 		ldx #0
 ecslong8:
@@ -255,15 +255,15 @@ ecslong9:
 		sta varbuf+1
 		lda #>buf2
 		sta varbuf+2
-		ldx #1
-		jsr putvar //a$
+		ldx #var_a_string
+		jsr putvar
 		ldy #31
 		lda (varbuf+3),y
 		sta varbuf+1
 		lda #0
 		sta varbuf
-		ldx #31
-		jsr putvar //b%
+		ldx #var_b_integer
+		jsr putvar
 		sec
 		rts
 
@@ -308,25 +308,25 @@ ecsshrt4:
 		sta varbuf+1
 		lda #>buffer
 		sta varbuf+2
-		ldx #2
-		jsr putvar //b$
+		ldx #var_b_string
+		jsr putvar
 		ldy #7
 		lda (varbuf+3),y
 		sta varbuf+1
 		lda #0
 		sta varbuf
-		ldx #31
-		jsr putvar //b%
-		ldx #1
-		jsr usevar //a$
+		ldx #var_b_integer
+		jsr putvar
+		ldx #var_a_string
+		jsr usevar
 		lda #0
 		sta varbuf
 		lda #<buf2
 		sta varbuf+1
 		lda #>buf2
 		sta varbuf+2
-		ldx #1
-		jsr putvar //a$
+		ldx #var_a_string
+		jsr putvar
 		sec
 		rts
 
@@ -354,8 +354,8 @@ ecsg2:
 		sta varbuf+2
 		sta varbuf+3
 		sta varbuf+4
-		ldx #30
-		jmp putvar //a%
+		ldx #var_a_integer
+		jmp putvar
 
 ecsput:
 		sty $6c
@@ -439,14 +439,14 @@ putvar:
 		jmp usetbl1
 
 ecsload:
-		ldx #1
-		jsr usevar //a$
+		ldx #var_a_string
+		jsr usevar
 		lda varbuf
 		ldx varbuf+1
 		ldy varbuf+2
 		jsr setnam
-		ldx #32
-		jsr usevar //dv%
+		ldx #var_dv_integer
+		jsr usevar
 		lda #8
 		ldx varbuf+1
 		ldy #0
@@ -457,14 +457,15 @@ ecsload:
 		jmp loadf
 
 ecssave:
-		ldx #1
-		jsr usevar //a$
+// TODO combine with common code from ecsload
+		ldx #var_a_string
+		jsr usevar
 		lda varbuf
 		ldx varbuf+1
 		ldy varbuf+2
 		jsr setnam
-		ldx #32
-		jsr usevar //dv%
+		ldx #var_dv_integer
+		jsr usevar
 		lda #8
 		ldx varbuf+1
 		ldy #0

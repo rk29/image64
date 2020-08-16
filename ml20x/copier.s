@@ -33,7 +33,7 @@ protonum:
 		sta varbuf
 		lda #2
 		sta varbuf+1
-		ldx #30 //a%
+		ldx #var_a_integer
 putvar:
 		lda #30
 		jmp usetbl1
