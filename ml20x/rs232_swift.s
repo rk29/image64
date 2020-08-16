@@ -59,9 +59,9 @@
 // This setting also disables rx interrupts, since they should not happen anyway
 .label comrts0 = m6551_cmd_dtr_low |  m6551_cmd_rxint_disabled | m6551_cmd_tx_0 | m6551_cmd_echo_off | m6551_cmd_parity_none
 
-.label statint = %10000000 // interrupt has occurred
-.label statdsr = %01000000 // Data Set Ready: 0=DSR low (ready), 1=DSR high (not ready)
-.label statdcd = %00100000 // Carrier detect: 0=DCD low (detected), 1=DCD high (not detected)
+.label m6551_stat_int =       %10000000 // interrupt has occurred
+.label m6551_stat_dsr =       %01000000 // Data Set Ready: 0=DSR low (ready), 1=DSR high (not ready)
+.label m6551_stat_dcd =       %00100000 // Carrier detect: 0=DCD low (detected), 1=DCD high (not detected)
 .label m6551_stat_tdr_empty = %00010000 // transmit data register empty: 0=not empty, 1=empty
 .label m6551_stat_rdr_full =  %00001000 // receive data register full: 0=not full, 1=full
 .label m6551_stat_overrun =   %00000100 // overrun: 0=no overrun, 1=overrun detected
@@ -207,13 +207,32 @@ setup3:
 // expected to only use A and Y
 
 setcarr:
-		ldy #imagecd1
+		lda flag_dcd_addr
+		and #flag_dcd_l_mask
+		beq setcarr_dcd
+
+setcarr_dsr:
 		lda status
-		and #statdcd
+		and #m6551_stat_dsr
 		beq setcarr1
-		ldy #imagecd0
+		bne setcarr0
+
+setcarr_dcd:
+		lda status
+		and #m6551_stat_dcd
+		beq setcarr1
+		bne setcarr0
+
+// no carrier
+setcarr0:
+		lda #imagecd0
+		sta carrier
+		rts
+
+// carrier present
 setcarr1:
-		sty carrier
+		lda #imagecd1
+		sta carrier
 		rts
 
 // interrupt routine
@@ -227,7 +246,7 @@ nmi64:
 		cld
 
 		lda status
-		and #statint
+		and #m6551_stat_int
 		beq notacia
 
 // disable further interrupts
@@ -418,6 +437,9 @@ rsout1:
 
 		ldy scnmode
 		bne rsout4
+		lda flag_scn_addr
+		and #flag_scn_l_mask
+		beq rsout4
 		ldy #0
 outdisp:
 		lda sdisp+30,y
@@ -514,18 +536,22 @@ rsget1:
 
 // update on screen buffers
 
-		ldy scnmode    // 4      1 * 4
-		bne ret1       // 2/3    1 * 2  +  0 * 3
-		ldy #0         // 3      1 * 3
+		ldy scnmode
+		bne ret1
+		lda flag_scn_addr
+		and #flag_scn_l_mask
+		beq ret1
+		ldy #0
 inpdisp:
-		lda sdisp+2,y  // 4/5    10 * 4
-		sta sdisp+1,y  // 5      10 * 5
-		iny            // 2      10 * 2
-		cpy #9         // 2      10 * 2
-		bcc inpdisp    // 2/3    3 * 10  +  2 * 1
-		lda $9e        // 3      1 * 3
-		sta sdisp+10   // 4      1 * 4
+		lda sdisp+2,y
+		sta sdisp+1,y
+		iny
+		cpy #9
+		bcc inpdisp
+		lda $9e
+		sta sdisp+10
 
+ret1:
 		lda ridbe
 		sec
 		sbc ridbs
@@ -534,7 +560,7 @@ inpdisp:
 		bcs ret1
 		lda shcomm
 		sta command
-ret1:
+// TODO is this needed?
 		clc
 ret2:
 		ldy $97

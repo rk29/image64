@@ -541,4 +541,32 @@
 
 .label flag_frd_addr = chktbl + 4
 .label flag_frd_l_mask = %00010000 // 36 Full-color read disable
-.label flag_frd_r_mask = %00100000 // 35 Undefined
+.label flag_frd_r_mask = %00100000 // 37 Undefined
+
+.label flag_sub_addr = chktbl + 4
+.label flag_sub_l_mask = %01000000 // 38 Messages bases closed
+.label flag_sub_r_mask = %10000000 // 39 Files section closed
+
+.label flag_res_addr = chktbl + 5
+.label flag_res_l_mask = %00000001 // 40 System reserved
+.label flag_res_r_mask = %00000010 // 41 Network reserved
+
+.label flag_mnt_addr = chktbl + 5
+.label flag_mnt_l_mask = %00000100 // 42 Undefined
+.label flag_mnt_r_mask = %00001000 // 43 Modem answer disabled
+
+.label flag_mnu_addr = chktbl + 5
+.label flag_mnu_l_mask = %00010000 // 44 Is user in menu mode?
+.label flag_mnu_r_mask = %00100000 // 45 Are menus available on BBS?
+
+.label flag_h2e_addr = chktbl + 5
+.label flag_h2e_l_mask = %01000000 // 46 Undefined
+.label flag_h2e_r_mask = %10000000 // 47 Undefined
+
+.label flag_dcd_addr = chktbl + 7
+.label flag_dcd_l_mask = %00000100 // 58 ($3a) DCD/DSR select (on = DSR, off=DCD)
+.label flag_dcd_r_mask = %00001000 // 59 ($3b) invert DCD
+
+.label flag_scn_addr = chktbl + 7
+.label flag_scn_l_mask = %00010000 // 60 ($3c) enable RX/TX windows
+.label flag_scn_r_mask = %00100000 // 61 ($3d)

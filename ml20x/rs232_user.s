@@ -256,9 +256,15 @@ rsout1:
 		cpy rodbs
 		beq fulbuf
 		sty rodbe
-		ldy scnmode
+
+		lda scnmode
 		bne strtup
-		pha
+		lda flag_scn_addr
+		and #flag_scn_l_mask
+		beq strtup
+
+// update TX window
+
 		ldy #0
 outdisp:
 		lda sdisp+30,y
@@ -266,7 +272,7 @@ outdisp:
 		iny
 		cpy #9
 		bcc outdisp
-		pla
+		lda $9e
 		sta sdisp+38
 strtup:
 		lda enabl
@@ -345,8 +351,15 @@ rsget_entry:
 		ldy #0
 rsget1:
 		sty ridbs
-		ldy scnmode
+
+		lda scnmode
 		bne ret1
+		lda flag_scn_addr
+		and #flag_scn_l_mask
+		beq ret1
+
+// update RX window
+
 		ldy #0
 inpdisp:
 		lda sdisp+2,y
