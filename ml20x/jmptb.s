@@ -20,8 +20,19 @@
 		.word 49155 //&,17
 		.word setmode //&,18
 		.word getversn //&,19
-		.word getversn //&,20
-		.word getversn //&,21
+
+		.word $fc0c // 20 - read_interface_byte
+		// Reads a byte from the interface table
+		// &,20,x,y
+		// x = index (see table)
+		// y = command (0=put in a%, 1=return in acc)
+
+		.word $fc12 // 21 - write_interface_byte
+		// Writes a byte to the interface table
+		// &,21,x,y
+		// x = index (see table)
+		// y = value
+
 		.word tenwait //&,22
 		.word xgetin //&,23
 		.word xchrout1 //&,24

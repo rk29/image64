@@ -4,15 +4,6 @@
 
 #import "equat.s"
 
-.label var_an_string = 0
-.label var_a_string = 1
-.label var_lp_float = 15
-.label var_rc_float = 17
-.label var_sh_float = 18
-.label var_a_integer = 30
-.label var_b_integer = 31
-.label var_dv_integer = 32
-
 * = protostart "post.prg"
 
 		jmp proto4

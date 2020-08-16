@@ -11,6 +11,10 @@ hc009:
 		jmp convdate
 hc00c:
 		jmp copyrite
+hc00f:
+		jmp read_interface_byte
+hc012:
+		jmp write_interface_byte
 
 // jump table routines
 
@@ -450,5 +454,50 @@ tz11:
 		jsr btoa
 		rts
 
+read_interface_byte:
+		txa
+		asl
+		cpx #interface_byte_table_end - interface_byte_table
+		bcc interface_byte_out_of_range
+
+		lda interface_byte_table,x
+		sta read_interface_byte_load+1
+		lda interface_byte_table+1,x
+		sta read_interface_byte_load+2
+read_interface_byte_load:
+		lda $ffff
+		cpy #0
+		bne read_interface_byte_done
+		tay
+		ldx #var_a_integer
+		jsr putvar
+read_interface_byte_done:
+		rts
+
+interface_byte_out_of_range:
+		lda #0
+		rts
+
+write_interface_byte:
+		txa
+		asl
+		cpx #interface_byte_table_end - interface_byte_table
+		bcc interface_byte_out_of_range
+
+		lda interface_byte_table,x
+		sta write_interface_byte_load+1
+		lda interface_byte_table+1,x
+		sta write_interface_byte_load+2
+write_interface_byte_load:
+		sty $ffff
+		rts
+
+interface_byte_table:
+		.word llen    // input line length
+//		.word local   // local-only output flag
+//		.word mci     // enable MCI in output
+//		.word carrst  // carrier detect status
+//		.word mxor    // modem xor (to invert DCD)
+interface_byte_table_end:
 }
 }
