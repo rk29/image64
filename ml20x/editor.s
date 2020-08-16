@@ -149,9 +149,8 @@ com1:
 		jsr xgetin
 		and #$7f
 		sta comchar
-		ldx #4
-		ldy #5
-		jsr chkflags
+		lda flag_loc_addr
+		and #flag_loc_l_mask
 		bne com2
 		lda carrst
 		and #127
@@ -1574,9 +1573,6 @@ xchrout1:
 		jmp usetbl1
 prtln:
 		lda #39
-		jmp usetbl1
-chkflags:
-		lda #52
 		jmp usetbl1
 inline:
 		lda #1

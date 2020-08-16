@@ -148,9 +148,8 @@ scup:
 scrvs:
 		jmp $e716
 scbell:
-		ldx #26
-		ldy #5
-		jsr chkflags
+		lda flag_bel_addr
+		and #flag_bel_l_mask
 		beq scbell1
 		ldx #2
 		ldy #0
@@ -633,9 +632,8 @@ trace3a:
 		dey
 		bpl trace3a
 trace4:
-		ldx #24
-		ldy #5
-		jsr chkflags
+		lda flag_trc_addr
+		and #flag_trc_l_mask
 		beq trace7
 		lda 57
 		ldx 58

@@ -243,9 +243,8 @@ moreprmt:
 		lda usrlin
 		cmp usrlinm
 		bcc more0
-		ldx #34
-		ldy #5
-		jsr chkflags
+		lda flag_mor_addr
+		and #flag_mor_l_mask
 		beq more0
 		lda #0
 		sta usrlin

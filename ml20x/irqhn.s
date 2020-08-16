@@ -482,9 +482,8 @@ irq5d:
 		stx tdisp+39
 		lda #$a0
 		pha
-		ldx #16
-		ldy #5
-		jsr chkflags
+		lda flag_asc_addr
+		and #flag_asc_l_mask
 		bne irq5b
 		pla
 		lda #$fa
@@ -507,10 +506,10 @@ irq6a:
 		lda #1
 		sta flag
 irq6b:
-		ldx #4
-		ldy #5
-		jsr chkflags
+		lda flag_loc_addr
+		and #flag_loc_l_mask
 irq6c:
+// target of self-modifying code
 		cmp #0
 		beq irq6d
 		sta irq6c+1
@@ -522,9 +521,9 @@ irq6c:
 		lda #1
 		sta flag
 irq6d:
-		ldx #36
-		ldy #5
-		jsr chkflags
+		lda flag_frd_addr
+		and #flag_frd_l_mask
+// TODO can eliminate the tax here
 		ldy #0
 		tax
 		beq irq6e
@@ -664,6 +663,12 @@ chkflags:
 		and #$0f
 		tax
 		pla
+
+// at this point:
+// A = bit mask 
+// X = index into the flag bytes
+// Y = function number
+
 		iny
 		dey
 		beq chkflag0
@@ -934,6 +939,7 @@ irq4:
 irq4a:
 		jmp $ffff
 irq4b:
+// target of self-modifying code
 		lda ktbl1,y
 irq4c:
 		rts
@@ -1257,9 +1263,8 @@ alarm6:
 		clc
 		adc #8
 		bpl alarm0
-		ldx #28
-		ldy #5 //net-l
-		jsr chkflags
+		lda flag_net_addr
+		and #flag_net_l_mask
 		beq alarm8
 		ldy #0
 alarm7:
@@ -1277,7 +1282,8 @@ alarm10:
 alarm8:
 		rts
 alarm9:
-		ldx #29
-		ldy #1 //net-r
-		jmp chkflags
+// TODO Can this be removed?
+		lda flag_net_addr
+		and #flag_net_r_mask
+		rts
 

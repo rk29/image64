@@ -89,13 +89,6 @@ xchrout2:
 xgetin:
 		lda #23
 		jmp usetbl1
-chkflag:
-		ldy #5
-chkflags:
-		lda #52
-		jsr usetbl1
-		cmp #0
-		rts
 
 stsize:
 		.byte 0

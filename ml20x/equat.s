@@ -465,3 +465,80 @@
 .label var_kp_integer = 38
 .label var_c3_string = 39
 .label var_mp_string = 48
+
+// indices and bit masks for chktbl
+.label flag_sys_addr = chktbl + 0
+.label flag_sys_l_mask = %00000001 // 0 Sysop available to chat
+.label flag_sys_r_mask = %00000010 // 1 Background chat page enable
+
+.label flag_acs_addr = chktbl + 0
+.label flag_acs_l_mask = %00000100 // 2 Edit users access
+.label flag_acs_r_mask = %00001000 // 3 Block 300 baud callers
+
+.label flag_loc_addr = chktbl + 0
+.label flag_loc_l_mask = %00010000 // 4 Local mode (no modem I/O)
+.label flag_loc_r_mask = %00100000 // 5 ZZ (pseudo-local) mode
+
+.label flag_tsr_addr = chktbl + 0
+.label flag_tsr_l_mask = %01000000 // 6 Edit user's time remaining
+.label flag_tsr_r_mask = %10000000 // 7 Prime-time enabled
+
+.label flag_cht_addr = chktbl + 1
+.label flag_cht_l_mask = %00000001 // 8 Enter/exit chat mode
+.label flag_cht_r_mask = %00000010 // 9 Disable modem input
+
+.label flag_new_addr = chktbl + 1
+.label flag_new_l_mask = %00000001 // 10 Disallow new users
+.label flag_new_r_mask = %00000010 // 11 Enable screen blanking
+
+.label flag_prt_addr = chktbl + 1
+.label flag_prt_l_mask = %00000001 // 12 Print spooling
+.label flag_prt_r_mask = %00000010 // 13 Print log entries
+
+.label flag_uxd_addr = chktbl + 1
+.label flag_uxd_l_mask = %00000001 // 14 Disable U/D section
+.label flag_uxd_r_mask = %00000010 // 15 300 baud U/D lockout
+
+.label flag_asc_addr = chktbl + 2
+.label flag_asc_l_mask = %00000001 // 16 ASCII translation
+.label flag_asc_r_mask = %00000010 // 17 Line feed after carriage return
+
+.label flag_ans_addr = chktbl + 2
+.label flag_ans_l_mask = %00000100 // 18 ANSI color enabled
+.label flag_ans_r_mask = %00001000 // 19 ANSI graphics enabled
+
+.label flag_exp_addr = chktbl + 2
+.label flag_exp_l_mask = %00010000 // 20 Expert mode enabled
+.label flag_exp_r_mask = %00100000 // 21 Disallow double calls
+
+.label flag_unv_addr = chktbl + 2
+.label flag_unv_l_mask = %01000000 // 22 No immediate U/D credits
+.label flag_unv_r_mask = %10000000 // 23 Allow auto-logoff
+
+.label flag_trc_addr = chktbl + 3
+.label flag_trc_l_mask = %00000001 // 24 On-screen trace enable
+.label flag_trc_r_mask = %00000010 // 25 Undefined
+
+.label flag_bel_addr = chktbl + 3
+.label flag_bel_l_mask = %00000100 // 26 Local bells enabled
+.label flag_bel_r_mask = %00001000 // 27 Local beeps disabled
+
+.label flag_net_addr = chktbl + 3
+.label flag_net_l_mask = %00010000 // 28 NetMail enable
+.label flag_net_r_mask = %00100000 // 29 NetMail trigger
+
+.label flag_mac_addr = chktbl + 3
+.label flag_mac_l_mask = %01000000 // 30 Macros on/off
+.label flag_mac_r_mask = %10000000 // 31 MCI disable in editor
+
+.label flag_chk_addr = chktbl + 4
+.label flag_chk_l_mask = %00000001 // 32 Enable MailCheck at logon
+.label flag_chk_r_mask = %00000010 // 33 Excessive chat logoff
+
+.label flag_mor_addr = chktbl + 4
+.label flag_mor_l_mask = %00000100 // 34 More prompt on
+.label flag_mor_r_mask = %00001000 // 35 More prompt not available
+
+.label flag_frd_addr = chktbl + 4
+.label flag_frd_l_mask = %00010000 // 36 Full-color read disable
+.label flag_frd_r_mask = %00100000 // 35 Undefined

@@ -1,17 +1,15 @@
 getmod:
 		jsr getmdm
 		sta $fe
-		ldx #9
-		ldy #5 //cht-r
-		jsr chkflags
+		lda flag_cht_addr
+		and #flag_cht_r_mask
 		beq getmod0
 		lda #0
 		sta $fe
 		rts
 getmod0:
-		ldx #16
-		ldy #5 //asc-l
-		jsr chkflags
+		lda flag_asc_addr
+		and #flag_asc_l_mask
 		beq getmod1
 		ldx $fe
 		lda tblatc,x
@@ -32,16 +30,14 @@ outmodh1:
 		jmp outm
 
 outmod:
-		ldx #16
-		ldy #5 //asc-l
-		jsr chkflags
+		lda flag_asc_addr
+		and #flag_asc_l_mask
 		bne outmod0
 		lda $fe
 		jmp outm
 outmod0:
-		ldx #19
-		ldy #5 //ans-r
-		jsr chkflags
+		lda flag_ans_addr
+		and #flag_ans_r_mask
 		tax
 		lda $fe
 		and #$1f
@@ -82,10 +78,9 @@ outmod1:
 		bcc outmod1a
 		jmp outm
 outmod1a:
-		ldx #18
-		ldy #5 //ans-l
 		pha
-		jsr chkflags
+		lda flag_ans_addr
+		and #flag_ans_l_mask
 		tax
 		pla
 		cmp #dish
@@ -123,9 +118,10 @@ outmodm:
 		beq outmodm1
 		jsr outmodr0
 outmodm1:
-		ldx #17
-		ldy #5 //asc-r
-		jsr chkflags
+		lda flag_asc_addr
+		and #flag_asc_r_mask
+
+// TODO clean this up, can eliminate php/plp
 		php
 		lda #13
 		plp

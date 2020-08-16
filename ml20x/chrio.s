@@ -391,9 +391,8 @@ getchr8:
 		stx $fe
 		lda curdsp
 		beq getchr9
-		ldx #4
-		ldy #5
-		jsr chkflags
+		lda flag_loc_addr
+		and #flag_loc_l_mask
 		bne getchr9
 		lda idlejif
 		cmp #60
@@ -481,9 +480,8 @@ getmdm:
 		jsr rsget
 		bcs getmdm6
 		pha
-		ldx #16
-		ldy #5
-		jsr chkflags
+		lda flag_asc_addr
+		and #flag_asc_l_mask
 		beq getmdm1
 		pla
 		and #$7f
@@ -510,9 +508,8 @@ getmdm6:
 carchk:
 		lda local
 		bne carchk2
-		ldx #4
-		ldy #5
-		jsr chkflags
+		lda flag_loc_addr
+		and #flag_loc_l_mask
 		bne carchk2
 		jsr carchk3
 		beq carchk1
@@ -544,9 +541,8 @@ carchk3:
 // 0 = ok
 // <>0 = no
 carchk4:
-		ldx #4
-		ldy #5
-		jsr chkflags
+		lda flag_loc_addr
+		and #flag_loc_l_mask
 		bne carchk5
 		lda local
 		bne carchk5
@@ -554,10 +550,11 @@ carchk4:
 carchk5:
 		rts
 
+// TODO probably doesn't need to be in jmptbl any more
 chatchk:
-		ldx #8
-		ldy #5
-		jmp chkflags
+		lda flag_cht_addr
+		and #flag_cht_l_mask
+		rts
 
 outadj:
 		cmp #13

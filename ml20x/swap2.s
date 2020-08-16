@@ -44,9 +44,6 @@ outscn:
 outmod:
 		lda #51
 		jmp usetbl1
-chkflags:
-		lda #52
-		jmp usetbl1
 output:
 		lda #55
 		jmp usetbl1
@@ -125,9 +122,8 @@ term1:
 
 //output to screen, interpret ansi
 outansi:
-		ldx #18
-		ldy #5
-		jsr chkflags
+		lda flag_ans_addr
+		and #flag_ans_l_mask
 		bne outansi2
 		jmp outscn
 outansi1:
@@ -488,9 +484,8 @@ sound1:
 		sty sndrept
 		cpx #0
 		bne sound3
-		ldx #27
-		ldy #5 //bel-r
-		jsr chkflags
+		lda flag_bel_addr
+		and #flag_bel_r_mask
 		bne sound0
 		ldx #0
 sound3:
