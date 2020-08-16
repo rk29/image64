@@ -53,9 +53,9 @@ outstr2:
 		lda chat
 		cmp #'/'
 		bne outstr3
-		lda #$86
+		lda #$86 // part of float value
 		sta varbuf
-		lda #$3c
+		lda #$3c // part of float value
 		sta varbuf+1
 		ldx #var_sh_float
 		jsr putvar
