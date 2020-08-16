@@ -41,7 +41,7 @@
 .label british_pound = $5c
 
 .label function_key_2 = 137
-.label function_key_5 = $87
+.label function_key_5 = 135
 .label function_key_6 = 139
 .label function_key_7 = 136
 .label function_key_8 = 140
