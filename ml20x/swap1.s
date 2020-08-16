@@ -469,8 +469,8 @@ prprompt:
 		pha
 		lda #0
 		sta passmode
-		ldx #28
-		jsr prtvar0 //p$
+		ldx #var_p_string
+		jsr prtvar0
 		lda #':'
 		jsr xchrout
 		lda #' '

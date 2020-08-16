@@ -86,8 +86,10 @@ outchr:
 		jsr setoutmd
 		lda $fe
 outchr0:
+// target of self-modifying code
 		jmp outchr1
 
+// output character in password mode
 outchr1:
 		jsr ctrlchk0
 		bcc outchr3

@@ -57,8 +57,8 @@ chatmode:
 		sta $fe
 		sta chatpage
 		sta sndrept
-		ldx #34
-		jsr prtvar0 //c1$
+		ldx #var_c1_string
+		jsr prtvar0
 		lda #1
 		sta inchat
 		lda case
@@ -88,16 +88,16 @@ chat3:
 		lda #0
 		sta inchat
 		sta usrlin
-		ldx #35
-		jsr prtvar0 //c2$
+		ldx #var_c2_string
+		jsr prtvar0
 		lda editor
 		and #130
 		beq chat5
-		ldx #39
-		jsr prtvar0 //c3$
+		ldx #var_c3_string
+		jsr prtvar0
 chat5:
-		ldx #36
-		jmp btmvar //co$
+		ldx #var_co_string
+		jmp btmvar
 
 // terminal mode
 
