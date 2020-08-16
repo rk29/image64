@@ -12,4 +12,4 @@ clean:
 	rm -f $(TARGETS) *~
 
 install: d6502
-	cp d6502 ~/bin
+	cp d6502 ~/Applications/bin/
