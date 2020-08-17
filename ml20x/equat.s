@@ -244,7 +244,10 @@
 .label inchat =$d007
 .label chatpage=$d008
 .label carrier=$d009
+
+// deprecated - use flag_dcd_l
 .label mxor =$d00a
+
 .label mkolor =$d00b
 .label mupcase =$d00c
 .label irqcount=$d00d
@@ -571,7 +574,7 @@
 
 .label flag_dcd_addr = chktbl + 7
 .label flag_dcd_l_mask = %00000100 // 58 ($3a) invert DCD
-.label flag_dcd_r_mask = %00001000 // 59 ($3b) carrier present
+.label flag_dcd_r_mask = %00001000 // 59 ($3b)
 
 .label flag_dsr_addr = chktbl + 7
 .label flag_dsr_l_mask = %00010000 // 60 ($3c) DCD/DSR select (on = DSR, off=DCD)
