@@ -214,15 +214,26 @@ line1:
 line2:
 		.text "bad: 00000"
 
+// check carrier/abort
+
 exit:
+
+// if the commodore key is pressed, abort the transfer
+
 		lda $028d
 		cmp #2
 		beq exit1
-		lda carrier
-		and #$10
-		eor mxor
-		bne exit1
+
+// if carrier is lost, abort the transfer
+
+		lda flag_dcd_addr
+		and #flag_dcd_r_mask
+		beq exit1
+
 		rts
+
+// exit and abort the transfer
+
 exit1:
 		ldx stack
 		txs
