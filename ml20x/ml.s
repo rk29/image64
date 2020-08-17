@@ -1,8 +1,6 @@
-.label revision = 1
-.var version_string = "2020-08-08 18:32"
-
 .encoding "petscii_mixed"
 
+#import "stamp.s"
 #import "equat.s"
 
 //////
@@ -689,3 +687,5 @@ versnum:
 //		.byte $81, $19, $99, $99, $9a // 1.2
 //		.byte $81, $26, $66, $66, $66 // 1.3
 		.byte $82, $00, $00, $00, $00 // 2.0
+
+.label room_in_buffer_page = $cf00 - *

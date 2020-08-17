@@ -12,3 +12,4 @@ notes
 *.zip
 *.tar.gz
 emulated/
+stamp.s

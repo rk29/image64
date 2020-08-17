@@ -13,15 +13,18 @@ all : $(TARGETS)
 %.prg : %.s equat.s
 	$(ASM) $<
 
+stamp.s: *.s
+	-date -u '+.var version_string = "%Y-%m-%dT%H:%M:%SZ"' > stamp.s
+
 ml.prg: wedge.s editor.s gc.s ecs.s struct.s swap1.s swap2.s swap3.s jmptb.s strio.s
 ml.prg: mcicm.s chrio.s dskio.s irqhn.s setup.s varbl.s miscl.s shdlr.s modem.s
-ml.prg: calls.s intro.s
+ml.prg: calls.s intro.s stamp.s
 
 image.prg: chr.imagelogo scn.imagelogo col.imagelogo
 rs232.prg: rs232_swift.prg rs232_user.prg
 
 clean :
-	rm -f *~
+	rm -f *~ stamp.s
 	rm -f $(TARGETS:.prg=.sym)
 	rm -f $(TARGETS)
 	rm -f ml-source.tar.gz ml.d81
