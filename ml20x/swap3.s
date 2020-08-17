@@ -497,6 +497,8 @@ interface_byte_table:
 		.word llen    // input line length
 //		.word local   // local-only output flag
 //		.word mci     // enable MCI in output
+//		.word carrst  // carrier detect status
+//		.word mxor    // modem xor (to invert DCD)
 interface_byte_table_end:
 }
 }

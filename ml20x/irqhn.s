@@ -472,101 +472,37 @@ chkblnk:
 bits:
 		.byte 1,2,4,8,16,32,64,128
 
-// backward compatibility with mxor location
-
-mxor_compat:
-		lda mxor
-
-mxor_shadow:
-		cmp #0 // target of self-modifying code
-		bne mxor_unchanged
-
-mxor_changed:
-		sta mxor_shadow+1
-		cmp #0
-		beq mxor_cleared
-
-mxor_set:
-		lda flag_dcd_addr
-		ora #flag_dcd_l_mask
-		sta flag_dcd_addr
-		rts
-
-mxor_cleared:
-		lda flag_dcd_addr
-		and #~flag_dcd_l_mask
-		sta flag_dcd_addr
-
-mxor_unchanged:
-		rts
-
-// update dcd-r flag based on carrier check
-// invert if dcd-l flag is set
-
-carrier_update:
-		lda flag_dcd_addr
-		and #flag_dcd_l_mask
-		bne carrier_update_inverted
-
-carrier_update_normal:
+//* put check on screen for carrier
+irq5:
 		lda carrier
+		eor mxor
 		and #$10
-		beq carrier_update_present
-
-carrier_update_not_present:
-
+		beq irq5a
+// carrier not present?
 		lda #1
 		sta carrst
-
-		lda #$a0 // reverse space
-		sta tdisp+39
-
-		lda flag_dcd_addr
-		and #~flag_dcd_r_mask
-		sta flag_dcd_addr
-		rts
-
-carrier_update_inverted:
-		lda carrier
-		and #$10
-		beq carrier_update_not_present
-
-carrier_update_present:
-
+		ldx #$a0
+		bne irq5d
+// carrier present
+irq5a:
 		lda carrst
 		ora #128
 		sta carrst
-
-		lda #$fa // reverse checkmark
-		sta tdisp+39
-
-		lda flag_dcd_addr
-		ora #flag_dcd_r_mask
-		sta flag_dcd_addr
-		rts
-
-// update carrier flags/display interrupt timeslot
-
-irq5:
-		jsr mxor_compat
-		jsr carrier_update
-// intentional fall-through
-
-// update the bottom-left corner of the screen
-
-bottom_left_check_update:
+		ldx #$fa
+irq5d:
+		stx tdisp+39
+		lda #$a0
+		pha
 		lda flag_asc_addr
 		and #flag_asc_l_mask
-		bne bottom_left_check_cleared
-
-bottom_left_check_set:
-		lda #$fa // reverse checkmark
+		bne irq5b
+		pla
+		lda #$fa
+		pha
+irq5b:
+		pla
 		sta tdisp
-		rts
-
-bottom_left_check_cleared:
-		lda #$a0 // reverse space
-		sta tdisp
+irq5c:
 		rts
 
 irq6:

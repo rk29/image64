@@ -248,37 +248,24 @@ multidn7:
 		jmp multiup4
 
 // check carrier/abort
-
 exit0:
-
-// if the commodore key is pressed, abort the transfer
-
 		lda $28d
 		cmp #2
 		beq ext1
-
-// if carrier is lost, abort the transfer
-
-		lda flag_dcd_addr
-		and #flag_dcd_r_mask
-		beq ext1
-
+		lda carrier
+		and #$10
+		eor mxor
+		bne ext1
 		rts
 
 exit:
-
-// if the commodore key is pressed, abort the transfer
-
 		lda $28d
 		cmp #2
 		beq ext1
-
-// if carrier is lost, abort the transfer
-
-		lda flag_dcd_addr
-		and #flag_dcd_r_mask
-		bne ext2
-
+		lda carrier
+		and #$10
+		eor mxor
+		beq ext2
 ext1:
 		ldx stack
 		txs
