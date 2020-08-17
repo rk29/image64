@@ -415,7 +415,7 @@
 
 // 6510 data direction register
 
-.label d6501 = 0
+.label d6510 = 0
 
 // 6510 data register
 
