@@ -21,7 +21,10 @@ image.prg: chr.imagelogo scn.imagelogo col.imagelogo
 rs232.prg: rs232_swift.prg rs232_user.prg
 
 clean :
-	rm -f *~ *.sym $(TARGETS) ml-source.tar.gz ml.d81
+	rm -f *~
+	rm -f $(TARGETS:.prg=.sym)
+	rm -f $(TARGETS)
+	rm -f ml-source.tar.gz ml.d81
 
 release: dist
 	cp ml-source.tar.gz ml.d81 ~/Public/public-downloads/content/
