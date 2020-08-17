@@ -205,11 +205,18 @@ tchk1:
 tchk2:
 		rts
 
+// Read the "time still remaining"
+// returns
+//   A = the value of tr%
+//   X = preserved
+//   Y = trashed
+//   flags set with load of A
+
 gettsr:
 		txa
 		pha
-		ldx #29
-		jsr gvarptr //tr%
+		ldx #var_tr_integer
+		jsr gvarptr
 		stx getts1+1
 		sty getts1+2
 		stx setts1+1
@@ -218,6 +225,7 @@ gettsr:
 		pla
 		tax
 getts1:
+// target of self-modifying code
 		lda $ffff,y
 		rts
 settsr:
@@ -225,6 +233,7 @@ settsr:
 		jsr gettsr
 		pla
 setts1:
+// target of self-modifying code
 		sta $ffff,y
 		rts
 
@@ -465,19 +474,21 @@ bits:
 
 //* put check on screen for carrier
 irq5:
-		ldx #$fa
 		lda carrier
 		eor mxor
 		and #$10
 		beq irq5a
+// carrier not present?
 		lda #1
 		sta carrst
 		ldx #$a0
 		bne irq5d
+// carrier present
 irq5a:
 		lda carrst
 		ora #128
 		sta carrst
+		ldx #$fa
 irq5d:
 		stx tdisp+39
 		lda #$a0
@@ -498,13 +509,18 @@ irq6:
 		lda carrst
 		and #127
 irq6a:
+// target of self-modifying code
 		cmp #1
 		beq irq6b
+
+// carrst low bits changed
+
 		sta irq6a+1
+
 		cmp #0
 		bne irq6b
 		lda #1
-		sta flag
+		sta someflag
 irq6b:
 		lda flag_loc_addr
 		and #flag_loc_l_mask
@@ -519,12 +535,12 @@ irq6c:
 		and #127
 		beq irq6d
 		lda #1
-		sta flag
+		sta someflag
 irq6d:
 		lda flag_frd_addr
 		and #flag_frd_l_mask
-// TODO can eliminate the tax here
 		ldy #0
+// TODO probably can eliminate the tax here by reordering
 		tax
 		beq irq6e
 		ldy comqc
@@ -1093,14 +1109,15 @@ t3init:
 		ldx #<ktbl3
 		ldy #>ktbl3
 		jsr usekey
-		ldx #24
-		jsr gvarptr //ac%
+		ldx #var_ac_integer
+		jsr gvarptr
 		stx t3ini1+1
 		sty t3ini1+2
 		stx t3fk7a+1
 		sty t3fk7a+2
 		ldy #1
 t3ini1:
+// target of self-modifying code
 		lda $ffff,y
 		and #$0f
 		ora #$b0
@@ -1131,6 +1148,7 @@ t3fk7:
 		and #$0f
 		ldy #1
 t3fk7a:
+// target of self-modifying code
 		sta $ffff,y
 		ldx #2
 		jmp t1init
@@ -1209,8 +1227,8 @@ alarm:
 		ldx bootdate+5
 		ldy bootdate+4
 		jsr cminute
-		ldx #49
-		jsr gvarptr //mn%
+		ldx #var_mn_integer
+		jsr gvarptr
 		stx alarmy+1
 		sty alarmy+2
 		ldy #1

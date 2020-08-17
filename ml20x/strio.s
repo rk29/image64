@@ -12,11 +12,18 @@ outstr:
 		sta $71
 		lda varbuf+2
 		sta $72
+
+// skip next check if user timed out
+
 		jsr gettsr
 		beq outstr0
-		lda flag
+
+		lda someflag
 		bne outstr5
 outstr0:
+
+// handle "skip lines" counter
+
 		lda mjump
 		beq outstr1
 		dec mjump

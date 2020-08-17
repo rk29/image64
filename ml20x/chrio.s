@@ -500,19 +500,22 @@ getmdm6:
 
 //check carrier
 // returns:
-
-//0 if carrier / local
-//1 if carrier dropped
-//2 if time out
+//   A = 0, if carrier or local
+//   A = 1, if not local and carrier dropped (writes 0 to time remaining)
+//   A = 2, if not local and time expired
 
 carchk:
 		lda local
-		bne carchk2
+		bne carchk_is_local_or_has_carrier
+
 		lda flag_loc_addr
 		and #flag_loc_l_mask
-		bne carchk2
+		bne carchk_is_local_or_has_carrier
+
 		jsr carchk3
 		beq carchk1
+
+carchk_carrier_dropped:
 		lda #0
 		jsr settsr
 		jsr disptime
@@ -520,26 +523,34 @@ carchk:
 		rts
 carchk1:
 		jsr gettsr
-		bne carchk2
+		bne carchk_is_local_or_has_carrier
 		lda editor
 		and #$40
-		bne carchk2
+		bne carchk_is_local_or_has_carrier
+
+carchk_time_expired:
+
 		lda #2
 		rts
-carchk2:
+
+carchk_is_local_or_has_carrier:
+
 		lda #0
 		rts
+
 // check actual carrier
-// 0 = ok
-// 1 = drop
+// returns
+//   A = 0 if ok, 1 if dropped
+
 carchk3:
 		lda carrst
 		and #127
 		rts
 
-//check if it's ok to use the modem
-// 0 = ok
-// <>0 = no
+// check if it's ok to use the modem
+// returns
+//   A = 0 if ok, nonzero if not
+
 carchk4:
 		lda flag_loc_addr
 		and #flag_loc_l_mask

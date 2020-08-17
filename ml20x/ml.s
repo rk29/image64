@@ -219,7 +219,7 @@ findvar1:
 		pha
 		lda #r6510_normal
 		sta r6510
-		jsr ptrget1
+		jsr basic_rom_ptrget1
 		jmp exitint
 
 // relink basic program lines

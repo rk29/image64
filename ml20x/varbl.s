@@ -86,7 +86,14 @@ findarr:
 		sta $48
 		rts
 
-//* find basic variable
+// Find address of basic variable by index
+// input
+//   X = variable index
+// returns
+//   A = trashed
+//   X = LSB of address
+//   Y = MSB of address
+
 gvarptr:
 		txa
 		asl
@@ -99,11 +106,13 @@ gvarptr:
 		adc $2e
 		tay
 		rts
+
 varnam:
 		jsr gvarptr
 		stx $47
 		sty $48
 		rts
+
 findvar:
 		sta $45
 		stx $46
@@ -173,6 +182,8 @@ minusone:
 //* variables used by ml *
 //********************************
 
+// the values here are replaced by offsets into
+// the variable area by the intro code
 vars:
 		.byte $41, $ce         //  0 an$
 		.byte $41, $80         //  1 a$

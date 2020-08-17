@@ -94,7 +94,7 @@
 .label linkprg=$a533
 .label makerm1=$b475
 .label getbytc=$b79b
-.label ptrget1=$b0e7
+.label basic_rom_ptrget1 = $b0e7
 .label synerr =$af08
 .label getnum =$b7eb
 .label ilqerr =$b248
@@ -239,7 +239,7 @@
 .label editor =$d002
 //.label tsr =$d003
 .label llen =$d004
-.label flag =$d005
+.label someflag = $d005
 .label chat =$d006
 .label inchat =$d007
 .label chatpage=$d008
@@ -456,6 +456,7 @@
 .label var_ac_integer = 24
 .label var_w_string = 27
 .label var_p_string = 28
+.label var_tr_integer = 29
 .label var_a_integer = 30
 .label var_b_integer = 31
 .label var_dv_integer = 32
@@ -465,6 +466,7 @@
 .label var_kp_integer = 38
 .label var_c3_string = 39
 .label var_mp_string = 48
+.label var_mn_integer = 49
 
 // indices and bit masks for chktbl
 .label flag_sys_addr = chktbl + 0
@@ -570,3 +572,18 @@
 .label flag_scn_addr = chktbl + 7
 .label flag_scn_l_mask = %00010000 // 60 ($3c) enable RX/TX windows
 .label flag_scn_r_mask = %00100000 // 61 ($3d)
+
+// editor input flags
+
+.label editor_allow_cursor_controls =   %00000001 // allow cursor movement and color characters in input
+.label editor_dot_on_column_one =       %00000010 // dot on column one exits input
+.label editor_show_prompt =             %00000100 // show prompt
+.label editor_allow_mci =               %00001000 // allow mci command character input
+.label editor_word_wrap =               %00010000 // word wrap enabled
+.label editor_edit_mode =               %00100000 // edit mode
+.label editor_ignore_time_remaining =   %01000000 // ignore time remaining
+.label editor_backspace_on_column_one = %10000000 // backspace on column one exits input
+
+.label passmode_off       = %00000000 // all password flags off
+.label passmode_show_mask = %00000001 // password mask enabled for output
+.label passmode_no_output = %00000010 // no output

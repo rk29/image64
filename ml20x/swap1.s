@@ -15,10 +15,11 @@ hc009:
 xgetin:
 		lda #23
 		jmp usetbl1
+
 xchrout0:
 		sta $fe
 		lda passmode
-		and #2
+		and #passmode_no_output
 		beq xchrout1
 		lda $fe
 		rts
@@ -108,9 +109,13 @@ inline0:
 		sty chat //result code
 		sty buffer
 		jsr prprompt
+
 		lda editor
-		and #$30 //word wrap
-		beq in0c //and edit mode
+		and #editor_word_wrap | editor_edit_mode
+		beq in0c
+
+// copy wrapped word to input buffer 
+
 		ldx #var_w_string
 		jsr usevar
 		ldy varbuf
@@ -135,27 +140,41 @@ in0a:
 		lda tmp1
 		sta index
 in0d:
-		lda editor //edit mode
-		and #$20
+		lda editor
+		and #editor_edit_mode
 		beq in0b
+
 		jsr prcr
+
 		lda #0
 		sta index
+
 		jsr prprompt
 in0b:
+
+// clear word wrap string
+
 		jsr zero
 		ldx #var_w_string
 		jsr putvar
+
+// input main loop
+
 in1:
-		jsr xgetin //main loop
+		jsr xgetin
 		sta $fe
+
 		jsr carchk
 		beq in1a
+
+// carrier lost, exit with empty input
+
 		lda #0
 		sta index
 		lda #3
 		sta chat
 		jmp ctrlm
+
 in1a:
 		jsr chatchk
 		beq in1b
@@ -170,6 +189,7 @@ in2:
 		beq in3
 		dex
 		bpl in2
+
 		jsr ctrlchk
 		bcc in1
 put:
@@ -267,7 +287,9 @@ ctrlt2:
 		jmp in1
 ctrlt1:
 		ldx editor
-		bpl ctrlt2
+		and #editor_backspace_on_column_one
+		beq ctrlt2
+
 		lda #20
 		sta buffer
 		lda #1
@@ -376,12 +398,23 @@ ctrlb1:
 ctrlb2:
 		jmp in1
 
+// handle the command escape charater (dot)
+
 dot:
+
+// are we on the first column?
+
 		cpy #0
 		bne dot1
+
+// do we care about a dot on the first column?
+
 		lda editor
-		and #2
+		and #editor_dot_on_column_one
 		beq dot1
+
+// exit
+
 		lda #1
 		sta chat
 		rts
@@ -391,13 +424,16 @@ dot1:
 
 wrap:
 		sta tmp2
+
 		lda editor
-		and #16
+		and #editor_word_wrap
 		bne wrap0
+
 		lda editor
-		and #32
+		and #editor_edit_mode
 		bne wrap0a
-		lda #7
+
+		lda #ascii_bel
 		jsr xchrout0
 wrap0a:
 		jmp in1
@@ -463,11 +499,12 @@ wrap6:
 
 prprompt:
 		lda editor
-		and #4
+		and #editor_show_prompt
 		bne prpr1
+
 		lda passmode
 		pha
-		lda #0
+		lda #passmode_off
 		sta passmode
 		ldx #var_p_string
 		jsr prtvar0
@@ -480,11 +517,15 @@ prprompt:
 prpr1:
 		rts
 
-// carry clear if cotrol
+// check for printable characters
+// returns
+//   carry clear if non-printable
+//   carry set if printable
+
 ctrlchk:
 		pha
 		lda editor
-		and #1
+		and #editor_allow_cursor_controls
 		beq ctrlch0
 		pla
 ctrlchk1:
@@ -543,20 +584,29 @@ prcr:
 		lda #$0d
 		jmp xchrout
 
-//* password input routine *
+// password input routine
+// input
+//   X = additional password flags
+// output
+//   same as inline0
 
 password:
 		lda #1
 		sta case
+
 		lda #15
 		sta llen
-		lda #4
+
+		lda #editor_show_prompt
 		sta editor
+
 		txa
-		ora #1
+		ora #passmode_show_mask
 		sta passmode
+
 		jsr inline0
-		lda #0
+
+		lda #passmode_off
 		sta passmode
 		rts
 
@@ -565,16 +615,17 @@ useeditr:
 		sta editjmp+1
 		jsr editswap
 editjmp:
-		jsr $1800
+// target of self-modifying code
+		jsr editor_exec_address
 editswap:
 		pha
 		txa
 		pha
 		tya
 		pha
-		lda #$18
-		ldy #$d0
-		ldx #16
+		lda #>editor_exec_address
+		ldy #>editor_swap_address
+		ldx #>editor_module_size
 		jsr swapper
 		pla
 		tay
