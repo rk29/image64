@@ -565,6 +565,10 @@
 .label flag_h2e_l_mask = %01000000 // 46 Undefined
 .label flag_h2e_r_mask = %10000000 // 47 Undefined
 
+.label flag_h38_addr = chktbl + 7
+.label flag_h38_l_mask = %00000001 // 56 ($38) Used for something in basic
+.label flag_h38_r_mask = %00000010 // 57 ($39) Unknown
+
 .label flag_dcd_addr = chktbl + 7
 .label flag_dcd_l_mask = %00000100 // 58 ($3a) DCD/DSR select (on = DSR, off=DCD)
 .label flag_dcd_r_mask = %00001000 // 59 ($3b) invert DCD
