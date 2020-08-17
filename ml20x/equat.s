@@ -570,12 +570,12 @@
 .label flag_h38_r_mask = %00000010 // 57 ($39) Unknown
 
 .label flag_dcd_addr = chktbl + 7
-.label flag_dcd_l_mask = %00000100 // 58 ($3a) DCD/DSR select (on = DSR, off=DCD)
-.label flag_dcd_r_mask = %00001000 // 59 ($3b) invert DCD
+.label flag_dcd_l_mask = %00000100 // 58 ($3a) invert DCD
+.label flag_dcd_r_mask = %00001000 // 59 ($3b) carrier present
 
-.label flag_scn_addr = chktbl + 7
-.label flag_scn_l_mask = %00010000 // 60 ($3c) enable RX/TX windows
-.label flag_scn_r_mask = %00100000 // 61 ($3d)
+.label flag_dsr_addr = chktbl + 7
+.label flag_dsr_l_mask = %00010000 // 60 ($3c) DCD/DSR select (on = DSR, off=DCD)
+.label flag_dsr_r_mask = %00100000 // 61 ($3d) enable RX/TX windows
 
 // editor input flags
 

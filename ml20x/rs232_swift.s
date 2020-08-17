@@ -207,8 +207,8 @@ setup3:
 // expected to only use A and Y
 
 setcarr:
-		lda flag_dcd_addr
-		and #flag_dcd_l_mask
+		lda flag_dsr_addr
+		and #flag_dsr_l_mask
 		beq setcarr_dcd
 
 setcarr_dsr:
@@ -437,8 +437,8 @@ rsout1:
 
 		ldy scnmode
 		bne rsout4
-		lda flag_scn_addr
-		and #flag_scn_l_mask
+		lda flag_dsr_addr
+		and #flag_dsr_r_mask
 		beq rsout4
 		ldy #0
 outdisp:
@@ -538,8 +538,8 @@ rsget1:
 
 		ldy scnmode
 		bne ret1
-		lda flag_scn_addr
-		and #flag_scn_l_mask
+		lda flag_dsr_addr
+		and #flag_dsr_r_mask
 		beq ret1
 		ldy #0
 inpdisp:

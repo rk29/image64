@@ -259,8 +259,8 @@ rsout1:
 
 		lda scnmode
 		bne strtup
-		lda flag_scn_addr
-		and #flag_scn_l_mask
+		lda flag_dsr_addr
+		and #flag_dsr_r_mask
 		beq strtup
 
 // update TX window
@@ -354,8 +354,8 @@ rsget1:
 
 		lda scnmode
 		bne ret1
-		lda flag_scn_addr
-		and #flag_scn_l_mask
+		lda flag_dsr_addr
+		and #flag_dsr_r_mask
 		beq ret1
 
 // update RX window
