@@ -576,7 +576,13 @@ xsend5:
 xsend6:
 		jmp exit1
 
+// initial handshake
+// exits with crcflag indicating if CRC was selected
+
 xrecvcrc:
+
+// try three times to get a response with 'c' (CRC mode)
+
 		lda #1
 		sta crcflag
 		lda #3
@@ -588,6 +594,9 @@ xrecvc1:
 		bcc xrecvc3
 		dec bufnum
 		bne xrecvc1
+
+// try three times to get a response with NAK (non-CRC mode)
+
 		lda #3
 		sta bufnum
 		lda #0
@@ -599,6 +608,7 @@ xrecvc2:
 		bcc xrecvc3
 		dec bufnum
 		bne xrecvc2
+
 		jmp xrecvcrc
 xrecvc3:
 		rts
@@ -611,7 +621,9 @@ xrecv:
 		sta blocknum
 		lda #0
 		sta lastbuf
+
 		jsr xrecvcrc
+
 		jsr recvblk0
 		jmp xrecv2
 xrecv1:
@@ -631,45 +643,88 @@ recvblk:
 recvblk0:
 		ldx #0
 		stx kflag
+
+// check for default handshake indicator
+
 		cmp #chrsoh
 		beq recvblk5
+
+// check for 1k handshake indicator
+
 		cmp #chrstx
 		beq recvblk1
+
+// check for cancel
+
 		cmp #chrcan
 		beq recvblk3
+
+// check for end of transmission
+
 		cmp #chreot
 		beq recvblk4
+
 recvblk2:
 		jsr waitch02
 		bcc recvblk2
+
+// didn't get something we recognized in time, send NAK
+
 		lda #chrnak
 		jsr sendbyte
+
 		jsr badblk
 		jmp recvblk
+
+// cancel received
+
 recvblk3:
 		jsr waitch02
 		bcs recvblk2
+
+// need two in a row to actual cancel
+
 		cmp #chrcan
 		bne recvblk2
+
+// exit with code 1 - cancelled
+
 		ldx #1
 		rts
+
+// end of transmission received
+
 recvblk4:
 		lda #chrack
 		jsr sendbyte
+
+// exit with code 2 - success
+
 		ldx #2
 		rts
+
+// 1k buffer start of data received
+
 recvblk1:
 		ldx #1
 		stx kflag
+
+// start of data received
+
 recvblk5:
 		jsr waitch02
 		bcs recvblk2
+
 		sta blockrcv
+
 		jsr waitch02
 		bcs recvblk2
+
 		sta blockrcv+1
+
 		jsr recvbuf
 		bcs recvblk2
+
 		jsr waitch02
 		bcs recvblk2
 		cmp crc
