@@ -108,7 +108,7 @@
 .label frmnum =$ad8a
 .label syscll =$e130
 .label comma = $aefd
-.label getfile=57812
+.label getfile=$e1d4
 .label linget = $a96b
 .label error = $a437
 .label chkcom= $aefd
