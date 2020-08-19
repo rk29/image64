@@ -72,10 +72,10 @@
 .label imagecd1 = %00010000 //carrier
 
 // when there are this many or more bytes in the input buffer, disable rx
-.label upper_flow_control_threshold = 120
+// .label upper_flow_control_threshold = 120
 
 // when there are less than this many bytes in the input buffer, enable rx
-.label lower_flow_control_threshold = 100
+// .label lower_flow_control_threshold = 100
 
 first:
 
@@ -307,17 +307,17 @@ rsint1:
 
 // check remaining space in buffer
 
-		tya
-		sec
-		sbc ridbs
-		and #127
-		cmp #120
-		bcc rsint2
+//		tya
+//		sec
+//		sbc ridbs
+//		and #127
+//		cmp #120
+//		bcc rsint2
 
 // unassert RTS to prevent more bytes from being received
 
-		lda #comrts0
-		sta command
+//		lda #comrts0
+//		sta command
 
 // ** check transmit
 
@@ -559,12 +559,12 @@ inpdisp:
 		sta sdisp+10
 
 ret1:
-		lda ridbe
-		sec
-		sbc ridbs
-		and #127
-		cmp #100
-		bcs ret1
+//		lda ridbe
+//		sec
+//		sbc ridbs
+//		and #127
+//		cmp #100
+//		bcs ret1
 		lda shcomm
 		sta command
 // TODO is this needed?
