@@ -796,6 +796,9 @@ savebuf1:
 savebuf2:
 		jmp clrchn
 
+buffer_index:
+		.byte 0
+
 recvbuf:
 		ldy #0
 		sty checksum
@@ -807,12 +810,16 @@ recvbuf:
 		sta $b1
 		lda #1
 		sta bufnum
+		lda #0
+		sta buffer_index
 recvbuf1:
 		jsr waitch02
 		bcs recvbuf3
 		jsr calcsum
+		ldy buffer_index
 		sta ($b0),y
 		iny
+		sty buffer_index
 		cpy #128
 		bcc recvbuf1
 		ldy #0
