@@ -58,6 +58,13 @@ oldchr:
 oldget:
 		.byte $2a
 		.word ngetin
+oldload:
+		.byte $30
+		.word nload
+oldsave:
+		.byte $32
+		.word nsave
+
 		.byte 0
 
 setup:
@@ -467,5 +474,15 @@ nchrin:
 		jsr disab
 		jsr oldchr
 		jmp inabl
+
+nload:
+		jsr disabl
+		jsr oldload
+		jmp inable
+
+nsave:
+		jsr disabl
+		jsr oldsave
+		jmp inable
 
 last:
