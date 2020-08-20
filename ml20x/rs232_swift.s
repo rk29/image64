@@ -18,10 +18,10 @@
 
 .label io1=$de00
 .label io2=$df00
-.label port = io1
-.label status = port + 1
-.label command = port + 2
-.label control = port + 3
+.label m6551_port = io1
+.label m6551_status = m6551_port + 1
+.label m6551_command = m6551_port + 2
+.label m6551_control = m6551_port + 3
 
 // command port values
 
@@ -152,7 +152,7 @@ setup:
 // drop DTR initially
 
 		lda #comint_none
-		sta command
+		sta m6551_command
 
 		ldx #0
 		lda #3
@@ -190,7 +190,7 @@ setup3:
 // do a "soft" reset of the chip
 
 		lda #0
-		sta status
+		sta m6551_status
 
 // set initial command register settings to "rx int enabled, tx int disabled"
 
@@ -219,13 +219,13 @@ setcarr:
 		beq setcarr_dcd
 
 setcarr_dsr:
-		lda status
+		lda m6551_status
 		and #m6551_stat_dsr
 		beq setcarr1
 		bne setcarr0
 
 setcarr_dcd:
-		lda status
+		lda m6551_status
 		and #m6551_stat_dcd
 		beq setcarr1
 		bne setcarr0
@@ -252,7 +252,7 @@ nmi64:
 		pha
 		cld
 
-		lda status
+		lda m6551_status
 		and #m6551_stat_int
 		beq notacia
 
@@ -261,7 +261,7 @@ nmi64:
 // then the new interrupt can interrupt this handler
 
 		lda #comint_none
-		sta command
+		sta m6551_command
 
 // handle interrupt sources
 
@@ -270,7 +270,7 @@ nmi64:
 // enable interrupts
 
 		lda shcomm
-		sta command
+		sta m6551_command
 
 		pla
 		tay
@@ -290,13 +290,13 @@ notacia:
 rsint:
 		jsr setcarr
 
-		lda status
+		lda m6551_status
 		and #m6551_stat_rdr_full
 		beq rsint2
 
 // a byte is available
 
-		lda port
+		lda m6551_port
 		ldy ridbe
 		sta ribuf,y
 		iny
@@ -317,7 +317,7 @@ rsint1:
 // unassert RTS to prevent more bytes from being received
 
 //		lda #comrts0
-//		sta command
+//		sta m6551_command
 
 // ** check transmit
 
@@ -325,7 +325,7 @@ rsint2:
 
 // if the transmit register is not empty, then we're done
 
-		lda status
+		lda m6551_status
 		and #m6551_stat_tdr_empty
 		beq rsint_done
 
@@ -338,7 +338,7 @@ rsint2:
 
 		ldy rodbs
 		lda robuf,y
-		sta port
+		sta m6551_port
 		iny
 		bpl rsint3
 
@@ -366,7 +366,7 @@ disabl:
 		php
 		pha
 		lda #comint_none
-		sta command
+		sta m6551_command
 		pla
 		plp
 		rts
@@ -377,7 +377,7 @@ inable:
 		php
 		pha
 		lda shcomm
-		sta command
+		sta m6551_command
 		pla
 		plp
 		rts
@@ -404,17 +404,17 @@ rsout_entry:
 		jsr setcarr
 
 rsout_block:
-		lda status
+		lda m6551_status
 		and #m6551_stat_tdr_empty
 		beq rsout_block
 
 		lda $9e
-		sta port
+		sta m6551_port
 
 // disable interrupts
 
 //		lda #comint_none
-//		sta command
+//		sta m6551_command
 
 rsout1:
 
@@ -461,7 +461,7 @@ rsout4:
 // restore command register, enabling interrupts
 
 //		lda shcomm
-//		sta command
+//		sta m6551_command
 
 // exit and restore registers
 
@@ -566,7 +566,7 @@ ret1:
 //		cmp #100
 //		bcs ret1
 		lda shcomm
-		sta command
+		sta m6551_command
 // TODO is this needed?
 		clc
 ret2:
@@ -589,13 +589,13 @@ setbaud:
 setbaud1:
 		lda #comdtr0
 setbaud2:
-		sta command
+		sta m6551_command
 		rts
 setbaud3:
 		and #7
 		tay
 		lda bauds,y
-		sta control
+		sta m6551_control
 		rts
 
 //nchrout:
