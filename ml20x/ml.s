@@ -136,14 +136,6 @@ swapagn0:
 		lda #$d3 // reverse capital "S"
 		sta tdisp+31
 
-// "temporary" debugging display
-// TODO move to after the loads below to avoid extra code
-
-		lda swappg1_load+1
-		sta tdisp+32
-		lda swappg2_load+1
-		sta tdisp+33
-
 		jsr rsdisab
 		sei
 		lda r6510
@@ -181,8 +173,6 @@ swapr1:
 		jsr rsinabl
 		lda #$a0 // reverse space
 		sta tdisp+31
-		sta tdisp+32
-		sta tdisp+33
 		rts
 
 getversn:
