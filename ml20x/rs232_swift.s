@@ -263,6 +263,7 @@ nmi64:
 
 // handle interrupt sources
 
+		jsr setcarr
 		jsr rsint
 
 // enable interrupts
@@ -286,8 +287,6 @@ notacia:
 // expected to only use A and Y
 
 rsint:
-		jsr setcarr
-
 		lda m6551_status
 		and #m6551_stat_rdr_full
 		beq rsint2
