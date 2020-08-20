@@ -289,7 +289,7 @@ notacia:
 rsint:
 		lda m6551_status
 		and #m6551_stat_rdr_full
-		beq rsint2
+		beq rsint_done
 
 // a byte is available
 
@@ -301,58 +301,6 @@ rsint:
 		ldy #0
 rsint1:
 		sty ridbe
-
-// check remaining space in buffer
-
-//		tya
-//		sec
-//		sbc ridbs
-//		and #127
-//		cmp #120
-//		bcc rsint2
-
-// unassert RTS to prevent more bytes from being received
-
-//		lda #comrts0
-//		sta m6551_command
-
-// ** check transmit
-
-rsint2:
-
-// if the transmit register is not empty, then we're done
-
-		lda m6551_status
-		and #m6551_stat_tdr_empty
-		beq rsint_done
-
-// if RTS is asserted, then transmit interrupts will be disabled too
-// so we just skip output for that case
-
-		lda shcomm
-		cmp #comint_rxtx
-		bne rsint_done
-
-		ldy rodbs
-		lda robuf,y
-		sta m6551_port
-		iny
-		bpl rsint3
-
-// wrap at $7F
-
-		ldy #0
-rsint3:
-		sty rodbs
-		cpy rodbe
-		bne rsint_done
-
-rsint_disable_tx:
-
-// no bytes remaining in output buffer, so we disable tx interrupts
-
-		lda #comint_rx
-		sta shcomm
 
 rsint_done:
 		rts
