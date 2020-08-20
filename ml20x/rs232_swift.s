@@ -222,19 +222,17 @@ setcarr_dsr:
 		lda m6551_status
 		and #m6551_stat_dsr
 		beq setcarr1
-		bne setcarr0
-
-setcarr_dcd:
-		lda m6551_status
-		and #m6551_stat_dcd
-		beq setcarr1
-		bne setcarr0
 
 // no carrier
 setcarr0:
 		lda #imagecd0
 		sta carrier
 		rts
+
+setcarr_dcd:
+		lda m6551_status
+		and #m6551_stat_dcd
+		bne setcarr0
 
 // carrier present
 setcarr1:
