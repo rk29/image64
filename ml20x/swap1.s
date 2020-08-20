@@ -286,7 +286,7 @@ ctrlt:
 ctrlt2:
 		jmp in1
 ctrlt1:
-		ldx editor
+		lda editor
 		and #editor_backspace_on_column_one
 		beq ctrlt2
 
