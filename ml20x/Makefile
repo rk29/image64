@@ -13,8 +13,10 @@ all : $(TARGETS)
 %.prg : %.s equat.s
 	$(ASM) $<
 
-stamp.s: *.s
-	-date -u '+.var version_string = "%Y-%m-%dT%H:%M:%SZ"' > stamp.s
+stamp.s: FORCE
+	-echo '.var version_string ="'`git log -1 --format='%H' | cut -c 1-16`'"' > stamp.s
+
+FORCE:
 
 ml.prg: wedge.s editor.s gc.s ecs.s struct.s swap1.s swap2.s swap3.s jmptb.s strio.s
 ml.prg: mcicm.s chrio.s dskio.s irqhn.s setup.s varbl.s miscl.s shdlr.s modem.s
