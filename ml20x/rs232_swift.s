@@ -297,10 +297,23 @@ rsint:
 		ldy ridbe
 		sta ribuf,y
 		iny
-		bpl rsint1
-		ldy #0
-rsint1:
-		sty ridbe
+		tya
+		and #127
+		sta ridbe
+
+// Check if the buffer is close to full
+
+		sec
+		sbc ridbs
+		and #127
+		cmp #120
+		bcc rsint_done
+
+rsint_stop_flow:
+		lda #comrts0
+		sta shcomm
+		lda #$c6 // reverse capital F
+		sta tdisp + 32
 
 rsint_done:
 		rts
@@ -310,6 +323,8 @@ rsint_done:
 disabl:
 		php
 		pha
+		lda #$c9 // reverse capital I
+		sta tdisp + 33
 		lda #comint_none
 		sta m6551_command
 		pla
@@ -321,23 +336,15 @@ disabl:
 inable:
 		php
 		pha
+		lda #$a0 // reverse space
+		sta tdisp + 33
 		lda shcomm
 		sta m6551_command
 		pla
 		plp
 		rts
 
-// ** rs232 bsout
-
-rsout0:
-
-// try to send/receive on the port
-
-		jsr rsint
-
-// then try to put the byte in the buffer again
-
-		jmp rsout1
+// rs232 bsout
 
 rsout_entry:
 
@@ -356,42 +363,17 @@ rsout_block:
 		lda $9e
 		sta m6551_port
 
-// disable interrupts
-
-//		lda #comint_none
-//		sta m6551_command
-
 rsout1:
-
-// write the byte to the buffer
-
-//		lda $9e
-//		ldy rodbe
-//		sta robuf,y
-//		iny
-//		bpl rsout2
-//		ldy #0
-//rsout2:
-
-// if the buffer is full, try to push bytes to the port
-
-//		cpy rodbs
-//		beq rsout0
-
-//		sty rodbe
-
-// enable rx and tx interrupts
-
-//		lda #comint_rxtx
-//		sta shcomm
 
 // update on-screen buffers
 
 		ldy scnmode
 		bne rsout4
+
 		lda flag_dsr_addr
 		and #flag_dsr_r_mask
 		beq rsout4
+
 		ldy #0
 outdisp:
 		lda sdisp+30,y
@@ -403,14 +385,9 @@ outdisp:
 		sta sdisp+38
 rsout4:
 
-// restore command register, enabling interrupts
-
-//		lda shcomm
-//		sta m6551_command
-
 // exit and restore registers
 
-		jmp ret1
+		jmp rsget_done
 
 xtmp:
 		.byte 0
@@ -476,23 +453,25 @@ rsget_entry:
 
 		ldy ridbs
 		cpy ridbe
-		beq ret2
+		beq rsget_done
 
 		lda ribuf,y
 		sta $9e
 		iny
-		bpl rsget1
+		bpl rsget_no_wrap
 		ldy #0
-rsget1:
+rsget_no_wrap:
 		sty ridbs
 
 // update on screen buffers
 
 		ldy scnmode
-		bne ret1
+		bne rsget_skip_screen
+
 		lda flag_dsr_addr
 		and #flag_dsr_r_mask
-		beq ret1
+		beq rsget_skip_screen
+
 		ldy #0
 inpdisp:
 		lda sdisp+2,y
@@ -503,18 +482,25 @@ inpdisp:
 		lda $9e
 		sta sdisp+10
 
-ret1:
-//		lda ridbe
-//		sec
-//		sbc ridbs
-//		and #127
-//		cmp #100
-//		bcs ret1
-		lda shcomm
+rsget_skip_screen:
+		lda ridbe
+		sec
+		sbc ridbs
+		and #127
+		cmp #100
+		bcs rsget_done
+
+rsget_enable_rx_int:
+		lda #comint_rx
+		sta shcomm
 		sta m6551_command
+		lda #$a0 // reverse space
+		sta tdisp + 32
+
 // TODO is this needed?
 		clc
-ret2:
+
+rsget_done:
 		ldy $97
 		lda $9e
 		rts
@@ -570,12 +556,28 @@ nchrin:
 
 nload:
 		jsr disabl
+		pha
+		lda #$cc // reverse uppercase L
+		sta tdisp + 30
+		pla
 		jsr oldload
+		pha
+		lda #$a0 // reverse space
+		sta tdisp + 30
+		pla
 		jmp inable
 
 nsave:
 		jsr disabl
+		pha
+		lda #$cc // reverse uppercase L
+		sta tdisp + 30
+		pla
 		jsr oldsave
+		pha
+		lda #$a0 // reverse space
+		sta tdisp + 30
+		pla
 		jmp inable
 
 last:
