@@ -818,6 +818,9 @@ recvbuf1:
 		jsr calcsum
 		ldy buffer_index
 		sta ($b0),y
+// temporary - show buffer data on screen
+		sta pbuf1,y
+
 		iny
 		sty buffer_index
 		cpy #128
