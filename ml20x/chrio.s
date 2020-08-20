@@ -26,7 +26,7 @@ output:
 		ldx #$a0
 		lda $fe
 		beq output1a
-		cmp #cursor_home
+		cmp #cursor_home // control-s for flow control
 		beq output2
 output0:
 		ldx #$a0
