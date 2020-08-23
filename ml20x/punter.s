@@ -596,8 +596,8 @@ rechand:
 		sta delay
 
 rch1:
-		lda #$02
-		sta $62
+		lda #2
+		sta rechand_retry_counter
 
 		ldx gbsave
 		jsr sendcode
