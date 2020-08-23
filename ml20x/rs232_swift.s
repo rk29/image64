@@ -72,10 +72,15 @@
 .label imagecd1 = %00010000 //carrier
 
 // when there are this many or more bytes in the input buffer, disable rx
-// .label upper_flow_control_threshold = 120
+.label upper_flow_control_threshold = 120
 
 // when there are less than this many bytes in the input buffer, enable rx
-// .label lower_flow_control_threshold = 100
+.label lower_flow_control_threshold = 100
+
+.label overrun_indicator = tdisp + 29
+.label loading_indicator = tdisp + 30
+.label flow_control_indicator = tdisp + 32
+.label interrupt_disabled_indicator = tdisp + 33
 
 first:
 
@@ -108,6 +113,9 @@ bauds:
 
 shcomm:
 		.byte comint_rx
+
+status_shadow:
+		.byte 0
 
 vectbl:
 
@@ -219,7 +227,7 @@ setcarr:
 		beq setcarr_dcd
 
 setcarr_dsr:
-		lda m6551_status
+		lda status_shadow
 		and #m6551_stat_dsr
 		beq setcarr1
 
@@ -230,7 +238,7 @@ setcarr0:
 		rts
 
 setcarr_dcd:
-		lda m6551_status
+		lda status_shadow
 		and #m6551_stat_dcd
 		bne setcarr0
 
@@ -250,10 +258,6 @@ nmi64:
 		pha
 		cld
 
-		lda m6551_status
-		and #m6551_stat_int
-		beq notacia
-
 // disable further interrupts
 // if we clear an interrupt source then another happens,
 // then the new interrupt can interrupt this handler
@@ -261,10 +265,15 @@ nmi64:
 		lda #comint_none
 		sta m6551_command
 
+		lda m6551_status
+		sta status_shadow
+		and #m6551_stat_int
+		beq notacia
+
 // handle interrupt sources
 
 		jsr setcarr
-		jsr rsint
+		jsr rxint
 
 // enable interrupts
 
@@ -286,10 +295,10 @@ notacia:
 // check for character
 // expected to only use A and Y
 
-rsint:
-		lda m6551_status
+rxint:
+		lda status_shadow
 		and #m6551_stat_rdr_full
-		beq rsint_done
+		beq rxint_no_receive
 
 // a byte is available
 
@@ -299,23 +308,37 @@ rsint:
 		iny
 		tya
 		and #127
+		cmp #ridbs
+		beq rxint_buffer_overrun
 		sta ridbe
+		jmp rxint_no_receive
+
+rxint_buffer_overrun:
+
+		lda #comrts0
+		sta shcomm
+		lda #$cf // reverse uppercase O
+		sta overrun_indicator
+
+		rts
+
+rxint_no_receive:
 
 // Check if the buffer is close to full
-
+		lda ridbe
 		sec
 		sbc ridbs
 		and #127
-		cmp #120
-		bcc rsint_done
+		cmp #upper_flow_control_threshold
+		bcc rxint_done
 
 rsint_stop_flow:
 		lda #comrts0
 		sta shcomm
 		lda #$c6 // reverse capital F
-		sta tdisp + 32
+		sta flow_control_indicator
 
-rsint_done:
+rxint_done:
 		rts
 
 // disable interrupts
@@ -324,7 +347,7 @@ disabl:
 		php
 		pha
 		lda #$c9 // reverse capital I
-		sta tdisp + 33
+		sta interrupt_disabled_indicator
 		lda #comint_none
 		sta m6551_command
 		pla
@@ -337,7 +360,7 @@ inable:
 		php
 		pha
 		lda #$a0 // reverse space
-		sta tdisp + 33
+		sta interrupt_disabled_indicator
 		lda shcomm
 		sta m6551_command
 		pla
@@ -353,26 +376,14 @@ rsout_entry:
 		sta $9e
 		sty $97
 
-		jsr setcarr
-
-rsout_block:
-		lda m6551_status
-		and #m6551_stat_tdr_empty
-		beq rsout_block
-
-		lda $9e
-		sta m6551_port
-
-rsout1:
-
 // update on-screen buffers
 
 		ldy scnmode
-		bne rsout4
+		bne rsout_skip_screen
 
 		lda flag_dsr_addr
 		and #flag_dsr_r_mask
-		beq rsout4
+		beq rsout_skip_screen
 
 		ldy #0
 outdisp:
@@ -383,7 +394,27 @@ outdisp:
 		bcc outdisp
 		lda $9e
 		sta sdisp+38
-rsout4:
+
+rsout_skip_screen:
+		lda #comint_none
+		sta m6551_command
+
+rsout_blocking:
+		lda m6551_status
+		sta status_shadow
+
+		jsr setcarr
+		jsr rxint
+
+		lda status_shadow
+		and #m6551_stat_tdr_empty
+		beq rsout_blocking
+
+		lda $9e
+		sta m6551_port
+
+		lda shcomm
+		sta m6551_command
 
 // exit and restore registers
 
@@ -447,13 +478,11 @@ rsget_entry:
 		sta $9e
 		sty $97
 
-		jsr setcarr
-
 // if buffer is empty, then we're done
 
 		ldy ridbs
 		cpy ridbe
-		beq rsget_done
+		beq rsget_no_char
 
 		lda ribuf,y
 		sta $9e
@@ -487,20 +516,25 @@ rsget_skip_screen:
 		sec
 		sbc ridbs
 		and #127
-		cmp #100
-		bcs rsget_done
+		cmp #lower_flow_control_threshold
+		bcs rsget_got_char
 
 rsget_enable_rx_int:
 		lda #comint_rx
 		sta shcomm
 		sta m6551_command
 		lda #$a0 // reverse space
-		sta tdisp + 32
+		sta flow_control_indicator
 
-// TODO is this needed?
+rsget_got_char:
 		clc
+		jmp rsget_done
+
+rsget_no_char:
+		sec
 
 rsget_done:
+
 		ldy $97
 		lda $9e
 		rts
@@ -558,12 +592,12 @@ nload:
 		jsr disabl
 		pha
 		lda #$cc // reverse uppercase L
-		sta tdisp + 30
+		sta loading_indicator
 		pla
 		jsr oldload
 		pha
 		lda #$a0 // reverse space
-		sta tdisp + 30
+		sta loading_indicator
 		pla
 		jmp inable
 
@@ -571,12 +605,12 @@ nsave:
 		jsr disabl
 		pha
 		lda #$cc // reverse uppercase L
-		sta tdisp + 30
+		sta loading_indicator
 		pla
 		jsr oldsave
 		pha
 		lda #$a0 // reverse space
-		sta tdisp + 30
+		sta loading_indicator
 		pla
 		jmp inable
 
