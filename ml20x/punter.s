@@ -1,6 +1,6 @@
-.var version = "9107098721"
-
 .encoding "petscii_mixed"
+
+.var version = "9107098721"
 
 #import "equat.s"
 
@@ -43,15 +43,51 @@
 .label mjz = 8
 .label okm = 9
 
-.label gcount = 11
-.label bcount = 23
-.label ncount = 38
-.label tcount = 16
-
-.label pbuf0= $658
 .label pbuf1= $400
 .label pbuf2= $500
+
+// start of the screen line with transfer time
 .label pbuf3= $630
+
+// index of the transfer time display
+.label tcount = 16
+
+.label codebuf = pbuf3 + 26
+
+.label display_state = pbuf3 + 30
+
+// start of the screen line with the good/bad counts
+.label pbuf0= $658
+
+// index of the good count display
+.label gcount = 11
+
+// index of the bad count display
+.label bcount = 23
+
+// index of the byte count display
+.label ncount = 38
+
+
+.label recmodem_st_got_buffer = $01
+.label recmodem_st_timed_out =  $02
+
+// Spec says 5 seconds, but we're only using one byte,
+// so 4 seconds is the best whole number we can do
+
+.label recmodem_timeout_jiffies = 240
+
+// offsets into the block header
+
+.label header_checksum_lsb = 0
+.label header_checksum_msb = 1
+.label header_clc_lsb = 2
+.label header_clc_msb = 3
+.label header_size_of_next_block = 4
+.label header_block_number_lsb = 5
+.label header_block_number_msb = 6
+
+.label header_size = 7
 
 // start - jump table
 ml:
@@ -75,15 +111,16 @@ defflag:
 		.byte 0
 flagbyte:
 		.byte 0
+
+.label flag_relaxed =  %00000001 // use relaxed timing
+.label flag_filetype = %00000010 // accept/send file type for single file transfers
+
 versiond:
 		.text version
 
-//code accept
+// code accept timing
 t1:
-		.byte 36,144
-//receive timing
-t2:
-		.byte 30,120
+		.byte 36, 144
 
 protonum:
 		lda #0
@@ -258,13 +295,13 @@ exit0:
 
 		lda $28d
 		cmp #2
-		beq ext1
+		beq exit_cleanup
 
 // if carrier is lost, abort the transfer
 
 		lda flag_dcd_addr
 		and #flag_dcd_r_mask
-		beq ext1
+		beq exit_cleanup
 
 		rts
 
@@ -274,7 +311,7 @@ exit:
 
 		lda $28d
 		cmp #2
-		beq ext1
+		beq exit_cleanup
 
 // if carrier is lost, abort the transfer
 
@@ -284,7 +321,7 @@ exit:
 
 // exit and abort the transfer
 
-ext1:
+exit_cleanup:
 		ldx stack
 		txs
 		ldx #xxx
@@ -348,6 +385,7 @@ xfer1:
 		sta r6510
 		lda #0
 		sta $65
+		// TODO get a label for this
 		jsr $bc4f
 		pla
 		sta r6510
@@ -358,77 +396,113 @@ xfer1:
 		ldx #var_rc_float
 		jmp putvar
 
-// check for code
+// wait for code received
+
 accept:
 		sta bitpat
 		lda #$00
 		sta codebuf
 		sta codebuf+1
 		sta codebuf+2
+
 acc1:
+
+// clear timer for timeout check
+
 		lda #$00
 		sta jiffy
-acc2:
+
+accept_loop:
 		jsr getnumx
-		bcs acc6
+		bcs accept_no_char
 acc3:
+
+// shift code buffer
+
 		ldx codebuf+1
 		stx codebuf
 		ldx codebuf+2
 		stx codebuf+1
 		sta codebuf+2
+
 		jsr chkcod
 		beq acc1
-		clc
+
+// calculate mask from code number
+
 		lda #1
 acc4:
-		rol
+		asl
 		dex
 		bne acc4
+
 		and bitpat
-		beq acc2
+		beq accept_loop
+
+// expected code received
+
+// if relaxed, don't worry about extra characters
+
 		lda flagbyte
-		and #1
+		and #flag_relaxed
 		bne acc5
+
+// if there is an extra character, start over
 		jsr getnumx
 		bcc acc3
 acc5:
 		lda #0
 		sta $96
 		rts
-acc6:
+
+accept_no_char:
+
+// check for timeout
+
+		ldx #0
 		lda flagbyte
-		and #1
-		tax
+		and #flag_relaxed
+		beq accept_not_relaxed
+		ldx #1
+accept_not_relaxed:
 		lda jiffy
 		cmp t1,x
-		bcc acc2
+		bcc accept_loop
+
+accept_timed_out:
 		lda #1
 		sta $96
 		rts
 
+// check of codebuf contains a code
+// return with code in .A and bitcnt
+// returns 255 if no match found
+
 chkcod:
 		ldx #syn
-chc1:
+chkcod_loop:
 		lda codebuf
 		cmp char1,x
-		bne chc2
+		bne chkcod_not_matched
 		lda codebuf+1
 		cmp char2,x
-		bne chc2
+		bne chkcod_not_matched
 		lda codebuf+2
 		cmp char3,x
-		beq chc3
-chc2:
+		beq chkcod_matched
+
+chkcod_not_matched:
 		dex
-		bpl chc1
-chc3:
+		bpl chkcod_loop
+
+chkcod_matched:
 		stx bitcnt
 		txa
 		cmp #xxx
-		bne chc4
-		jmp ext1
-chc4:
+		bne chkcode_not_xxx
+// abort if xxx code received
+		jmp exit_cleanup
+chkcode_not_xxx:
 		cmp #255
 		rts
 
@@ -476,14 +550,19 @@ chrdly1:
 getnum0:
 		jsr exit0
 		jmp getnum1
+
+// get a character from the modem
+// if a character is available, returns with character in .A, carry clear, and status (st) zero
+// if no character is available, returns 0 in .A, carry set, and status (st) 2
+
 getnumx:
 		jsr exit
 getnum1:
 		jsr displclk
 		lda #0
 		sta $0200
-		lda 667
-		cmp 668
+		lda ridbe
+		cmp ridbs
 		beq get1
 		tya
 		pha
@@ -507,39 +586,56 @@ get2:
 		lda $0200
 		rts
 
+rechand_retry_counter:
+		.byte 0
+
 rechand:
 		sta gbsave
+
 		lda #$00
 		sta delay
+
 rch1:
 		lda #$02
 		sta $62
+
 		ldx gbsave
 		jsr sendcode
+
 rch2:
+
+// wait for ack
+
 		lda #1<<ack
 		jsr accept
 		beq rch3
-		dec $62
+
+// ack not received
+		dec rechand_retry_counter
 		bne rch2
+
 		jmp rch1
+
 rch3:
 		ldx #snb
 		jsr sendcode
+
 		lda endflag
 		beq rch4
+
 		lda gbsave
 		cmp #goo
 		beq rch6
 rch4:
-		lda pbuf1+4
+		lda pbuf1 + header_size_of_next_block
 		sta bufcount
 		sta recsize
 		jsr recmodem
+
 		lda $96
-		cmp #$01
+		cmp #recmodem_st_got_buffer
 		beq rch5
-		cmp #$02
+		cmp #recmodem_st_timed_out
 		beq rch3
 		cmp #$04
 		beq rch5
@@ -551,14 +647,17 @@ rch6:
 		lda #1<<syn
 		jsr accept
 		bne rch3
+
 		lda #$0a
 		sta bufcount
 rch7:
 		ldx #syn
 		jsr sendcode
+
 		lda #1<<snb
 		jsr accept
 		beq rch8
+
 		dec bufcount
 		bne rch7
 rch8:
@@ -659,62 +758,71 @@ trhb:
 		lda #1
 		rts
 
+recmodem_index:
+		.byte 0
+
 recmodem:
-		ldy #$00
+		lda #0
+		sta recmodem_index
+
 rcm1:
 		lda #$00
 		sta jiffy
-		sta toflag
 rcm2:
 		jsr getnumx
+
 		lda $96
-		bne rcm5
+		bne recmodem_no_byte_received
+
+		ldy recmodem_index
 		lda $0200
 		sta pbuf1,y
-		cpy #$03
-		bcs rcm3
+
+		cpy #3
+		bcs recmodem_not_ack_in_buffer
+
 		sta codebuf,y
-		cpy #$02
-		bne rcm3
+		cpy #2
+		bne recmodem_not_ack_in_buffer
+
 		lda codebuf
 		cmp #'a'
-		bne rcm3
+		bne recmodem_not_ack_in_buffer
 		lda codebuf+1
 		cmp #'c'
-		bne rcm3
+		bne recmodem_not_ack_in_buffer
 		lda codebuf+2
 		cmp #'k'
-		beq rcm4
-rcm3:
+		beq recmodem_ack_in_buffer
+
+recmodem_not_ack_in_buffer:
 		iny
+		sty recmodem_index
 		cpy bufcount
 		bne rcm1
-		lda #$01
+
+// got all of our bytes
+
+		lda #recmodem_st_got_buffer
 		sta $96
 		rts
-rcm4:
-		lda #1
-		sta toflag
-		jmp rcm2
-rcm5:
-		lda toflag
-		beq rcm8
-		lda flagbyte
-		and #1
-		tax
+
+// we got an "ack" in the buffer
+// treat that like a timeout
+
+recmodem_ack_in_buffer:
+
+		lda #recmodem_st_timed_out
+		sta $96
+		rts
+
+recmodem_no_byte_received:
+
 		lda jiffy
-		cmp t2,x
+		cmp #recmodem_timeout_jiffies
 		bcc rcm2
-		lda #$02
-		sta $96
-		cpy #$00
-		beq rcm7
-		lda #$04
-		sta $96
-rcm7:
-		jmp dodelay
-rcm8:
-		lda #$08
+
+		lda #recmodem_st_timed_out
 		sta $96
 		rts
 
@@ -869,11 +977,11 @@ recieve:
 		sta blocknum+1
 		sta endflag
 		sta bufpnt
-		sta pbuf1+5
-		sta pbuf1+6
+		sta pbuf1 + header_block_number_lsb
+		sta pbuf1 + header_block_number_msb
 		sta skpdelay
-		lda #7
-		sta pbuf1+4
+		lda #header_size
+		sta pbuf1 + header_size_of_next_block
 		lda #goo
 rec1:
 		jsr rechand
@@ -882,9 +990,13 @@ rec1:
 		jsr match
 		bne rec5
 		jsr clrchn
+
+// first block
+
 		lda bufcount
-		cmp #$07
+		cmp #header_size
 		beq rec3
+
 		ldx #dfile
 		jsr chkout
 		ldy #$07
@@ -897,7 +1009,7 @@ rec2:
 		bne rec2
 		jsr clrchn
 rec3:
-		lda pbuf1+6
+		lda pbuf1 + header_block_number_msb
 		cmp #$ff
 		bne rec4
 		lda #$01
@@ -907,14 +1019,14 @@ rec4:
 		jsr goodblok
 rec4a:
 		jsr reset
-		lda #1
+		lda #goo
 		jmp rec1
 rec5:
 		jsr clrchn
 		jsr badblok
 		lda recsize
 		sta pbuf1+4
-		lda #2
+		lda #bad
 		jmp rec1
 
 match:
@@ -950,7 +1062,7 @@ mch1:
 
 rectype:
 		lda defflag
-		and #2
+		and #flag_filetype
 		beq rct0
 		rts
 rct0:
@@ -1143,12 +1255,6 @@ dontdash:
 		.byte $00
 specmode:
 		.byte $00
-codebuf:
-		.text "   "
-numx:
-		.byte 0
-toflag:
-		.byte 0
 
 getln:
 		lda #35
