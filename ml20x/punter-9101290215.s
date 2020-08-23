@@ -3,6 +3,7 @@
 .var version = "9101290215"
 
 #import "equat.s"
+
 * = protostart "punter-9101290215.prg"
 
 // modem file number
@@ -255,13 +256,13 @@ exit0:
 
 		lda $28d
 		cmp #2
-		beq ext1
+		beq exit_cleanup
 
 // if carrier is lost, abort the transfer
 
 		lda flag_dcd_addr
 		and #flag_dcd_r_mask
-		beq ext1
+		beq exit_cleanup
 
 		rts
 
@@ -271,7 +272,7 @@ exit:
 
 		lda $28d
 		cmp #2
-		beq ext1
+		beq exit_cleanup
 
 // if carrier is lost, abort the transfer
 
@@ -279,7 +280,9 @@ exit:
 		and #flag_dcd_r_mask
 		bne ext2
 
-ext1:
+// exit and abort the transfer
+
+exit_cleanup:
 		ldx stack
 		txs
 		ldx #xxx
@@ -430,7 +433,7 @@ chc3:
 		txa
 		cmp #xxx
 		bne chc4
-		jmp ext1
+		jmp exit_cleanup
 chc4:
 		cmp #255
 		rts
