@@ -1224,7 +1224,6 @@ minhi:
 minlo:
 		.byte 0
 
-// TODO make this more efficient, it is using about 1% of total CPU
 // convert time of day into minute of the day
 // input:
 // Y - hour of the day in BCD format
@@ -1233,82 +1232,70 @@ minlo:
 // minhi/minlo - minute of the day? (0 to 1439)
 
 cminute:
-		txa
-		pha
 		lda #0
-		sta minlo
 		sta minhi
-		tya
+		lda bootdate+4
 		and #$7f
 		cmp #$12
-		bne cminute1
-
-// change "12" to "00"
-
-		tya
+		bne cmin1
+		lda #0
+cmin1:
+// A = hours in BCD ($00 to $11)
+		cmp #$10
+		bcc cmin2
 		sec
-		sbc #$12
-		tay
-cminute1:
-		tya
-		lsr
-		lsr
-		lsr
-		lsr
-		tax
-		tya
-		and #$0f
-		cpx #0
-		beq cminute3
-cminute2:
-		clc
-		adc #10
-		dex
-		bne cminute2
-cminute3:
-		cmp #80
-		bcc cminutex
-// adjust for the fact that the high bit indicates PM
-		sbc #(80-12)
-cminutex:
-		ldy #60
-		jsr cminute4
-		pla
-		pha
-		lsr
-		lsr
-		lsr
-		lsr
-		ldy #10
-		jsr cminute4
-		pla
-		and #$0f
-		ldy #1
-
-// [minlo/minhi] += Y * A
-
-cminute4:
-		tax
-		beq cminute7
-cminute5:
-		clc
-		tya
+		sbc #($10-10)
+cmin2:
+// A = hours in binary (0 to 11)
+		sta minlo
+		asl
+		adc minlo
+		asl
+		adc minlo
+		asl
 		adc minlo
 		sta minlo
-		bcc cminute6
+// (minlo/minhi) = hours * 15 (0 to 165)
+		lda bootdate+4
+		bpl cmin_not_pm
+cmin_is_pm:
+		lda #180
+		jsr cmin_sum
+cmin_not_pm:
+// (minlo/minhi) = hours_am_pm * 15 (0 to 345)
+		asl minlo
+		rol minhi
+		asl minlo
+		rol minhi
+// (minlo/minhi) = hours * 60 (0 to 1380)
+		lda bootdate+5
+		and #$70
+		sta cmin_not_pm1+1
+		lsr
+		lsr
+		clc
+cmin_not_pm1:
+// target of self modifying code
+		adc #0
+		lsr
+		jsr cmin_sum
+		lda bootdate+5
+		and #$0f
+// intentional fall-through
+
+cmin_sum:
+		clc
+		adc minlo
+		sta minlo
+		bcc cmin_sum_no_carry
 		inc minhi
-cminute6:
-		dex
-		bne cminute5
-cminute7:
+cmin_sum_no_carry:
 		rts
 
 alarm:
 
 // calculate minute of the day
 
-		ldx bootdate+5
-		ldy bootdate+4
 		jsr cminute
 
 // assign to mn% variable
@@ -1398,3 +1385,5 @@ alarm9:
 		sta flag_net_addr
 		rts
 
+		ldx bootdate+5 // minute
+		ldy bootdate+4 // hours
