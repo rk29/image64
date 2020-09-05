@@ -493,16 +493,16 @@
 .label flag_cht_r_mask = %00000010 // 9 Disable modem input
 
 .label flag_new_addr = chktbl + 1
-.label flag_new_l_mask = %00000001 // 10 Disallow new users
-.label flag_new_r_mask = %00000010 // 11 Enable screen blanking
+.label flag_new_l_mask = %00000100 // 10 Disallow new users
+.label flag_new_r_mask = %00001000 // 11 Enable screen blanking
 
 .label flag_prt_addr = chktbl + 1
-.label flag_prt_l_mask = %00000001 // 12 Print spooling
-.label flag_prt_r_mask = %00000010 // 13 Print log entries
+.label flag_prt_l_mask = %00010000 // 12 Print spooling
+.label flag_prt_r_mask = %00100000 // 13 Print log entries
 
 .label flag_uxd_addr = chktbl + 1
-.label flag_uxd_l_mask = %00000001 // 14 Disable U/D section
-.label flag_uxd_r_mask = %00000010 // 15 300 baud U/D lockout
+.label flag_uxd_l_mask = %01000000 // 14 Disable U/D section
+.label flag_uxd_r_mask = %10000000 // 15 300 baud U/D lockout
 
 .label flag_asc_addr = chktbl + 2
 .label flag_asc_l_mask = %00000001 // 16 ASCII translation
