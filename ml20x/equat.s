@@ -322,7 +322,21 @@
 .label tblcta1= $1600 //$20
 .label tblcta2= $1620 //$20
 .label tblcta3= $1640 //$20
-.label alarmtb= $1660 //$80
+
+
+.label alarmtb= $1660 //$80 (16 entries, 8 bytes per entry)
+
+// struct alarmtb_entry {
+//     uint8 enableMode; (0=enable input is a checkmark, nonzero=enable input is a just a byte)
+//     uint8 enableInput; // 0=skip
+//     uint8 setOutputTimeMsb;
+//     uint8 setOutputTimeLsb;
+//     uint8 clearOutputTimeMsb;
+//     uint8 clearOutputTimeLsb;
+//     uint8 unused;
+//     uint8 outputCheckmark;
+// }
+
 .label date1 = $16e0 //$20
 .label lobytes =$1700 //25
 .label hibytes =$1719 //25

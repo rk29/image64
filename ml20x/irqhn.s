@@ -1217,10 +1217,20 @@ t3fk7a:
 		ldx #2
 		jmp t1init
 
+// code relies on the order of these two
+
 minhi:
 		.byte 0
 minlo:
 		.byte 0
+
+// TODO make this more efficient, it is using about 1% of total CPU
+// convert time of day into minute of the day
+// input:
+// Y - hour of the day in BCD format
+// X - minute of the hour in BCD format
+// output:
+// minhi/minlo - minute of the day? (0 to 1439)
 
 cminute:
 		txa
@@ -1232,6 +1242,9 @@ cminute:
 		and #$7f
 		cmp #$12
 		bne cminute1
+
+// change "12" to "00"
+
 		tya
 		sec
 		sbc #$12
@@ -1255,7 +1268,8 @@ cminute2:
 cminute3:
 		cmp #80
 		bcc cminutex
-		sbc #68
+// adjust for the fact that the high bit indicates PM
+		sbc #(80-12)
 cminutex:
 		ldy #60
 		jsr cminute4
@@ -1270,6 +1284,8 @@ cminutex:
 		pla
 		and #$0f
 		ldy #1
+
+// [minlo/minhi] += Y * A
 
 cminute4:
 		tax
@@ -1288,9 +1304,15 @@ cminute7:
 		rts
 
 alarm:
+
+// calculate minute of the day
+
 		ldx bootdate+5
 		ldy bootdate+4
 		jsr cminute
+
+// assign to mn% variable
+
 		ldx #var_mn_integer
 		jsr gvarptr
 		stx alarmy+1
@@ -1302,10 +1324,16 @@ alarmy:
 		sta minhi,y
 		dey
 		bpl alarmx
+
+//
+
 		lda #0
 alarm0:
 		sta alarm1+1
 alarm1:
+
+// target of self-modifying code
+
 		ldx #0
 		lda alarmtb,x
 		bne alarm2
@@ -1345,6 +1373,7 @@ alarm6:
 		clc
 		adc #8
 		bpl alarm0
+
 		lda flag_net_addr
 		and #flag_net_l_mask
 		beq alarm8
@@ -1364,8 +1393,8 @@ alarm10:
 alarm8:
 		rts
 alarm9:
-// TODO Can this be removed?
 		lda flag_net_addr
-		and #flag_net_r_mask
+		ora #flag_net_r_mask
+		sta flag_net_addr
 		rts
 
