@@ -1,0 +1,35 @@
+tagscan - purpose
+================
+
+tagscan is a generic object/inventory engine for the image64 BBS's
+BASIC scripts - exposed as the "&,16" command so slow BASIC code
+doesn't have to walk the tables itself.
+
+The model it implements (documented in the header of tagscan.s):
+
+- obj  - every object in the "world", tagged with a 16 bit flag word
+         (bits), a type id (type), and a location id (loc)
+- list - a working set of object references (a player's inventory, a
+         room's contents, etc.)
+- def  - combination rules: three piece types + a result type
+
+The four sub functions cover the typical game-loop operations:
+
+- makelist  builds a list from the world by location and flag
+            criteria ("what's in room 10 that isn't hidden")
+- haveobjt  asks "does the list contain an object of type T"
+            (has the player got a key?)
+- findobjd  reverse-looks-up which rule builds a given object
+- scanvirt  the payoff: repeatedly applies every satisfied rule -
+            three ingredients in the list are replaced by their
+            product - until the list reaches a fixed point (the
+            "virtual" scan, i.e. auto-crafting/closure over all
+            recipes)
+
+Concretely: it is the machinery for crafting/item-combination
+puzzles (or any tagged-object reduction) in the BBS's door games,
+with the 8 bit counts, big-endian fields, and entry-0 header
+conventions matching how BASIC integer arrays are laid out so
+scripts can build and inspect the tables directly.
+
+Usage examples are in tagscan.bas.
